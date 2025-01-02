@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+const { fontFamily } = require("tailwindcss/defaultTheme");
 
 export default {
   content: [
@@ -8,9 +9,16 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        spaceranger: ["SpaceRanger", ...fontFamily.sans],
+        satoshi: ["Satoshi", ...fontFamily.sans],
+      },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        primary: "#FE4600",
+        "text-color": "#3D3D3D",
+        "light-text-color": "#8F95B2",
+        "placeholder-text": "#6F6D66",
+        "alternate-black-text-color": "#B2B1AA"
       },
     },
   },

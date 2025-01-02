@@ -1,101 +1,285 @@
-import Image from "next/image";
+import { AppHeader, SideMenu } from "./components";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div>
+      <AppHeader />
+      <div className="flex items-start gap-16 pt-16">
+        <SideMenu />
+        <div className="w-full flex flex-col items-start gap-16 mt-3">
+          <div className="space-y-3 w-full">
+            <p className="font-spaceranger text-[28px] leading-[25px] text-primary">
+              Social services
+            </p>
+            <div className="flex items-stretch w-full gap-4 flex-wrap">
+              <div className="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.33%-11px)] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[18px] leading-[24px] font-[500]">
+                    BULL POST
+                  </p>
+                  <img src="/assets/bull-post-icon.svg" alt="bull-post" />
+                </div>
+                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
+                  Select an AI KOL your project.
+                  <br />
+                  The perfect Hype-man!
+                </p>
+                <div className="flex items-center justify-between w-full gap-2 mt-auto">
+                  <div>
+                    <img src="/assets/users-icon.svg" alt="users" />
+                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
+                      8,150 users
+                    </p>
+                  </div>
+                  <button className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      Select
+                    </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                    />
+                  </button>
+                </div>
+              </div>
+              <div className="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.33%-11px)] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[18px] leading-[24px] font-[500]">REPLY</p>
+                  <img src="/assets/reply-icon.svg" alt="reply" />
+                </div>
+                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
+                  Reply agents are great for interaction and possibly farm
+                  airdrops/whitelist spots!
+                </p>
+                <div className="flex items-center justify-between w-full gap-2 mt-auto">
+                  <div>
+                    <img src="/assets/users-icon.svg" alt="users" />
+                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
+                      4,200 users
+                    </p>
+                  </div>
+                  <button className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      Select
+                    </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                    />
+                  </button>
+                </div>
+              </div>
+              <div className="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.33%-11px)] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[18px] leading-[24px] font-[500]">
+                    CAMPAIGN
+                  </p>
+                  <img src="/assets/campaign-icon.svg" alt="campaign" />
+                </div>
+                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
+                  Agents will run a campaign on your behalf, ensuring attention
+                  and consistency
+                </p>
+                <div className="flex items-center justify-between w-full gap-2 mt-auto">
+                  <div>
+                    <img src="/assets/users-icon.svg" alt="users" />
+                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
+                      1,500 users
+                    </p>
+                  </div>
+                  <button className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      Select
+                    </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-3 w-full">
+            <p className="font-spaceranger text-[28px] leading-[25px] text-primary">
+              DeFi services
+            </p>
+            <div className="flex items-stretch w-full gap-4 flex-wrap">
+              <div className="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.33%-11px)] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[18px] leading-[24px] font-[500]">SWAP</p>
+                  <img src="/assets/swap-icon.svg" alt="swap" />
+                </div>
+                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
+                  Agent conducts a swap on your behalf using an optimal route
+                  with less fees
+                </p>
+                <div className="flex items-center justify-between w-full gap-2 mt-auto">
+                  <div>
+                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
+                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
+                      Jan, 2025
+                    </p>
+                  </div>
+                  <button
+                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    disabled
+                  >
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      Coming Soon
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div className="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.33%-11px)] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[18px] leading-[24px] font-[500]">
+                    BRIDGE
+                  </p>
+                  <img src="/assets/bridge-icon.svg" alt="bridge" />
+                </div>
+                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
+                  Agent conducts a swap on your behalf using an optimal route
+                  with less fees
+                </p>
+                <div className="flex items-center justify-between w-full gap-2 mt-auto">
+                  <div>
+                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
+                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
+                      Jan, 2025
+                    </p>
+                  </div>
+                  <button
+                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    disabled
+                  >
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      Coming Soon
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div className="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.33%-11px)] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[18px] leading-[24px] font-[500]">
+                    PROVIDE LP
+                  </p>
+                  <img src="/assets/provide-lp-icon.svg" alt="provide-lp" />
+                </div>
+                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
+                  Agent conducts a swap on your behalf using an optimal route
+                  with less fees
+                </p>
+                <div className="flex items-center justify-between w-full gap-2 mt-auto">
+                  <div>
+                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
+                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
+                      Jan, 2025
+                    </p>
+                  </div>
+                  <button
+                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    disabled
+                  >
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      Coming Soon
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-3 w-full">
+            <p className="font-spaceranger text-[28px] leading-[25px] text-primary">
+              Research services
+            </p>
+            <div className="flex items-stretch w-full gap-4 flex-wrap">
+              <div className="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.33%-11px)] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[18px] leading-[24px] font-[500]">
+                    MARKETS
+                  </p>
+                  <img src="/assets/markets-icon.svg" alt="markets" />
+                </div>
+                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
+                  Perfect for analyzing market data and providing accurate
+                  information
+                </p>
+                <div className="flex items-center justify-between w-full gap-2 mt-auto">
+                  <div>
+                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
+                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
+                      Feb, 2025
+                    </p>
+                  </div>
+                  <button
+                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    disabled
+                  >
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      Coming Soon
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div className="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.33%-11px)] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[18px] leading-[24px] font-[500]">
+                    TRENDS
+                  </p>
+                  <img src="/assets/trends-icon.svg" alt="trends" />
+                </div>
+                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
+                  Get up-tp-date with the latest trends in the Crypto world!
+                </p>
+                <div className="flex items-center justify-between w-full gap-2 mt-auto">
+                  <div>
+                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
+                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
+                      Feb, 2025
+                    </p>
+                  </div>
+                  <button
+                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    disabled
+                  >
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      Coming Soon
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div className="w-full md:w-[calc(50%-8px)] lg:w-[calc(33.33%-11px)] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[18px] leading-[24px] font-[500]">
+                    AI AGENTS
+                  </p>
+                  <img src="/assets/openai-icon.svg" alt="openai" />
+                </div>
+                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
+                  Stay updated with the latest on AI Agents!
+                </p>
+                <div className="flex items-center justify-between w-full gap-2 mt-auto">
+                  <div>
+                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
+                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
+                      Feb, 2025
+                    </p>
+                  </div>
+                  <button
+                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    disabled
+                  >
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      Coming Soon
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
   );
 }
