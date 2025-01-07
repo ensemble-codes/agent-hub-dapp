@@ -120,14 +120,13 @@ export default function Home() {
                       8,150 users
                     </p>
                   </div>
-                  <button className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                  <button
+                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    disabled
+                  >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
+                      Coming Soon
                     </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                    />
                   </button>
                 </div>
               </div>
@@ -147,14 +146,13 @@ export default function Home() {
                       4,200 users
                     </p>
                   </div>
-                  <button className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                  <button
+                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    disabled
+                  >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
+                      Coming Soon
                     </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                    />
                   </button>
                 </div>
               </div>
@@ -176,14 +174,13 @@ export default function Home() {
                       1,500 users
                     </p>
                   </div>
-                  <button className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                  <button
+                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    disabled
+                  >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
+                      Coming Soon
                     </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                    />
                   </button>
                 </div>
               </div>
@@ -373,6 +370,12 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+        <div className="relative">
+          <img
+            src="/assets/agent-hub-landing-text-media.png"
+            alt="text-media"
+          />
         </div>
       </div>
     </>
