@@ -15,3 +15,7 @@ body {
   background: white;
   font-family: "Satoshi";
 }
+
+* {
+  scroll-behavior: smooth;
+}

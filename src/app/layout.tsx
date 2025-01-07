@@ -28,7 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <main className="py-[124px] px-[146px] flex-1">
+        <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">
           <AppBg />
           {children}
         </main>
