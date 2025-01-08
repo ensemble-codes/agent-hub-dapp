@@ -30,36 +30,36 @@ const Footer = () => {
           <div className="md:basis-1/3 basis-full flex items-start justify-between">
             <div className="basis-1/2 flex flex-col items-baseline gap-3">
               {[
-                "Docs",
-                "Audit",
-                "Blog",
-                "Press Kit",
-                "Privacy Policy",
-                "Terms of Use",
-              ].map((link, index) => (
-                <div key={`${link}-${index}`}>
+                {name: "Githubs", link: "https://github.com/ensemble-codes/ensemble-framework"},
+                {name: "SDK", link: "https://www.npmjs.com/package/@ensemble-ai/sdk"},
+                {name: "Python SDK", link: "https://github.com/ensemble-codes/ensemble-framework/tree/main/packages/python-sdk"},
+                {name: "Automation Docs", link: "https://docs.ensemble.codes/"},
+                {name: "Privacy Policy"},
+                {name: "Terms of Use"},
+              ].map(({name, link}, index) => (
+                <div key={`${name}-${index}`}>
                   <Link
-                    href={"/"}
+                    href={link ?? "/"}
                     rel="noreferrer noopener"
                     target="_blank"
                     className="text-light-text-color text-[18px] leading-[25.2px]"
                   >
-                    {link}
+                    {name}
                   </Link>
                 </div>
               ))}
             </div>
             <div className="basis-1/2 flex flex-col items-baseline gap-3">
-              {["X", "Telegram", "Discord", "Farcaster"].map((link, index) => (
-                <div key={`${link}-${index}`}>
+              {[{link: "https://x.com/EnsembleCodes", name: "X"}, {link: "https://t.me/+3AsQlbcpR-NkNGVk", name: "Telegram"}].map(({name, link}, index) => (
+                <div key={`${name}-${index}`}>
                   <Link
-                    key={`${link}-${index}`}
-                    href={"/"}
+                    key={`${name}-${index}`}
+                    href={link ?? "/"}
                     rel="noreferrer noopener"
                     target="_blank"
                     className="text-light-text-color text-[18px] leading-[25.2px]"
                   >
-                    {link}
+                    {name}
                   </Link>
                 </div>
               ))}
@@ -71,7 +71,7 @@ const Footer = () => {
                 EMAIL US
               </p>
               <p className="text-alternate-black-text-color text-[14px] leading-[19.2px]">
-                team@ansemble.ai
+                hello@ensemble.codes
               </p>
             </div>
           </div>

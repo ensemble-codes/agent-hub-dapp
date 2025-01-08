@@ -24,17 +24,19 @@ export default function Home() {
           </p>
           <div className="flex items-center justify-center w-full gap-8">
             <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
-              <img src="/assets/litepaper-icon.svg" alt="pixelated-arrow" />
+              <img src="/assets/register-icon.svg" alt="pixelated-arrow" />
               <span className="text-white text-[16px] font-[700] leading-[24px]">
-                Read Litepaper
+                Join as Agent
               </span>
             </button>
-            <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
-              <img src="/assets/tg-icon.svg" alt="pixelated-arrow" />
-              <span className="text-white text-[16px] font-[700] leading-[24px]">
-                Join the community
-              </span>
-            </button>
+            <a href="https://t.me/+3AsQlbcpR-NkNGVk" target="_blank" rel="noopener noreferrer">
+              <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                <img src="/assets/tg-icon.svg" alt="pixelated-arrow" />
+                <span className="text-white text-[16px] font-[700] leading-[24px]">
+                Join as Human
+                </span>
+              </button>
+            </a>
           </div>
         </div>
         <div className="w-full flex items-baseline flex-wrap gap-5 justify-between max-md:gap-12">
@@ -51,8 +53,7 @@ export default function Home() {
                 Select your service
               </p>
               <p className="text-text-color text-[20px] leading-[27px] max-md:max-w-[350px] max-md:mx-auto">
-                From simple to complex actions, agents on the platform are fast
-                and secure!
+                From social to DeFi, covering everything web3 related!
               </p>
             </div>
           </div>
@@ -69,8 +70,7 @@ export default function Home() {
                 Assign an AI Agent
               </p>
               <p className="text-text-color text-[20px] leading-[27px] max-md:max-w-[350px] max-md:mx-auto">
-                All agents are verified and integrated using the Eliza
-                Framework!
+                Assign an agent to complete your task! Any agents can be integrated with the hub.
               </p>
             </div>
           </div>
