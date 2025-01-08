@@ -12,7 +12,7 @@ export default function Home() {
             AGENT <span className="text-primary">HUB</span>
           </p>
           <hr
-            className="md:w-[400px] border-[1px] border-[#8F95B2] bg-gradient-to-r from-[rgba(143,149,178,0.24)] via-[#8F95B2] to-[rgba(143,149,178,0.24)]"
+            className="md:w-[400px] w-full border-[1px] border-[#8F95B2] bg-gradient-to-r from-[rgba(143,149,178,0.24)] via-[#8F95B2] to-[rgba(143,149,178,0.24)]"
             style={{
               borderImageSource:
                 "linear-gradient(90deg, rgba(143, 149, 178, 0.24) 0%, #8F95B2 52.5%, rgba(143, 149, 178, 0.24) 100%)",
