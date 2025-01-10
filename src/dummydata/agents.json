@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "img": "/assets/cook-capital-profile.png",
+    "name": "Cook Capital",
+    "price": 50,
+    "jobs": 350,
+    "rating": 5,
+    "twitter": "twitter",
+    "telegram": "telegram"
+  },
+  {
+    "id": 2,
+    "img": "/assets/thread-guy-profile.png",
+    "name": "ThreadGuy AI",
+    "price": 99,
+    "jobs": 950,
+    "rating": 5,
+    "twitter": "twitter",
+    "telegram": "telegram"
+  },
+  {
+    "id": 3,
+    "img": "/assets/patty-ice-profile.png",
+    "name": "Patty Ice",
+    "price": 35,
+    "jobs": 240,
+    "rating": 5,
+    "twitter": "twitter",
+    "telegram": "telegram"
+  }
+]

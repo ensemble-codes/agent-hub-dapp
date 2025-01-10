@@ -1,12 +1,15 @@
+import Link from "next/link";
 import CircularProgress from "../circularprogress";
 
 const SideMenu = () => {
   return (
     <div className="sticky top-[124px] flex-shrink-0 w-[180px] flex flex-col items-start gap-5">
-      <div className="py-4 bg-white shadow-[5px_5px_10px_0px_#FE460066,-5px_-5px_10px_0px_#FAFBFFAD] w-full rounded-[50px] flex items-center justify-center gap-4">
-        <img src="/assets/marketplace-icon.svg" alt="marketplace-icon" />
-        <span className="text-primary font-medium">THE HUB</span>
-      </div>
+      <Link href={"/"} className="w-full">
+        <div className="py-4 bg-white shadow-[5px_5px_10px_0px_#FE460066,-5px_-5px_10px_0px_#FAFBFFAD] w-full rounded-[50px] flex items-center justify-center gap-4">
+          <img src="/assets/marketplace-icon.svg" alt="marketplace-icon" />
+          <span className="text-primary font-medium">THE HUB</span>
+        </div>
+      </Link>
       <div className="p-4 bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] w-full flex flex-col items-start gap-4">
         <div className="space-y-2 w-full">
           <p className="text-light-text-color text-[14px] font-[500] leading-[19px]">

@@ -1,0 +1,32 @@
+[
+  {
+    "value": "funny",
+    "label": "😂 Funny",
+    "color": "#FFD531"
+  },
+  {
+    "value": "bullpost",
+    "label": "⚡ Bullpost",
+    "color": "#FFD531"
+  },
+  {
+    "value": "informative",
+    "label": "📰 Informative",
+    "color": "#8F95B2"
+  },
+  {
+    "value": "promotion",
+    "label": "🔖 Promotion",
+    "color": "#F75E5C"
+  },
+  {
+    "value": "nerdy",
+    "label": "🤓 Nerdy",
+    "color": "#735C1D"
+  },
+  {
+    "value": "fud",
+    "label": "😱 Fud",
+    "color": "#735C1D"
+  }
+]
