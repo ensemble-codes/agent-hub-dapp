@@ -101,9 +101,9 @@ const AgentCard: FC<AgentCardProps> = ({
           Average rating
         </p>
         <div className="flex items-center gap-1">
-          {ratingsArray.fill(0).map((star) => (
+          {ratingsArray.fill(0).map((star, index) => (
             <img
-              key={star}
+              key={`${star}-${index}`}
               src="/assets/star-icon.svg"
               alt="star"
               className="w-5 h-5"

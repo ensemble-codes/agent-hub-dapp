@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppBg, Footer } from "@/components";
+import OnchainProvider from "@/components/onchainconfig/provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,11 +43,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">
-          <AppBg />
-          {children}
-        </main>
-        <Footer />
+        <OnchainProvider>
+          <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">
+            <AppBg />
+            {children}
+          </main>
+          <Footer />
+        </OnchainProvider>
       </body>
     </html>
   );

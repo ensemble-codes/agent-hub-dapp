@@ -1,4 +1,11 @@
+import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { metaMask } from "wagmi/connectors";
+
 const AppHeader = () => {
+  const { connect } = useConnect();
+  const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+
   return (
     <>
       <div className="w-full flex items-start justify-between">
@@ -20,11 +27,26 @@ const AppHeader = () => {
             for Crypto tasks
           </p>
         </div>
-        <img
-          src="/assets/header-menu-icon.svg"
-          alt="header-menu"
-          className="cursor-pointer"
-        />
+        {isConnected ? (
+          <button
+            className="w-auto mt-6 space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+            onClick={() => disconnect()}
+          >
+            <span className="text-white text-[16px] font-[700] leading-[24px]">
+              {address?.slice(0, 5)}...{address?.slice(-5)}
+            </span>
+          </button>
+        ) : (
+          <button
+            className="w-auto mt-6 space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+            onClick={() => connect({ connector: metaMask() })}
+          >
+            <img src="/assets/connect-wallet-icon.svg" alt="connect-wallet" />
+            <span className="text-white text-[16px] font-[700] leading-[24px]">
+              Connect Wallet
+            </span>
+          </button>
+        )}
       </div>
     </>
   );
