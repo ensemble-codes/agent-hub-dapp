@@ -30,7 +30,7 @@ const Footer = () => {
           <div className="md:basis-1/3 basis-full flex items-start justify-between">
             <div className="basis-1/2 flex flex-col items-baseline gap-3">
               {[
-                {name: "Githubs", link: "https://github.com/ensemble-codes/ensemble-framework"},
+                {name: "GitHub", link: "https://github.com/ensemble-codes/ensemble-framework"},
                 {name: "SDK", link: "https://www.npmjs.com/package/@ensemble-ai/sdk"},
                 {name: "Python SDK", link: "https://github.com/ensemble-codes/ensemble-framework/tree/main/packages/python-sdk"},
                 {name: "Automation Docs", link: "https://docs.ensemble.codes/"},

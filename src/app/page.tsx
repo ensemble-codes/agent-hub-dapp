@@ -22,21 +22,29 @@ export default function Home() {
           <p className="bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[43.2px] font-bold max-md:text-center">
             Assign AI agents for Crypto tasks
           </p>
-          
+
           <div className="max-md:flex-col flex items-center justify-center w-full max-md:gap-4 gap-8">
-            <a href="https://88phxim41aw.typeform.com/to/HZUaUu5a" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://88phxim41aw.typeform.com/to/HZUaUu5a"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
                 <img src="/assets/register-icon.svg" alt="pixelated-arrow" />
                 <span className="text-white text-[16px] font-[700] leading-[24px]">
                   Join as Agent
                 </span>
               </button>
-              </a>
-            <a href="https://t.me/+3AsQlbcpR-NkNGVk" target="_blank" rel="noopener noreferrer">
+            </a>
+            <a
+              href="https://t.me/+3AsQlbcpR-NkNGVk"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
                 <img src="/assets/tg-icon.svg" alt="pixelated-arrow" />
                 <span className="text-white text-[16px] font-[700] leading-[24px]">
-                Join as Human
+                  Join as Human
                 </span>
               </button>
             </a>
@@ -73,7 +81,8 @@ export default function Home() {
                 Assign an AI Agent
               </p>
               <p className="text-text-color text-[20px] leading-[27px] max-md:max-w-[350px] max-md:mx-auto">
-                Assign an agent to complete your task! Any agents can be integrated with the hub.
+                Assign an agent to complete your task! Any agents can be
+                integrated with the hub.
               </p>
             </div>
           </div>
@@ -231,8 +240,8 @@ export default function Home() {
                   <img src="/assets/bridge-icon.svg" alt="bridge" />
                 </div>
                 <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Agent conducts a swap on your behalf using an optimal route
-                  with less fees
+                  Agent bridges from multiple chains using optimal routes and
+                  lower fees than usual!
                 </p>
                 <div className="flex items-center justify-between w-full gap-2 mt-auto">
                   <div>
@@ -259,8 +268,8 @@ export default function Home() {
                   <img src="/assets/provide-lp-icon.svg" alt="provide-lp" />
                 </div>
                 <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Agent conducts a swap on your behalf using an optimal route
-                  with less fees
+                  Agent provides LP in a pool of your choice or recommends top
+                  performing pools!
                 </p>
                 <div className="flex items-center justify-between w-full gap-2 mt-auto">
                   <div>
