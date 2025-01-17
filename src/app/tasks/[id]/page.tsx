@@ -1,8 +1,42 @@
 "use client";
 import { AppHeader, SideMenu, StarRating } from "@/components";
-import { FC } from "react";
+import { FC, useEffect, useState, use } from "react";
+import { useEnsembleSDK } from "@/sdk-config";
+import { TaskData } from "@ensemble-ai/sdk";
+import Loader from "@/components/loader";
 
-const Page: FC<{ params: { hash: string } }> = ({ params }) => {
+const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
+  const { id } = use(params);
+  const [task, setTask] = useState<TaskData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const getSDK = useEnsembleSDK();
+
+  useEffect(() => {
+    const fetchTaskDetails = async () => {
+      try {
+        setLoading(true);
+        const sdk = await getSDK();
+        const taskData = await sdk.getTaskData(id);
+        console.log(taskData);
+        setTask(taskData);
+      } catch (error) {
+        console.error("Error fetching task:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTaskDetails();
+  }, [id, getSDK]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-8">
+        <Loader size="lg" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <AppHeader />
@@ -20,7 +54,7 @@ const Page: FC<{ params: { hash: string } }> = ({ params }) => {
             className="w-full h-[450px] overflow-auto relative"
             style={{ scrollbarWidth: "none" }}
           >
-            <button
+            {/* <button
               className="absolute top-0 right-0 w-[226px] flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
               // onClick={() => selectedAgent(id)}
             >
@@ -32,18 +66,18 @@ const Page: FC<{ params: { hash: string } }> = ({ params }) => {
                 alt="check-icon"
                 className="w-[18px] h-[18px]"
               />
-            </button>
+            </button> */}
             <div className="rounded-[8px] border border-light-text-color py-4 px-3 w-fit mb-4">
-              <p className="text-[14px] font-bold text-primary leading-[18.9px] mb-4">
+              {/* <p className="text-[14px] font-bold text-primary leading-[18.9px] mb-4">
                 Bullpost
-              </p>
+              </p> */}
               <div className="flex items-start gap-2">
-                <div className="border border-light-text-color rounded-full h-4 w-4 relative top-[2px]" />
+                {/* <div className="border border-light-text-color rounded-full h-4 w-4 relative top-[2px]" /> */}
                 <div className="space-y-3">
                   <p className="font-medium leading-[21.6px]">
-                    Write a Tweet on FWOG
+                    {task?.prompt}
                   </p>
-                  <div className="w-[280px] border border-primary rounded-[16px] p-4 flex items-center gap-2">
+                  {/* <div className="w-[280px] border border-primary rounded-[16px] p-4 flex items-center gap-2">
                     <img
                       src="/assets/fwog-token-icon.png"
                       alt="fwog"
@@ -55,11 +89,11 @@ const Page: FC<{ params: { hash: string } }> = ({ params }) => {
                         Just a lil fwog in a big pond
                       </p>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 mb-4">
+            {/* <div className="flex items-center gap-3 mb-4">
               <img
                 src="/assets/cook-capital-profile.png"
                 alt="cook-capital"
@@ -115,7 +149,7 @@ const Page: FC<{ params: { hash: string } }> = ({ params }) => {
                 </p>
                 <StarRating />
               </div>
-            </div>
+            </div> */}
           </div>
           <div className="flex items-center gap-2 w-full">
             <div className="p-3 rounded-[8px] border border-light-text-color flex items-center gap-2 w-full">
@@ -123,11 +157,11 @@ const Page: FC<{ params: { hash: string } }> = ({ params }) => {
                 className="flex-grow w-full border-none outline-none p-0 text-[14px] leading-[18.9px] placeholder:text-light-text-color"
                 placeholder="ask anything..."
               />
-              <img
+             {/*  <img
                 src="/assets/microphone-icon.svg"
                 alt="microphone"
                 className="w-6 h-6"
-              />
+              /> */}
             </div>
             <div className="bg-primary h-12 w-12 flex items-center justify-center rounded-[8px]">
               <img src="/assets/send-icon.svg" alt="send" className="w-6 h-6" />
@@ -138,4 +172,5 @@ const Page: FC<{ params: { hash: string } }> = ({ params }) => {
     </div>
   );
 };
+
 export default Page;

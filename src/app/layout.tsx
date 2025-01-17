@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppBg, Footer } from "@/components";
 import OnchainProvider from "@/components/onchainconfig/provider";
+import { AppContextProvider } from "@/context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,11 +45,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <OnchainProvider>
-          <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">
-            <AppBg />
-            {children}
-          </main>
-          <Footer />
+          <AppContextProvider>
+            <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">
+              <AppBg />
+              {children}
+            </main>
+            <Footer />
+          </AppContextProvider>
         </OnchainProvider>
       </body>
     </html>

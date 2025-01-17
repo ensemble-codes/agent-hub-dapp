@@ -1,3 +1,4 @@
+import { baseSepolia } from "viem/chains";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { metaMask } from "wagmi/connectors";
 
@@ -39,7 +40,9 @@ const AppHeader = () => {
         ) : (
           <button
             className="w-auto mt-6 space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-            onClick={() => connect({ connector: metaMask() })}
+            onClick={() =>
+              connect({ connector: metaMask(), chainId: baseSepolia.id })
+            }
           >
             <img src="/assets/connect-wallet-icon.svg" alt="connect-wallet" />
             <span className="text-white text-[16px] font-[700] leading-[24px]">

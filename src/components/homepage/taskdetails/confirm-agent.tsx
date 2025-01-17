@@ -1,8 +1,11 @@
 "use client";
-import { FC, useMemo } from "react";
+import { FC, useCallback, useContext, useMemo, useState } from "react";
 import AGENTSLIST from "@/dummydata/agents.json";
 import TWEETSTYLES from "@/dummydata/tweetstyles.json";
 import { useRouter } from "next/navigation";
+import { AppContext } from "@/context";
+import { useEnsembleSDK } from "@/sdk-config";
+import Loader from "@/components/loader";
 
 interface ConfirmAgentProps {
   selectedAgent: number;
@@ -15,7 +18,11 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   selectedTweetStyles,
   topic,
 }) => {
+  const [state] = useContext(AppContext);
   const router = useRouter();
+  const getSDK = useEnsembleSDK();
+
+  const [loadingCreate, setLoadingCreate] = useState(false);
 
   const agentDetails = AGENTSLIST.find((agent) => agent.id === selectedAgent);
 
@@ -28,6 +35,24 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
       ) || []
     );
   }, [selectedTweetStyles]);
+
+  const createTask = useCallback(async () => {
+    try {
+      setLoadingCreate(true);
+      const sdk = await getSDK();
+      const task = await sdk.createTask({
+        prompt: state.taskPrompt,
+        proposalId: "0",
+      });
+      if (task.id) {
+        router.push(`/tasks/${task.id}`);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingCreate(false);
+    }
+  }, [state.taskPrompt]);
 
   return (
     <>
@@ -77,13 +102,16 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
             ) : null}
           </div>
           <button
-            className="max-w-[240px] mt-6 space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-            onClick={() => router.push(`/tasks/1`)}
+            className="max-w-[240px] mt-6 space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] disabled:opacity-[0.6]"
+            onClick={() => {
+              createTask();
+            }}
+            disabled={loadingCreate}
           >
             <span className="text-white text-[16px] font-[700] leading-[24px]">
               Confirm and begin
             </span>
-            <img src="/assets/pixelated-arrow-icon.svg" alt="pixelated-arrow" />
+            {loadingCreate ? <Loader color="white" size="md" /> : <img src="/assets/pixelated-arrow-icon.svg" alt="pixelated-arrow" className="w-6 h-6" />}
           </button>
         </div>
         <div className="flex-grow max-w-[412px] max-md:w-full max-md:mx-auto">

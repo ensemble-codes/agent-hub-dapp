@@ -11,7 +11,10 @@ const Main: FC<MainProps> = ({ selectedService }) => {
         <p className="font-spaceranger text-[28px] leading-[25px] text-primary">
           Social services
         </p>
-        <div className="flex items-stretch w-full gap-4 overflow-auto" style={{ scrollbarWidth: "none" }}>
+        <div
+          className="flex items-stretch w-full gap-4 overflow-auto"
+          style={{ scrollbarWidth: "none" }}
+        >
           <div className="h-[248px]">
             <div className="w-[256px] h-[232px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
               <div className="flex items-center justify-between mb-3">
@@ -119,7 +122,10 @@ const Main: FC<MainProps> = ({ selectedService }) => {
         <p className="font-spaceranger text-[28px] leading-[25px] text-primary">
           DeFi services
         </p>
-        <div className="flex items-stretch w-full gap-4 overflow-auto" style={{ scrollbarWidth: "none" }}>
+        <div
+          className="flex items-stretch w-full gap-4 overflow-auto"
+          style={{ scrollbarWidth: "none" }}
+        >
           <div className="h-[248px]">
             <div className="w-[256px] h-[232px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
               <div className="flex items-center justify-between mb-3">
@@ -155,8 +161,8 @@ const Main: FC<MainProps> = ({ selectedService }) => {
                 <img src="/assets/bridge-icon.svg" alt="bridge" />
               </div>
               <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                Agent conducts a swap on your behalf using an optimal route with
-                less fees
+                Agent bridges from multiple chains using optimal routes and
+                lower fees than usual!
               </p>
               <div className="flex items-center justify-between w-full gap-2 mt-auto">
                 <div>
@@ -185,8 +191,8 @@ const Main: FC<MainProps> = ({ selectedService }) => {
                 <img src="/assets/provide-lp-icon.svg" alt="provide-lp" />
               </div>
               <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                Agent conducts a swap on your behalf using an optimal route with
-                less fees
+                Agent provides LP in a pool of your choice or recommends top
+                performing pools!
               </p>
               <div className="flex items-center justify-between w-full gap-2 mt-auto">
                 <div>
@@ -212,7 +218,10 @@ const Main: FC<MainProps> = ({ selectedService }) => {
         <p className="font-spaceranger text-[28px] leading-[25px] text-primary">
           Research services
         </p>
-        <div className="flex items-stretch w-full gap-4 overflow-auto" style={{ scrollbarWidth: "none" }}>
+        <div
+          className="flex items-stretch w-full gap-4 overflow-auto"
+          style={{ scrollbarWidth: "none" }}
+        >
           <div className="h-[248px]">
             <div className="w-[256px] h-[232px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
               <div className="flex items-center justify-between mb-3">
@@ -248,7 +257,7 @@ const Main: FC<MainProps> = ({ selectedService }) => {
                 <img src="/assets/trends-icon.svg" alt="trends" />
               </div>
               <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                Get up-tp-date with the latest trends in the Crypto world!
+                Get up-to-date with the latest trends in the Crypto world!
               </p>
               <div className="flex items-center justify-between w-full gap-2 mt-auto">
                 <div>

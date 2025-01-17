@@ -1,14 +1,17 @@
 "use client";
-import { FC, useCallback, useState, useEffect } from "react";
+import { FC, useCallback, useState, useEffect, useContext } from "react";
 import DetailStep from "./detail-step";
 import SelectAgentStep from "./select-step";
 import ConfirmAgent from "./confirm-agent";
+import { AppContext } from "@/context";
+import { SET_TASK_PROMPT } from "@/context/actions";
 
 interface TaskDetailsProps {
   selectedService: string;
 }
 
 const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
+  const [, dispatch] = useContext(AppContext);
   const [detailStep, setDetailStep] = useState<string>("details");
   const [selectedAgent, setSelectedAgent] = useState<number>(1);
   const [selectedTweetStyles, setSelectedTweetStyles] = useState<string[]>([]);
@@ -50,6 +53,19 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
       setDetailStep(step);
     }
   };
+
+  const generatePrompt = useCallback(() => {
+    if (!taskTopic) return "";
+
+    const styleText = selectedTweetStyles.length
+      ? `tweet style should be ${selectedTweetStyles.join(", ")}.`
+      : "";
+
+    dispatch({
+      type: SET_TASK_PROMPT,
+      payload: `${taskTopic}. ${styleText}`.trim(),
+    });
+  }, [taskTopic, selectedTweetStyles]);
 
   return (
     <div className="flex flex-col items-start w-full">
@@ -116,7 +132,10 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
             </div>
             {detailStep === "details" ? (
               <DetailStep
-                setDetailStep={(val) => setDetailStep(val)}
+                setDetailStep={(val) => {
+                  setDetailStep(val);
+                  generatePrompt();
+                }}
                 selectedTweetStyles={selectedTweetStyles}
                 setSelectedTweetStyles={setSelectedTweetStyles}
                 topic={taskTopic}

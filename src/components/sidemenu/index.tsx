@@ -1,7 +1,47 @@
+"use client";
 import Link from "next/link";
-import CircularProgress from "../circularprogress";
+import { useCallback, useEffect, useState } from "react";
+import { useAccount, useDisconnect } from "wagmi";
+import { useEnsembleSDK } from "@/sdk-config";
+import { TaskData } from "@ensemble-ai/sdk";
+import { getTaskStatusText } from "@/utils";
+import { TaskStatus } from "@/enum/taskstatus";
+import Loader from "../loader";
 
 const SideMenu = () => {
+  const { address } = useAccount();
+  const { disconnect } = useDisconnect();
+  const getSDK = useEnsembleSDK();
+  const [taskDetails, setTaskDetails] = useState<TaskData[]>([]);
+  const [loadingTask, setLoadingTask] = useState(false);
+
+  const getTasks = useCallback(async () => {
+    try {
+      setLoadingTask(true);
+      if (address) {
+        const sdk = await getSDK();
+        const tasks = await sdk.getTasksByIssuer(address);
+
+        const taskDetails = await Promise.all(
+          tasks.map(async (taskId) => {
+            const id = taskId.toString();
+            return await sdk.getTaskData(id);
+          })
+        );
+
+        setTaskDetails(taskDetails);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingTask(false);
+    }
+  }, [address, getSDK]);
+
+  useEffect(() => {
+    getTasks();
+  }, [getTasks]);
+
   return (
     <div className="sticky top-[124px] flex-shrink-0 w-[180px] flex flex-col items-start gap-5">
       <Link href={"/"} className="w-full">
@@ -13,65 +53,50 @@ const SideMenu = () => {
       <div className="p-4 bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] w-full flex flex-col items-start gap-4">
         <div className="space-y-2 w-full">
           <p className="text-light-text-color text-[14px] font-[500] leading-[19px]">
-            ACTIVE TASKS
+            TASKS
           </p>
-          <div className="flex items-center justify-between w-full">
-            <div className="space-x-2 flex items-center">
-              <img src="/assets/dummy-agent-1-icon.svg" alt="dummy-1" />
-              <p className="text-light-text-color font-[500] max-w-[6ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                DeFi
-              </p>
+          {loadingTask ? (
+            <div className="flex justify-center py-4">
+              <Loader size="sm" />
             </div>
-            <CircularProgress progress={25} />
-          </div>
-          <div className="flex items-center justify-between w-full">
-            <div className="space-x-2 flex items-center">
-              <img src="/assets/dummy-agent-2-icon.svg" alt="dummy-1" />
-              <p className="text-light-text-color font-[500] max-w-[6ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                Social
-              </p>
-            </div>
-            <CircularProgress progress={84} />
-          </div>
-        </div>
-        <div className="space-y-2 w-full">
-          <p className="text-light-text-color text-[14px] font-[500] leading-[19px]">
-            PENDING TASKS
-          </p>
-          <div className="flex items-center justify-between w-full">
-            <div className="space-x-2 flex items-center">
-              <div className="w-10 h-10 rounded-full bg-[#FFC12166] flex items-center justify-center">
-                <img
-                  src="/assets/clock-outline-icon.svg"
-                  alt="clock-outline"
-                  className="h-6 w-6"
-                />
+          ) : (
+            taskDetails.map((td) => (
+              <div key={`${td.id}-${td.prompt}`}>
+                <Link href={`/tasks/${td.id}`}>
+                  <p className="text-light-text-color font-[500] max-w-[12ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                    {td.prompt}
+                  </p>
+                  <p className="text-[12px] text-primary">
+                    {getTaskStatusText(Number(td.status) as TaskStatus)}
+                  </p>
+                </Link>
               </div>
-              <div>
-                <p className="text-light-text-color font-[500] max-w-[6ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                  DeFi
-                </p>
-                <p className="text-[12px] text-primary">assign agent</p>
-              </div>
-            </div>
-          </div>
+            ))
+          )}
         </div>
       </div>
       <div className="p-4 bg-white rounded-[200px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] w-full flex items-start justify-between">
         <img
           src="/assets/light-dark-toggle-icon.svg"
           alt="light-dark"
-          className="cursor-pointer"
+          className="cursor-not-allowed opacity-[0.5]"
         />
-        <img
-          src="/assets/help-icon.svg"
-          alt="help"
-          className="cursor-pointer"
-        />
+        <Link
+          href={"https://t.me/+3AsQlbcpR-NkNGVk"}
+          rel="nofollower noopener"
+          target="_blank"
+        >
+          <img
+            src="/assets/help-icon.svg"
+            alt="help"
+            className="cursor-pointer"
+          />
+        </Link>
         <img
           src="/assets/power-icon.svg"
           alt="power"
           className="cursor-pointer"
+          onClick={() => disconnect()}
         />
       </div>
     </div>
