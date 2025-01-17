@@ -50,7 +50,10 @@ const SideMenu = () => {
           <span className="text-primary font-medium">THE HUB</span>
         </div>
       </Link>
-      <div className="p-4 bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] w-full flex flex-col items-start gap-4">
+      <div
+        className="p-4 bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] w-full flex flex-col items-start gap-4 max-h-[300px] overflow-y-auto"
+        style={{ scrollbarWidth: "none" }}
+      >
         <div className="space-y-2 w-full">
           <p className="text-light-text-color text-[14px] font-[500] leading-[19px]">
             TASKS
