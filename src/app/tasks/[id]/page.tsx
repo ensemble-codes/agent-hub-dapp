@@ -17,7 +17,6 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
         setLoading(true);
         const sdk = await getSDK();
         const taskData = await sdk.getTaskData(id);
-        console.log(taskData);
         setTask(taskData);
       } catch (error) {
         console.error("Error fetching task:", error);
