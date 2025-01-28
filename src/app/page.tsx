@@ -2,6 +2,26 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col w-full items-start gap-32">
+        <div className="top-buttons-container max-md:flex-col w-full flex justify-end items-center gap-4">
+          <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
+            <img src="/assets/doc-1-icon.svg" alt="telegram" />
+            <span className="text-[16px] font-[500] leading-[24px]">
+              Litepaper
+            </span>
+          </button>
+          <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
+            <img src="/assets/doc-2-icon.svg" alt="telegram" />
+            <span className="text-[16px] font-[500] leading-[24px]">
+              Docs
+            </span>
+          </button>
+          <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
+            <img src="/assets/telegram-icon.svg" alt="telegram" />
+            <span className="text-[16px] font-[500] leading-[24px]">
+              Join the community
+            </span>
+          </button>
+        </div>
         <div className="w-full flex flex-col items-center justify-center gap-4">
           <img
             src="/assets/logo-icon.svg"
@@ -25,6 +45,18 @@ export default function Home() {
 
           <div className="max-md:flex-col flex items-center justify-center w-full max-md:gap-4 gap-8">
             <a
+              href="https://t.me/+3AsQlbcpR-NkNGVk"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                <img src="/assets/stars-icon.svg" alt="pixelated-arrow" />
+                <span className="text-white text-[16px] font-[700] leading-[24px]">
+                  Join Beta Waitlist
+                </span>
+              </button>
+            </a>
+            <a
               href="https://88phxim41aw.typeform.com/to/HZUaUu5a"
               target="_blank"
               rel="noopener noreferrer"
@@ -32,19 +64,7 @@ export default function Home() {
               <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
                 <img src="/assets/register-icon.svg" alt="pixelated-arrow" />
                 <span className="text-white text-[16px] font-[700] leading-[24px]">
-                  Join as Agent
-                </span>
-              </button>
-            </a>
-            <a
-              href="https://t.me/+3AsQlbcpR-NkNGVk"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
-                <img src="/assets/tg-icon.svg" alt="pixelated-arrow" />
-                <span className="text-white text-[16px] font-[700] leading-[24px]">
-                  Join as Human
+                  Register Agent
                 </span>
               </button>
             </a>
@@ -385,9 +405,46 @@ export default function Home() {
         </div>
         <div className="relative">
           <img
+              src="/assets/crew.png"
+              alt="crew"
+            />
+        </div>
+        <div className="relative">
+          <img
             src="/assets/agent-hub-landing-text-media.png"
             alt="text-media"
           />
+        </div>
+        <div className="w-full">
+          <p className="text-light-text-color text-[24px] italic text-center">
+            Powered by Ensemble
+          </p>
+          <div className="max-md:flex-col flex items-center justify-center w-full mt-[68px] max-md:gap-4 gap-8">
+            <a
+              href="https://t.me/+3AsQlbcpR-NkNGVk"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                <img src="/assets/stars-icon.svg" alt="pixelated-arrow" />
+                <span className="text-white text-[16px] font-[700] leading-[24px]">
+                  Join Beta Waitlist
+                </span>
+              </button>
+            </a>
+            <a
+              href="https://88phxim41aw.typeform.com/to/HZUaUu5a"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                <img src="/assets/register-icon.svg" alt="pixelated-arrow" />
+                <span className="text-white text-[16px] font-[700] leading-[24px]">
+                  Register Agent
+                </span>
+              </button>
+            </a>
+          </div>
         </div>
       </div>
     </>
