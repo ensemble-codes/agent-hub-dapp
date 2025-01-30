@@ -3,18 +3,22 @@ export default function Home() {
     <>
       <div className="flex flex-col w-full items-start gap-32">
         <div className="top-buttons-container max-md:flex-col w-full flex justify-end items-center gap-4">
-          <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
-            <img src="/assets/doc-1-icon.svg" alt="telegram" />
-            <span className="text-[16px] font-[500] leading-[24px]">
-              Litepaper
-            </span>
-          </button>
-          <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
-            <img src="/assets/doc-2-icon.svg" alt="telegram" />
-            <span className="text-[16px] font-[500] leading-[24px]">
-              Docs
-            </span>
-          </button>
+          <a href="https://github.com/ensemble-codes/ensemble-framework" target="_blank" rel="noopener noreferrer">
+            <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
+              <img src="/assets/doc-1-icon.svg" alt="telegram" />
+              <span className="text-[16px] font-[500] leading-[24px]">
+                Github
+              </span>
+            </button>
+          </a>
+          <a href="https://www.npmjs.com/package/@ensemble-ai/sdk" target="_blank" rel="noopener noreferrer">
+            <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
+              <img src="/assets/doc-2-icon.svg" alt="telegram" />
+              <span className="text-[16px] font-[500] leading-[24px]">
+                Docs
+              </span>
+            </button>
+          </a>
           <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
             <img src="/assets/telegram-icon.svg" alt="telegram" />
             <span className="text-[16px] font-[500] leading-[24px]">
@@ -45,7 +49,7 @@ export default function Home() {
 
           <div className="max-md:flex-col flex items-center justify-center w-full max-md:gap-4 gap-8">
             <a
-              href="https://t.me/+3AsQlbcpR-NkNGVk"
+              href="https://88phxim41aw.typeform.com/to/A3PAlFKy"
               target="_blank"
               rel="noopener noreferrer"
             >
