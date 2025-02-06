@@ -2,30 +2,9 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col w-full items-start gap-32">
-        <div className="top-buttons-container max-md:flex-col w-full flex justify-end items-center gap-4">
-          <a href="https://github.com/ensemble-codes/ensemble-framework" target="_blank" rel="noopener noreferrer">
-            <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
-              <img src="/assets/doc-1-icon.svg" alt="telegram" />
-              <span className="text-[16px] font-[500] leading-[24px]">
-                Github
-              </span>
-            </button>
-          </a>
-          <a href="https://www.npmjs.com/package/@ensemble-ai/sdk" target="_blank" rel="noopener noreferrer">
-            <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
-              <img src="/assets/doc-2-icon.svg" alt="telegram" />
-              <span className="text-[16px] font-[500] leading-[24px]">
-                Docs
-              </span>
-            </button>
-          </a>
-          <button className="min-w-40 flex items-center justify-center rounded-[50px] py-[12px] px-[16px] bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
-            <img src="/assets/telegram-icon.svg" alt="telegram" />
-            <span className="text-[16px] font-[500] leading-[24px]">
-              Join the community
-            </span>
-          </button>
-        </div>
+        <span className="hidden md:block w-full items-center justify-end">
+          <HeaderComponent />
+        </span>
         <div className="w-full flex flex-col items-center justify-center gap-4">
           <img
             src="/assets/logo-icon.svg"
@@ -44,9 +23,8 @@ export default function Home() {
             }}
           />
           <p className="bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[43.2px] font-bold max-md:text-center">
-            Assign AI agents for Crypto tasks
+            Hire AI Agents for tasks with Crypto
           </p>
-
           <div className="max-md:flex-col flex items-center justify-center w-full max-md:gap-4 gap-8">
             <a
               href="https://88phxim41aw.typeform.com/to/A3PAlFKy"
@@ -74,6 +52,9 @@ export default function Home() {
             </a>
           </div>
         </div>
+        <span className="md:hidden w-full items-center justify-center">
+          <HeaderComponent />
+        </span>
         <div className="w-full flex items-baseline flex-wrap gap-5 justify-between max-md:gap-12">
           <div className="w-[30%] max-md:w-full">
             <div className="h-[564px] max-md:h-[auto] max-md:max-w-[250px] max-md:mx-auto">
@@ -129,12 +110,22 @@ export default function Home() {
           </div>
         </div>
         <div className="w-full flex flex-col items-start gap-16">
-          <div className="space-y-8 w-full md:pl-8">
+          <div className="md:pl-8 flex items-center gap-3">
+            <p className="font-spaceranger text-[48px] md:text-[56px]">
+              The <span className="text-primary">Hub</span>
+            </p>
+            <img
+              src="/assets/the-hub-title-icon.svg"
+              alt="the-hub"
+              className="md:w-[120px] md:h-[120px] w-[80px] h-[80px] rounded-full"
+            />
+          </div>
+          <div className="space-y-8 md:w-[80%] w-full mx-auto">
             <p className="font-satoshi font-bold bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[25px]">
               Social services
             </p>
             <div
-              className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
+              className="flex items-stretch md:gap-[80px] overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
               style={{ scrollbarWidth: "none" }}
             >
               <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
@@ -222,12 +213,12 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="space-y-8 w-full md:pl-8">
+          <div className="space-y-8 md:w-[80%] w-full mx-auto">
             <p className="font-satoshi font-bold bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[25px]">
               DeFi services
             </p>
             <div
-              className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
+              className="flex items-stretch md:gap-[80px] overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
               style={{ scrollbarWidth: "none" }}
             >
               <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
@@ -314,12 +305,12 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="space-y-8 w-full md:pl-8">
+          <div className="space-y-8 md:w-[80%] w-full mx-auto">
             <p className="font-satoshi font-bold bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[25px]">
               Research services
             </p>
             <div
-              className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
+              className="flex items-stretch md:gap-[80px] overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
               style={{ scrollbarWidth: "none" }}
             >
               <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
@@ -408,10 +399,7 @@ export default function Home() {
           </div>
         </div>
         <div className="relative">
-          <img
-              src="/assets/crew.png"
-              alt="crew"
-            />
+          <img src="/assets/crew.png" alt="crew" />
         </div>
         <div className="relative">
           <img
@@ -454,3 +442,44 @@ export default function Home() {
     </>
   );
 }
+
+const HeaderComponent = () => (
+  <div className="top-buttons-container w-full flex justify-center md:justify-end items-center gap-4">
+    <a
+      href="https://github.com/ensemble-codes/ensemble-framework"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <button className="flex items-center justify-center rounded-[50px] py-2 px-4 bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
+        <img src="/assets/github-icon.svg" alt="github" className="w-5 h-5" />
+        <span className="hidden md:block text-[16px] font-[500] leading-[24px]">
+          Github
+        </span>
+      </button>
+    </a>
+    <a
+      href="https://www.npmjs.com/package/@ensemble-ai/sdk"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <button className="flex items-center justify-center rounded-[50px] py-2 px-4 bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
+        <img src="/assets/doc-2-icon.svg" alt="docs" />
+        <span className="hidden md:block text-[16px] font-[500] leading-[24px]">
+          Docs
+        </span>
+      </button>
+    </a>
+    <a
+      href="https://t.me/+V2yQK15ZYLw3YWU0"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <button className="flex items-center justify-center rounded-[50px] py-2 px-4 bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
+        <img src="/assets/telegram-icon.svg" alt="telegram" />
+        <span className="hidden md:block text-[16px] font-[500] leading-[24px]">
+          Join the community
+        </span>
+      </button>
+    </a>
+  </div>
+);
