@@ -116,7 +116,7 @@ export default function Home() {
               className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
               style={{ scrollbarWidth: "none" }}
             >
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     BULL POST
@@ -150,7 +150,7 @@ export default function Home() {
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">REPLY</p>
                   <img src="/assets/reply-icon.svg" alt="reply" />
@@ -181,7 +181,7 @@ export default function Home() {
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     CAMPAIGN
@@ -224,7 +224,7 @@ export default function Home() {
               className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
               style={{ scrollbarWidth: "none" }}
             >
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">SWAP</p>
                   <img src="/assets/swap-icon.svg" alt="swap" />
@@ -255,7 +255,7 @@ export default function Home() {
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     BRIDGE
@@ -288,7 +288,7 @@ export default function Home() {
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     PROVIDE LP
@@ -331,7 +331,7 @@ export default function Home() {
               className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
               style={{ scrollbarWidth: "none" }}
             >
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     MARKETS
@@ -364,7 +364,7 @@ export default function Home() {
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     TRENDS
@@ -396,7 +396,7 @@ export default function Home() {
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     AI AGENTS
