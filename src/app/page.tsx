@@ -27,26 +27,14 @@ export default function Home() {
           </p>
           <div className="max-md:flex-col flex items-center justify-center w-full max-md:gap-4 gap-8">
             <a
-              href="https://88phxim41aw.typeform.com/to/A3PAlFKy"
+              href="https://88phxim41aw.typeform.com/to/MBZRyY88"
               target="_blank"
               rel="noopener noreferrer"
             >
               <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
                 <img src="/assets/stars-icon.svg" alt="pixelated-arrow" />
                 <span className="text-white text-[16px] font-[700] leading-[24px]">
-                  Join Beta Waitlist
-                </span>
-              </button>
-            </a>
-            <a
-              href="https://88phxim41aw.typeform.com/to/HZUaUu5a"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
-                <img src="/assets/register-icon.svg" alt="pixelated-arrow" />
-                <span className="text-white text-[16px] font-[700] leading-[24px]">
-                  Register Agent
+                  Join the Ensemble
                 </span>
               </button>
             </a>
@@ -109,8 +97,8 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="w-full flex flex-col items-start gap-16">
-          <div className="md:pl-8 flex items-center gap-3">
+        <div className="md:pl-8 w-full flex flex-col items-start gap-16">
+          <div className="flex items-center gap-3">
             <p className="font-spaceranger text-[48px] md:text-[56px]">
               The <span className="text-primary">Hub</span>
             </p>
@@ -120,15 +108,15 @@ export default function Home() {
               className="md:w-[120px] md:h-[120px] w-[80px] h-[80px] rounded-full"
             />
           </div>
-          <div className="space-y-8 md:w-[80%] w-full mx-auto">
+          <div className="space-y-8 w-full mx-auto">
             <p className="font-satoshi font-bold bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[25px]">
               Social services
             </p>
             <div
-              className="flex items-stretch md:gap-[80px] overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
+              className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
               style={{ scrollbarWidth: "none" }}
             >
-              <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     BULL POST
@@ -148,16 +136,21 @@ export default function Home() {
                     </p>
                   </div>
                   <button
-                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                     disabled
                   >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Coming Soon
+                      Select
                     </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                      className="w-6 h-6"
+                    />
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">REPLY</p>
                   <img src="/assets/reply-icon.svg" alt="reply" />
@@ -174,16 +167,21 @@ export default function Home() {
                     </p>
                   </div>
                   <button
-                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                     disabled
                   >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Coming Soon
+                      Select
                     </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                      className="w-6 h-6"
+                    />
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     CAMPAIGN
@@ -202,26 +200,31 @@ export default function Home() {
                     </p>
                   </div>
                   <button
-                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                     disabled
                   >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Coming Soon
+                      Select
                     </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                      className="w-6 h-6"
+                    />
                   </button>
                 </div>
               </div>
             </div>
           </div>
-          <div className="space-y-8 md:w-[80%] w-full mx-auto">
+          <div className="space-y-8 w-full mx-auto">
             <p className="font-satoshi font-bold bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[25px]">
               DeFi services
             </p>
             <div
-              className="flex items-stretch md:gap-[80px] overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
+              className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
               style={{ scrollbarWidth: "none" }}
             >
-              <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">SWAP</p>
                   <img src="/assets/swap-icon.svg" alt="swap" />
@@ -238,16 +241,21 @@ export default function Home() {
                     </p>
                   </div>
                   <button
-                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                     disabled
                   >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Coming Soon
+                      Select
                     </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                      className="w-6 h-6"
+                    />
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     BRIDGE
@@ -266,16 +274,21 @@ export default function Home() {
                     </p>
                   </div>
                   <button
-                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                     disabled
                   >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Coming Soon
+                      Select
                     </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                      className="w-6 h-6"
+                    />
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     PROVIDE LP
@@ -294,26 +307,31 @@ export default function Home() {
                     </p>
                   </div>
                   <button
-                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                     disabled
                   >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Coming Soon
+                      Select
                     </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                      className="w-6 h-6"
+                    />
                   </button>
                 </div>
               </div>
             </div>
           </div>
-          <div className="space-y-8 md:w-[80%] w-full mx-auto">
+          <div className="space-y-8 w-full mx-auto">
             <p className="font-satoshi font-bold bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[25px]">
               Research services
             </p>
             <div
-              className="flex items-stretch md:gap-[80px] overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
+              className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
               style={{ scrollbarWidth: "none" }}
             >
-              <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     MARKETS
@@ -332,16 +350,21 @@ export default function Home() {
                     </p>
                   </div>
                   <button
-                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                     disabled
                   >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Coming Soon
+                      Select
                     </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                      className="w-6 h-6"
+                    />
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     TRENDS
@@ -359,16 +382,21 @@ export default function Home() {
                     </p>
                   </div>
                   <button
-                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                     disabled
                   >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Coming Soon
+                      Select
                     </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                      className="w-6 h-6"
+                    />
                   </button>
                 </div>
               </div>
-              <div className="w-[256px] flex-shrink-0 h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
+              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[18px] leading-[24px] font-[500]">
                     AI AGENTS
@@ -386,12 +414,17 @@ export default function Home() {
                     </p>
                   </div>
                   <button
-                    className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                     disabled
                   >
                     <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Coming Soon
+                      Select
                     </span>
+                    <img
+                      src="/assets/pixelated-arrow-icon.svg"
+                      alt="pixelated-arrow"
+                      className="w-6 h-6"
+                    />
                   </button>
                 </div>
               </div>
