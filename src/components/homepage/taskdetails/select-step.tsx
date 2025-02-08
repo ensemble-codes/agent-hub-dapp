@@ -2,30 +2,34 @@ import { FC } from "react";
 import { gql, useQuery } from "@apollo/client";
 import Loader from "@/components/loader";
 import { formatEther } from "ethers";
+import { useSearchParams } from "next/navigation";
 
 interface SelectAgentStepProps {
   selectedAgent: (agent: number) => void;
 }
 
-const GET_PROPOSALS = gql`
-  query MyQuery {
-    proposals {
-      id
-      price
-      service
-      issuer {
-        agentUri
+const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
+  const searchParams = useSearchParams();
+  const selectedService = searchParams.get("service");
+
+  const GET_PROPOSALS = gql`
+    query MyQuery {
+      proposals(where: { service: "${selectedService?.split(' ').join('-')}" }) {
         id
-        isRegistered
-        name
-        owner
-        reputation
+        service
+        price
+        issuer {
+          agentUri
+          id
+          isRegistered
+          name
+          owner
+          reputation
+        }
       }
     }
-  }
-`;
+  `;
 
-const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
   const { data, loading, error } = useQuery(GET_PROPOSALS);
 
   console.log(data);
