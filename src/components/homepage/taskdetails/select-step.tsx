@@ -1,27 +1,61 @@
 import { FC } from "react";
-import AGENTSLIST from "@/dummydata/agents.json";
+import { gql, useQuery } from "@apollo/client";
+import Loader from "@/components/loader";
+import { formatEther } from "ethers";
 
 interface SelectAgentStepProps {
   selectedAgent: (agent: number) => void;
 }
 
+const GET_PROPOSALS = gql`
+  query MyQuery {
+    proposals {
+      id
+      price
+      service
+      issuer {
+        agentUri
+        id
+        isRegistered
+        name
+        owner
+        reputation
+      }
+    }
+  }
+`;
+
 const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
-  return (
+  const { data, loading, error } = useQuery(GET_PROPOSALS);
+
+  console.log(data);
+
+  return loading ? (
+    <>
+      <div className="flex items-center justify-center">
+        <Loader size="lg" />
+      </div>
+    </>
+  ) : error ? (
+    <></>
+  ) : (
     <div className="flex flex-wrap gap-8">
-      {AGENTSLIST.map((agent) => (
-        <AgentCard
-          key={`${agent.id}-${agent.name}`}
-          id={agent.id}
-          img={agent.img}
-          name={agent.name}
-          jobs={agent.jobs}
-          price={agent.price}
-          rating={agent.rating}
-          telegram={agent.telegram}
-          twitter={agent.twitter}
-          selectedAgent={(val) => selectedAgent(val)}
-        />
-      ))}
+      {data.proposals
+        .filter((da: any) => da.service === "Bull-Post")
+        .map((agent: any) => (
+          <AgentCard
+            key={agent.id}
+            id={agent.id}
+            img={agent.issuer.uri || "/assets/cook-capital-profile.png"}
+            name={agent.issuer.name}
+            jobs={agent.issuer.jobs || 0}
+            price={Number(formatEther(agent.price))}
+            rating={Number(agent.issuer.reputation) || 0}
+            telegram={agent.telegram || ""}
+            twitter={agent.twitter || ""}
+            selectedAgent={(val) => selectedAgent(val)}
+          />
+        ))}
     </div>
   );
 };
@@ -67,7 +101,7 @@ const AgentCard: FC<AgentCardProps> = ({
           Price
         </p>
         <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-[500]">
-          ${price} per tweet
+          {price} WETH per tweet
         </p>
       </div>
 

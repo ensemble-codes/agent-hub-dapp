@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.12.9",
     "@ensemble-ai/sdk": "^0.2.2",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tanstack/react-query": "^5.64.1",

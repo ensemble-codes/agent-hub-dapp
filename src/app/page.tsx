@@ -16,13 +16,13 @@ export default function Home() {
       <AppHeader />
       <div className="flex items-start gap-16 pt-16">
         <SideMenu />
-          {!selectedService ? (
-            <HomeMain
-              selectedService={(service) => handleServiceSelect(service)}
-            />
-          ) : (
-            <TaskDetails selectedService={selectedService} />
-          )}
+        {!selectedService ? (
+          <HomeMain 
+            selectedService={(service) => handleServiceSelect(service)}
+          />
+        ) : (
+          <TaskDetails selectedService={selectedService} />
+        )}
       </div>
     </div>
   );
