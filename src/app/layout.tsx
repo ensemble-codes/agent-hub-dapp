@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AppBg, Footer } from "@/components";
+import { AppBg, Footer, GoogleTagManager } from "@/components";
 import OnchainProvider from "@/components/onchainconfig/provider";
 import { AppContextProvider } from "@/context";
 
@@ -44,6 +44,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {process.env.NEXT_PUBLIC_GTM_ID && (
+          <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
+        )}
         <OnchainProvider>
           <AppContextProvider>
             <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">

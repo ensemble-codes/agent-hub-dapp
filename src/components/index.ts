@@ -5,4 +5,5 @@ export { default as Footer } from "./footer";
 export { default as SideMenu } from "./sidemenu";
 export { default as StarRating } from "./star-rating"; 
 export { default as Loader } from "./loader";
+export { default as GoogleTagManager } from "./googletagmanager";
 export * from "./homepage";
