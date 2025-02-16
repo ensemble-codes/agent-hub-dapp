@@ -1,32 +1,35 @@
 "use client";
-import { AppHeader, SideMenu, StarRating } from "@/components";
-import { FC, useEffect, useState, use } from "react";
+import { AppHeader, SideMenu } from "@/components";
+import { FC, use } from "react";
 import { useEnsembleSDK } from "@/sdk-config";
-import { TaskData } from "@ensemble-ai/sdk";
 import Loader from "@/components/loader";
+import { gql, useQuery } from "@apollo/client";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
-  const [task, setTask] = useState<TaskData | null>(null);
-  const [loading, setLoading] = useState(true);
   const getSDK = useEnsembleSDK();
 
-  useEffect(() => {
-    const fetchTaskDetails = async () => {
-      try {
-        setLoading(true);
-        const sdk = await getSDK();
-        const taskData = await sdk.getTaskData(id);
-        setTask(taskData);
-      } catch (error) {
-        console.error("Error fetching task:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const GET_TASK = gql`
+  query MyQuery {
+  task(id: "${id}") {
+    id
+    issuer
+    prompt
+    proposalId
+    status
+    assignee {
+      agentUri
+      id
+      isRegistered
+      name
+      owner
+      reputation
+    }
+  }
+}
+  `;
 
-    fetchTaskDetails();
-  }, [id, getSDK]);
+  const { data: task, loading } = useQuery(GET_TASK);
 
   if (loading) {
     return (
@@ -73,9 +76,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
               <div className="flex items-start gap-2">
                 {/* <div className="border border-light-text-color rounded-full h-4 w-4 relative top-[2px]" /> */}
                 <div className="space-y-3">
-                  <p className="font-medium leading-[21.6px]">
-                    {task?.prompt}
-                  </p>
+                  <p className="font-medium leading-[21.6px]">{task?.task?.prompt}</p>
                   {/* <div className="w-[280px] border border-primary rounded-[16px] p-4 flex items-center gap-2">
                     <img
                       src="/assets/fwog-token-icon.png"
@@ -156,7 +157,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                 className="flex-grow w-full border-none outline-none p-0 text-[14px] leading-[18.9px] placeholder:text-light-text-color"
                 placeholder="ask anything..."
               />
-             {/*  <img
+              {/*  <img
                 src="/assets/microphone-icon.svg"
                 alt="microphone"
                 className="w-6 h-6"

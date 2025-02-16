@@ -32,8 +32,6 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
 
   const { data, loading, error } = useQuery(GET_PROPOSALS);
 
-  console.log(data);
-
   return loading ? (
     <>
       <div className="flex items-center justify-center">
