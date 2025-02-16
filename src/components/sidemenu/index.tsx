@@ -31,10 +31,7 @@ const SideMenu = () => {
     [address]
   );
 
-  const {
-    data: taskDetails,
-    loading: loadingTask,
-  } = useQuery(GET_TASKS);
+  const { data: taskDetails, loading: loadingTask } = useQuery(GET_TASKS);
 
   return (
     <div className="sticky top-[124px] flex-shrink-0 w-[180px] flex flex-col items-start gap-5">
@@ -56,7 +53,7 @@ const SideMenu = () => {
             <div className="flex justify-center py-4">
               <Loader size="sm" />
             </div>
-          ) : (
+          ) : taskDetails ? (
             taskDetails.tasks.map((td: (typeof taskDetails)[0]) => (
               <div key={`${td.id}-${td.prompt}`}>
                 <Link href={`/tasks/${td.id}`}>
@@ -69,7 +66,7 @@ const SideMenu = () => {
                 </Link>
               </div>
             ))
-          )}
+          ) : null}
         </div>
       </div>
       <div className="p-4 bg-white rounded-[200px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] w-full flex items-start justify-between">
