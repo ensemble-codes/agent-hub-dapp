@@ -1,46 +1,37 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useAccount, useDisconnect } from "wagmi";
-import { useEnsembleSDK } from "@/sdk-config";
-import { TaskData } from "@ensemble-ai/sdk";
 import { getTaskStatusText } from "@/utils";
 import { TaskStatus } from "@/enum/taskstatus";
 import Loader from "../loader";
+import { gql, useQuery } from "@apollo/client";
 
 const SideMenu = () => {
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
-  const getSDK = useEnsembleSDK();
-  const [taskDetails, setTaskDetails] = useState<TaskData[]>([]);
-  const [loadingTask, setLoadingTask] = useState(false);
 
-  const getTasks = useCallback(async () => {
-    try {
-      setLoadingTask(true);
-      if (address) {
-        const sdk = await getSDK();
-        const tasks = await sdk.getTasksByIssuer(address);
-
-        const taskDetails = await Promise.all(
-          tasks.map(async (taskId) => {
-            const id = taskId.toString();
-            return await sdk.getTaskData(id);
-          })
-        );
-
-        setTaskDetails(taskDetails);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoadingTask(false);
+  const GET_TASKS = useMemo(
+    () => gql`query MyQuery {
+  tasks(where: {issuer: "${address?.toLowerCase()}" }) {
+    assignee {
+      agentUri
+      id
+      isRegistered
+      name
+      owner
+      reputation
     }
-  }, [address, getSDK]);
+    prompt
+    proposalId
+    status
+    id
+  }
+}`,
+    [address]
+  );
 
-  useEffect(() => {
-    getTasks();
-  }, [getTasks]);
+  const { data: taskDetails, loading: loadingTask } = useQuery(GET_TASKS);
 
   return (
     <div className="sticky top-[124px] flex-shrink-0 w-[180px] flex flex-col items-start gap-5">
@@ -62,8 +53,8 @@ const SideMenu = () => {
             <div className="flex justify-center py-4">
               <Loader size="sm" />
             </div>
-          ) : (
-            taskDetails.map((td) => (
+          ) : taskDetails ? (
+            taskDetails.tasks.map((td: (typeof taskDetails)[0]) => (
               <div key={`${td.id}-${td.prompt}`}>
                 <Link href={`/tasks/${td.id}`}>
                   <p className="text-light-text-color font-[500] max-w-[12ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
@@ -75,7 +66,7 @@ const SideMenu = () => {
                 </Link>
               </div>
             ))
-          )}
+          ) : null}
         </div>
       </div>
       <div className="p-4 bg-white rounded-[200px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] w-full flex items-start justify-between">

@@ -4,8 +4,12 @@ import AGENTSLIST from "@/dummydata/agents.json";
 import TWEETSTYLES from "@/dummydata/tweetstyles.json";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context";
-import { useEnsembleSDK } from "@/sdk-config";
+import { initSdk, useSdk } from "@/sdk-config";
 import Loader from "@/components/loader";
+import { gql, useQuery } from "@apollo/client";
+import { formatEther } from "ethers";
+import { useWalletClient } from 'wagmi';
+import { config } from "@/components/onchainconfig/config";
 
 interface ConfirmAgentProps {
   selectedAgent: number;
@@ -20,13 +24,35 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
 }) => {
   const [state] = useContext(AppContext);
   const router = useRouter();
-  const getSDK = useEnsembleSDK();
-
+  const { data: walletClient } = useWalletClient({
+    config: config
+  });
+  const sdk = useSdk(walletClient);
   const [loadingCreate, setLoadingCreate] = useState(false);
 
-  const agentDetails = AGENTSLIST.find((agent) => agent.id === selectedAgent);
+  const GET_PROPOSAL = gql`
+    query MyQuery {
+      proposal(id: "${selectedAgent}") {
+    id
+    issuer {
+      agentUri
+      id
+      isRegistered
+      name
+      owner
+      reputation
+    }
+    price
+    service
+  }
+    }
+  `;
 
-  const ratingsArray = new Array(agentDetails?.rating);
+  const { data } = useQuery(GET_PROPOSAL);
+
+  const ratingsArray = new Array(
+    data && data.proposal ? data.proposal.issuer.reputation : 0
+  );
 
   const filteredTweetStyles = useMemo(() => {
     return (
@@ -39,10 +65,9 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   const createTask = useCallback(async () => {
     try {
       setLoadingCreate(true);
-      const sdk = await getSDK();
       const task = await sdk.createTask({
         prompt: state.taskPrompt,
-        proposalId: "0",
+        proposalId: selectedAgent.toString(),
       });
       if (task.id) {
         router.push(`/tasks/${task.id}`);
@@ -52,7 +77,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
     } finally {
       setLoadingCreate(false);
     }
-  }, [state.taskPrompt]);
+  }, [state.taskPrompt, sdk]);
 
   return (
     <>
@@ -111,7 +136,15 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
             <span className="text-white text-[16px] font-[700] leading-[24px]">
               Confirm and begin
             </span>
-            {loadingCreate ? <Loader color="white" size="md" /> : <img src="/assets/pixelated-arrow-icon.svg" alt="pixelated-arrow" className="w-6 h-6" />}
+            {loadingCreate ? (
+              <Loader color="white" size="md" />
+            ) : (
+              <img
+                src="/assets/pixelated-arrow-icon.svg"
+                alt="pixelated-arrow"
+                className="w-6 h-6"
+              />
+            )}
           </button>
         </div>
         <div className="flex-grow max-w-[412px] max-md:w-full max-md:mx-auto">
@@ -128,14 +161,14 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                 Agent details
               </p>
               <div className="flex items-center gap-1">
-                {agentDetails?.twitter ? (
+                {data?.proposal?.twitter ? (
                   <img
                     src="/assets/agent-telegram-icon.svg"
                     alt="telegram"
                     className="w-8 h-8 cursor-pointer"
                   />
                 ) : null}
-                {agentDetails?.telegram ? (
+                {data?.proposal?.telegram ? (
                   <img
                     src="/assets/agent-twitter-icon.svg"
                     alt="twitter"
@@ -155,18 +188,22 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
             <div className="w-full flex items-center justify-between">
               <div className="flex space-x-2">
                 <img
-                  src={agentDetails?.img}
-                  alt={agentDetails?.name}
+                  src={
+                    data?.proposal?.issuer?.agentUri ||
+                    "/assets/cook-capital-profile.png"
+                  }
+                  alt={data?.proposal?.issuer?.name}
                   className="w-8 h-8 rounded-full"
                 />
                 <div className="space-y-1">
-                  <p className="font-medium">{agentDetails?.name}</p>
+                  <p className="font-medium">{data?.proposal?.name}</p>
                   <p className="text-light-text-color text-[12px]">@Twitter</p>
                 </div>
               </div>
               <div className="rounded-[200px] border-none bg-[#AB21FF3D] px-[12px] py-[4px]">
                 <p className="text-[#AB21FF] leading-[24px] text-center font-bold text-[12px]">
-                  0x52...s3a6
+                  {data?.proposal?.issuer?.owner?.slice(0, 4)}...
+                  {data?.proposal?.issuer?.owner?.slice(-4)}
                 </p>
               </div>
             </div>
@@ -182,9 +219,11 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
               <p className="font-medium text-light-text-color text-[14px] leading-[18.9px]">
                 Price
               </p>
-              <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
-                ${agentDetails?.price} per tweet
-              </p>
+              {data && data.proposal && data.proposal.price ? (
+                <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
+                  {Number(formatEther(data?.proposal?.price))} WETH per tweet
+                </p>
+              ) : null}
             </div>
             <hr
               className="my-5 border-[1px] border-[#8F95B2]"
@@ -213,7 +252,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                 Jobs done
               </p>
               <p className="text-[14px] leading-[21.6px] font-bold">
-                {agentDetails?.jobs}
+                {data?.proposal?.jobs || 0}
               </p>
             </div>
             <hr
