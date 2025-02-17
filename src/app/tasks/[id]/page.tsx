@@ -1,13 +1,11 @@
 "use client";
 import { AppHeader, SideMenu } from "@/components";
 import { FC, use } from "react";
-import { useEnsembleSDK } from "@/sdk-config";
 import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
-  const getSDK = useEnsembleSDK();
 
   const GET_TASK = gql`
   query MyQuery {

@@ -4,10 +4,12 @@ import AGENTSLIST from "@/dummydata/agents.json";
 import TWEETSTYLES from "@/dummydata/tweetstyles.json";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context";
-import { useEnsembleSDK } from "@/sdk-config";
+import { initSdk } from "@/sdk-config";
 import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 import { formatEther } from "ethers";
+import { useWalletClient } from 'wagmi';
+import { config } from "@/components/onchainconfig/config";
 
 interface ConfirmAgentProps {
   selectedAgent: number;
@@ -22,7 +24,9 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
 }) => {
   const [state] = useContext(AppContext);
   const router = useRouter();
-  const getSDK = useEnsembleSDK();
+  const { data: walletClient } = useWalletClient({
+    config: config
+  });
 
   const [loadingCreate, setLoadingCreate] = useState(false);
 
@@ -61,7 +65,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   const createTask = useCallback(async () => {
     try {
       setLoadingCreate(true);
-      const sdk = await getSDK();
+      const sdk = initSdk(walletClient);
       const task = await sdk.createTask({
         prompt: state.taskPrompt,
         proposalId: selectedAgent.toString(),
@@ -74,7 +78,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
     } finally {
       setLoadingCreate(false);
     }
-  }, [state.taskPrompt]);
+  }, [state.taskPrompt, walletClient]);
 
   return (
     <>
