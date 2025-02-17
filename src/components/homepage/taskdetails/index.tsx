@@ -144,7 +144,6 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
             ) : detailStep === "select" ? (
               <SelectAgentStep
                 selectedAgent={(val) => {
-                  console.log(val);
                   setSelectedAgent(val);
                   setDetailStep("confirm");
                 }}

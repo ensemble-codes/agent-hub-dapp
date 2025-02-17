@@ -185,7 +185,10 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
             <div className="w-full flex items-center justify-between">
               <div className="flex space-x-2">
                 <img
-                  src={data?.proposal?.issuer?.agentUri || "/assets/cook-capital-profile.png"}
+                  src={
+                    data?.proposal?.issuer?.agentUri ||
+                    "/assets/cook-capital-profile.png"
+                  }
                   alt={data?.proposal?.issuer?.name}
                   className="w-8 h-8 rounded-full"
                 />
@@ -213,9 +216,11 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
               <p className="font-medium text-light-text-color text-[14px] leading-[18.9px]">
                 Price
               </p>
-              <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
-                {Number(formatEther(data?.proposal?.price))} WETH per tweet
-              </p>
+              {data && data.proposal && data.proposal.price ? (
+                <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
+                  {Number(formatEther(data?.proposal?.price))} WETH per tweet
+                </p>
+              ) : null}
             </div>
             <hr
               className="my-5 border-[1px] border-[#8F95B2]"
