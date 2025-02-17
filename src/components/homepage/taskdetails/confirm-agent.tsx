@@ -64,7 +64,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
       const sdk = await getSDK();
       const task = await sdk.createTask({
         prompt: state.taskPrompt,
-        proposalId: "0",
+        proposalId: selectedAgent.toString(),
       });
       if (task.id) {
         router.push(`/tasks/${task.id}`);
