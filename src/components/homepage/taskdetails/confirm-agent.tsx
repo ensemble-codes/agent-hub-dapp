@@ -4,7 +4,7 @@ import AGENTSLIST from "@/dummydata/agents.json";
 import TWEETSTYLES from "@/dummydata/tweetstyles.json";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context";
-import { initSdk } from "@/sdk-config";
+import { initSdk, useSdk } from "@/sdk-config";
 import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 import { formatEther } from "ethers";
@@ -27,7 +27,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   const { data: walletClient } = useWalletClient({
     config: config
   });
-
+  const sdk = useSdk(walletClient);
   const [loadingCreate, setLoadingCreate] = useState(false);
 
   const GET_PROPOSAL = gql`
@@ -65,7 +65,6 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   const createTask = useCallback(async () => {
     try {
       setLoadingCreate(true);
-      const sdk = initSdk(walletClient);
       const task = await sdk.createTask({
         prompt: state.taskPrompt,
         proposalId: selectedAgent.toString(),
@@ -78,7 +77,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
     } finally {
       setLoadingCreate(false);
     }
-  }, [state.taskPrompt, walletClient]);
+  }, [state.taskPrompt, sdk]);
 
   return (
     <>

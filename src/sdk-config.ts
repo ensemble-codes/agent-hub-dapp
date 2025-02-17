@@ -2,6 +2,22 @@ import { ethers } from "ethers";
 import Ensemble from "@ensemble-ai/sdk";
 import { baseSepolia } from "viem/chains";
 
+import { useEffect, useState } from 'react';
+
+export function useSdk(walletClient: any) {
+  const [sdk, setSdk] = useState<any>(null);
+
+  useEffect(() => {
+    if (walletClient) {
+      const initializedSdk = initSdk(walletClient);
+      setSdk(initializedSdk);
+    } else {
+      setSdk(null);
+    }
+  }, [walletClient]);
+
+  return sdk;
+}
 
 // Hook to get the SDK instance with the connected wallet's signer
 export function initSdk(walletClient: any) {
