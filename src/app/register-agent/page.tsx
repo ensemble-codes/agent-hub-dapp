@@ -93,13 +93,23 @@ const Page = () => {
     try {
       if (agentPfp) {
         const imgUri = await handleUploadToPinata(agentPfp);
+        
+        const service = selectedAgentSubServices[0].replace(" ", "-");
+        const servicePrice = parseEther(agentServicePrice);
 
+        console.log({  
+          address,
+          agentName,
+          imgUri,
+          service,
+          servicePrice
+        });
         const boolean = await sdk.registerAgent(
           address,
           agentName,
           imgUri,
-          selectedAgentService,
-          Number(parseEther(agentServicePrice))
+          service,
+          servicePrice
         );
 
         console.log({ registration: boolean });
