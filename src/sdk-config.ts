@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import Ensemble from "@ensemble-ai/sdk";
 import { baseSepolia } from "viem/chains";
+import { PinataSDK } from "pinata-web3";
 
 import { useEffect, useState } from 'react';
 
@@ -67,7 +68,12 @@ export function initSdk(walletClient: any) {
     serviceRegistryAddress: process.env.NEXT_PUBLIC_SERVICE_REGISTRY_ADDRESS!,
   };
 
-  return new Ensemble(config, signer);
+  const pinata = new PinataSDK({
+    pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT_KEY!,
+    pinataGateway: process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL!,
+  });
+  
+  return new Ensemble(config, signer, pinata);
   // const { data: walletClient } = useWalletClient({
   //   config: config
   // });
