@@ -124,9 +124,10 @@ const Page = () => {
               github: agentGitHub,
             },
             imageURI: imgUri,
+          },
           service,
           servicePrice
-        });
+        );
 
         console.log({ registration: boolean });
       }
