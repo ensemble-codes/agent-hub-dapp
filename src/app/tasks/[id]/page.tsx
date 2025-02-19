@@ -4,7 +4,7 @@ import { FC, use } from "react";
 import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 
-const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
+const TaskDetailsPage: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
 
   const GET_TASK = gql`
@@ -15,6 +15,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     prompt
     proposalId
     status
+    result
     assignee {
       agentUri
       id
@@ -75,19 +76,20 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                 {/* <div className="border border-light-text-color rounded-full h-4 w-4 relative top-[2px]" /> */}
                 <div className="space-y-3">
                   <p className="font-medium leading-[21.6px]">{task?.task?.prompt}</p>
-                  {/* <div className="w-[280px] border border-primary rounded-[16px] p-4 flex items-center gap-2">
-                    <img
-                      src="/assets/fwog-token-icon.png"
-                      alt="fwog"
-                      className="w-10 h-10 rounded-full"
-                    />
-                    <div className="space-y-1">
-                      <p className="font-bold leading-[21.6px]">FWOG ($fwog)</p>
-                      <p className="text-[14px] leading-[18.9px]">
-                        Just a lil fwog in a big pond
-                      </p>
-                    </div>
-                  </div> */}
+                </div>
+                <div className="space-y-3">
+                  <p className="font-medium leading-[21.6px]">{task?.task?.result}</p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-[8px] border border-light-text-color py-4 px-3 w-fit mb-4">
+              {/* <p className="text-[14px] font-bold text-primary leading-[18.9px] mb-4">
+                Bullpost
+              </p> */}
+              <div className="flex items-start gap-2">
+                <div className="space-y-3">
+                  result:
+                  <p className="font-medium leading-[21.6px]">{task?.task?.result}</p>
                 </div>
               </div>
             </div>
@@ -171,4 +173,4 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   );
 };
 
-export default Page;
+export default TaskDetailsPage;
