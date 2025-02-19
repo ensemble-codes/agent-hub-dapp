@@ -6,6 +6,7 @@ import { useAccount, useWalletClient } from "wagmi";
 import { useSdk } from "@/sdk-config";
 import { config } from "@/components/onchainconfig/config";
 import Loader from "@/components/loader";
+import { parseEther } from "ethers";
 
 const services = [
   {
@@ -62,6 +63,7 @@ const Page = () => {
   >(
     [SUB_SERVICES["DeFi"][0]] // Initialize with "Swap"
   );
+  const [agentServicePrice, setAgentServicePrice] = useState("");
   const [loadingRegister, setLoadingRegister] = useState(false);
 
   const handleUploadToPinata = useCallback(async (file: File) => {
@@ -87,17 +89,6 @@ const Page = () => {
   }, []);
 
   const registerAgent = useCallback(async () => {
-    console.log({
-      agentName,
-      agentPfp,
-      agentDescription,
-      agentXProfile,
-      agentTelegram,
-      selectedAgentService,
-      selectedAgentSubServices,
-      agentAddress,
-      address,
-    });
     setLoadingRegister(true);
     try {
       if (agentPfp) {
@@ -108,10 +99,10 @@ const Page = () => {
           agentName,
           imgUri,
           selectedAgentService,
-          1000
+          Number(parseEther(agentServicePrice))
         );
 
-        console.log({registration: boolean});
+        console.log({ registration: boolean });
       }
     } catch (error) {
       console.log(error);
@@ -158,7 +149,8 @@ const Page = () => {
       disableNext ||
       !agentAddress ||
       !selectedAgentService ||
-      selectedAgentSubServices.length === 0,
+      selectedAgentSubServices.length === 0 ||
+      !agentServicePrice,
     [disableNext, selectedAgentService, selectedAgentSubServices, agentAddress]
   );
 
@@ -447,6 +439,16 @@ const Page = () => {
                           ))}
                         </div>
                       )}
+                    <div className="flex-1 max-w-[300px] mt-3">
+                      <input
+                        className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color remove-arrow"
+                        placeholder="Enter service fee in ETH"
+                        value={agentServicePrice}
+                        step="any"
+                        type="number"
+                        onChange={(e) => setAgentServicePrice(e.target.value)}
+                      />
+                    </div>
                   </div>
                   <hr
                     className="my-2 border-[0.5px] border-[#8F95B2] w-[50%] mt-6"
@@ -470,7 +472,7 @@ const Page = () => {
                   <button
                     className="w-auto mt-12 space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] disabled:bg-[#FE460066] disabled:cursor-not-allowed"
                     onClick={registerAgent}
-                    disabled={disableRegister}
+                    disabled={disableRegister || loadingRegister}
                   >
                     {loadingRegister ? (
                       <Loader color="white" size="md" />

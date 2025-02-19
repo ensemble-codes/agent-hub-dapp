@@ -19,3 +19,15 @@ body {
 * {
   scroll-behavior: smooth;
 }
+
+@layer base {
+  .remove-arrow::-webkit-outer-spin-button,
+  .remove-arrow::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .remove-arrow {
+    -moz-appearance: textfield;
+  }
+}
