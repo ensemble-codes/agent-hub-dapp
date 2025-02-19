@@ -95,22 +95,38 @@ const Page = () => {
         const imgUri = await handleUploadToPinata(agentPfp);
         
         const service = selectedAgentSubServices[0].replace(" ", "-");
-        const servicePrice = parseEther(agentServicePrice);
+        const servicePrice = parseEther(agentServicePrice).toString();
 
-        console.log({  
+        // console.log({  
+        //   address,
+        //   {
+        //     name: agentName,
+        //     description: agentDescription,
+        //     socials: {
+        //       twitter: agentXProfile,
+        //       telegram: agentTelegram,
+        //       dexscreener: "",
+        //       github: agentGitHub,
+        //     },
+        //     imageURI: imgUri,
+        //   service,
+        //   servicePrice
+        // }
+        const boolean = await sdk.registerAgent(
           address,
-          agentName,
-          imgUri,
+          {
+            name: agentName,
+            description: agentDescription,
+            socials: {
+              twitter: agentXProfile,
+              telegram: agentTelegram,
+              dexscreener: "",
+              github: agentGitHub,
+            },
+            imageURI: imgUri,
           service,
           servicePrice
         });
-        const boolean = await sdk.registerAgent(
-          address,
-          agentName,
-          imgUri,
-          service,
-          servicePrice
-        );
 
         console.log({ registration: boolean });
       }
