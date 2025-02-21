@@ -8,8 +8,9 @@ import { initSdk, useSdk } from "@/sdk-config";
 import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 import { formatEther } from "ethers";
-import { useWalletClient } from 'wagmi';
+import { useWalletClient } from "wagmi";
 import { config } from "@/components/onchainconfig/config";
+import Link from "next/link";
 
 interface ConfirmAgentProps {
   selectedAgent: number;
@@ -25,7 +26,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   const [state] = useContext(AppContext);
   const router = useRouter();
   const { data: walletClient } = useWalletClient({
-    config: config
+    config: config,
   });
   const sdk = useSdk(walletClient);
   const [loadingCreate, setLoadingCreate] = useState(false);
@@ -38,9 +39,27 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
       agentUri
       id
       isRegistered
+      metadata {
+        description
+        dexscreener
+        github
+        id
+        imageUri
+        name
+        telegram
+        twitter
+      }
       name
       owner
       reputation
+      tasks {
+        id
+        issuer
+        prompt
+        proposalId
+        result
+        status
+      }
     }
     price
     service
@@ -53,6 +72,8 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   const ratingsArray = new Array(
     data && data.proposal ? data.proposal.issuer.reputation : 0
   );
+
+  const proposal = data.proposal ? data.proposal : undefined;
 
   const filteredTweetStyles = useMemo(() => {
     return (
@@ -161,19 +182,31 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                 Agent details
               </p>
               <div className="flex items-center gap-1">
-                {data?.proposal?.twitter ? (
-                  <img
-                    src="/assets/agent-telegram-icon.svg"
-                    alt="telegram"
-                    className="w-8 h-8 cursor-pointer"
-                  />
+                {proposal?.issuer?.metadata?.telegram ? (
+                  <Link
+                    href={proposal?.issuer?.metadata?.telegram}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <img
+                      src="/assets/agent-telegram-icon.svg"
+                      alt="telegram"
+                      className="w-8 h-8 cursor-pointer"
+                    />
+                  </Link>
                 ) : null}
-                {data?.proposal?.telegram ? (
-                  <img
-                    src="/assets/agent-twitter-icon.svg"
-                    alt="twitter"
-                    className="w-8 h-8 cursor-pointer"
-                  />
+                {proposal?.issuer?.metadata?.twitter ? (
+                  <Link
+                    href={proposal?.issuer?.metadata?.twitter}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <img
+                      src="/assets/agent-twitter-icon.svg"
+                      alt="twitter"
+                      className="w-8 h-8 cursor-pointer"
+                    />
+                  </Link>
                 ) : null}
               </div>
             </div>
@@ -189,21 +222,26 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
               <div className="flex space-x-2">
                 <img
                   src={
-                    data?.proposal?.issuer?.agentUri ||
-                    "/assets/cook-capital-profile.png"
+                    proposal?.issuer?.metadata?.imageUri.startsWith(
+                      "httroposal?s://"
+                    )
+                      ? proposal?.issuer?.metadata?.imageUri
+                      : `https://${proposal?.issuer?.metadata?.imageUri}` ||
+                        "/assets/cook-capital-profile.png"
                   }
-                  alt={data?.proposal?.issuer?.name}
+                  alt={proposal?.issuer?.metadata?.name}
                   className="w-8 h-8 rounded-full"
                 />
                 <div className="space-y-1">
-                  <p className="font-medium">{data?.proposal?.name}</p>
-                  <p className="text-light-text-color text-[12px]">@Twitter</p>
+                  <p className="font-medium">
+                    {proposal?.issuer?.metadata?.name}
+                  </p>
                 </div>
               </div>
               <div className="rounded-[200px] border-none bg-[#AB21FF3D] px-[12px] py-[4px]">
                 <p className="text-[#AB21FF] leading-[24px] text-center font-bold text-[12px]">
-                  {data?.proposal?.issuer?.owner?.slice(0, 4)}...
-                  {data?.proposal?.issuer?.owner?.slice(-4)}
+                  {proposal?.issuer?.owner?.slice(0, 4)}...
+                  {proposal?.issuer?.owner?.slice(-4)}
                 </p>
               </div>
             </div>
@@ -219,25 +257,11 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
               <p className="font-medium text-light-text-color text-[14px] leading-[18.9px]">
                 Price
               </p>
-              {data && data.proposal && data.proposal.price ? (
+              {proposal && proposal.price ? (
                 <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
-                  {Number(formatEther(data?.proposal?.price))} WETH per tweet
+                  {Number(formatEther(proposal?.price))} WETH per tweet
                 </p>
               ) : null}
-            </div>
-            <hr
-              className="my-5 border-[1px] border-[#8F95B2]"
-              style={{
-                borderImageSource:
-                  "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                borderImageSlice: "1",
-              }}
-            />
-            <div className="w-full flex items-center justify-between">
-              <p className="font-medium text-light-text-color text-[14px] leading-[18.9px]">
-                Mcap
-              </p>
-              <p className="text-[14px] leading-[21.6px] font-bold">$12.51m</p>
             </div>
             <hr
               className="my-5 border-[1px] border-[#8F95B2]"
@@ -252,7 +276,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                 Jobs done
               </p>
               <p className="text-[14px] leading-[21.6px] font-bold">
-                {data?.proposal?.jobs || 0}
+                {proposal?.issuer?.tasks?.length || 0}
               </p>
             </div>
             <hr
