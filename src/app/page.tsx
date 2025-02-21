@@ -33,54 +33,48 @@ export default function Home() {
   const { push } = useRouter();
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
-  const GET_PROPOSALS = useMemo(
+  const GET_AGENTS = useMemo(
     () => gql`
       query MyQuery {
-        proposals${
-          selectedService ? `(where: {service: "${selectedService}"})` : ""
-        } {
-    id
-    issuer {
-      agentUri
-      id
-      isRegistered
-      metadata {
-        description
-        dexscreener
-        github
-        id
-        imageUri
-        name
-        telegram
-        twitter
-      }
-      name
-      owner
-      reputation
-      tasks {
-        id
-        issuer
-        prompt
-        proposalId
-        result
-        status
-      }
-    }
-    price
-    service
-  }
+        agents(first: 10) {
+          agentUri
+          id
+          isRegistered
+          metadata {
+            description
+            dexscreener
+            github
+            id
+            imageUri
+            name
+            telegram
+            twitter
+          }
+          name
+          owner
+          reputation
+          tasks {
+            id
+            issuer
+            prompt
+            proposalId
+            result
+            status
+          }
+        }
       }
     `,
     [selectedService]
   );
 
-  const { data, loading } = useQuery(GET_PROPOSALS);
-  const proposals = data?.proposals || [];
+  const { data, loading } = useQuery(GET_AGENTS);
+  const agents = data?.agents || [];
+  console.log({ agents });
   // just testing services
-  console.log({
-    proposals: proposals.map((p: any) => p.issuer.metadata.imageUri),
-    loading,
-  });
+  // console.log({
+  //   agents: agents.map((a: any) => a.metadata.imageUri),
+  //   loading,
+  // });
 
   return (
     <>
@@ -132,32 +126,34 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center justify-start gap-6 flex-wrap">
-              {proposals.map((p: any) => (
+              {agents.map((a: any) => (
                 <div
-                  key={p.id}
+                  key={a.id}
                   className="p-[1px] bg-gradient-to-br from-[#D8E2EB] to-[#E2ECF5] rounded-[8px] shadow-[4px_4px_8px_0px_#A7BCCF66,-4px_-4px_8px_0px_#FFFFFF3D]"
                 >
                   <div className="md:min-w-[282px] w-full p-3 bg-[#fafafa] rounded-[8px]">
                     <div className="flex items-center justify-between gap-12">
-                      <div className="flex items-center justify-start gap-2">
-                        <img
-                          className="w-14 h-14 rounded-full"
-                          alt="img"
-                          src={p.issuer.metadata.imageUri.startsWith('https://') 
-                            ? p.issuer.metadata.imageUri 
-                            : `https://${p.issuer.metadata.imageUri}`
-                          }
-                        />
-                        <div>
-                          <p className="font-bold text-[14px] leading-[19px] text-text-color">
-                            {p.issuer.metadata.name}
-                          </p>
-                          <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
-                            {p.issuer.owner.slice(0, 4)}...
-                            {p.issuer.owner.slice(-4)}
-                          </p>
+                      {a.metadata && (
+                        <div className="flex items-center justify-start gap-2">
+                          <img
+                            className="w-14 h-14 rounded-full"
+                            alt="img"
+                            src={a.metadata.imageUri.startsWith('https://') 
+                              ? a.metadata.imageUri 
+                              : `https://${a.metadata.imageUri}`
+                            }
+                          />
+                          <div>
+                            <p className="font-bold text-[14px] leading-[19px] text-text-color">
+                              {a.metadata.name}
+                            </p>
+                            <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
+                              {a.owner.slice(0, 4)}...
+                              {a.owner.slice(-4)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      )}
                       <div className="p-2 rounded-[200px] bg-[#8F95B229] flex items-center gap-1">
                         <img
                           src="/assets/star-icon.svg"
@@ -165,7 +161,7 @@ export default function Home() {
                           className="w-3 h-3"
                         />
                         <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
-                          {p.issuer.reputation}
+                          {a.reputation}
                         </p>
                       </div>
                     </div>
@@ -184,9 +180,9 @@ export default function Home() {
                           alt="dollar"
                           className="w-4 h-4"
                         />
-                        <p className="font-bold text-[14px] leading-[19px] text-primary">
-                          {formatEther(p.price)} WETH per task
-                        </p>
+                        {/* <p className="font-bold text-[14px] leading-[19px] text-primary">
+                          {formatEther(a.price)} WETH per task
+                        </p> */}
                       </div>
                       <hr
                         className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
@@ -203,7 +199,7 @@ export default function Home() {
                           className="w-4 h-4"
                         />
                         <p className="font-normal text-[14px] leading-[19px] text-text-color">
-                          {p.issuer.tasks.length} tasks
+                          {a.tasks.length} tasks
                         </p>
                       </div>
                       <hr
@@ -221,7 +217,7 @@ export default function Home() {
                           className="w-4 h-4"
                         />
                         <p className="font-normal text-[14px] leading-[19px] text-text-color">
-                          {p.service}
+                          {a.service}
                         </p>
                       </div>
                       <hr
@@ -238,9 +234,9 @@ export default function Home() {
                           alt="social"
                           className="w-4 h-4"
                         />
-                        {p.issuer.metadata.twitter ? (
+                        {a?.metadata?.twitter ? (
                           <Link
-                            href={p.issuer.metadata.twitter}
+                            href={a.metadata.twitter}
                             target="_blank"
                             rel="noreferrer noopener"
                           >
@@ -251,9 +247,9 @@ export default function Home() {
                             />
                           </Link>
                         ) : null}
-                        {p.issuer.metadata.telegram ? (
+                        {a?.metadata?.telegram ? (
                           <Link
-                            href={p.issuer.metadata.telegram}
+                            href={a.metadata.telegram}
                             target="_blank"
                             rel="noreferrer noopener"
                           >
@@ -264,9 +260,9 @@ export default function Home() {
                             />
                           </Link>
                         ) : null}
-                        {p.issuer.metadata.github ? (
+                        {a?.metadata?.github ? (
                           <Link
-                            href={p.issuer.metadata.github}
+                            href={a.metadata.github}
                             target="_blank"
                             rel="noreferrer noopener"
                           >
@@ -281,7 +277,7 @@ export default function Home() {
                     </div>
                     <button
                       className="w-full border border-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
-                      onClick={() => push(`/task-center?service=${p.service}&proposal=${p.id}`)}
+                      onClick={() => push(`/task-center?service=${a.service}&proposal=${a.id}`)}
                     >
                       <img
                         src="/assets/bolt-primary-icon.svg"
