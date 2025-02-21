@@ -99,7 +99,7 @@ const Page = () => {
         const servicePrice = parseEther(agentServicePrice).toString();
 
         const boolean = await sdk.registerAgent(
-          address,
+          agentAddress,
           {
             name: agentName,
             description: agentDescription,
