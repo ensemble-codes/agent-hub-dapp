@@ -1,27 +1,10 @@
-import { gql, useQuery } from "@apollo/client";
 import { FC } from "react";
 
 interface MainProps {
   selectedService: (service: string) => void;
 }
 
-const GET_SERVICES = gql`
-  query MyQuery {
-  services {
-    category
-    description
-    id
-    name
-  }
-}
-`
-
 const Main: FC<MainProps> = ({ selectedService }) => {
-
-  const { data, loading, error } = useQuery(GET_SERVICES);
-
-  // just testing services
-  console.log({ data, loading, error });
 
   return (
     <div className="w-full flex flex-col items-start gap-16 mt-3">
