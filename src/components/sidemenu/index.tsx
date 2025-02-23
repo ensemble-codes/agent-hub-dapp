@@ -6,14 +6,16 @@ import { getTaskStatusText } from "@/utils";
 import { TaskStatus } from "@/enum/taskstatus";
 import Loader from "../loader";
 import { gql, useQuery } from "@apollo/client";
+import { usePathname } from "next/navigation";
 
 const SideMenu = () => {
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
+  const pathname = usePathname();
 
   const GET_TASKS = useMemo(
     () => gql`query MyQuery {
-  tasks(where: {issuer: "${address?.toLowerCase()}" }) {
+  tasks${address ? `(where: {issuer: "${address?.toLowerCase()}" })` : ""} {
     assignee {
       agentUri
       id
@@ -36,10 +38,42 @@ const SideMenu = () => {
   return (
     <div className="sticky top-[124px] flex-shrink-0 w-[180px] flex flex-col items-start gap-5">
       <Link href={"/"} className="w-full">
-        <div className="py-4 bg-white shadow-[5px_5px_10px_0px_#FE460066,-5px_-5px_10px_0px_#FAFBFFAD] w-full rounded-[50px] flex items-center justify-center gap-4">
-          <img src="/assets/marketplace-icon.svg" alt="marketplace-icon" />
-          <span className="text-primary font-medium">THE HUB</span>
-        </div>
+        {pathname === "/" ? (
+          <div className="py-4 bg-[#DDE7F0] w-full rounded-[50px] flex items-center justify-center gap-2 shadow-[inset_4px_4px_30px_0px_#A7BCCF,inset_-7px_-7px_30px_0px_#FFFFFF99]">
+            <img
+              src="/assets/marketplace-selected-icon.svg"
+              alt="marketplace-selected-icon"
+            />
+            <span className="text-primary font-medium">THE HUB</span>
+          </div>
+        ) : (
+          <div className="p-[3px] bg-gradient-to-br from-[#D8E2EB] to-[#E2ECF5] rounded-[50px] shadow-[7px_7px_30px_0px_#A7BCCF,7px_-7px_30px_0px_#FFFFFF99]">
+            <div className="py-4 bg-white w-full rounded-[50px] flex items-center justify-center gap-2">
+              <img src="/assets/marketplace-icon.svg" alt="marketplace-icon" />
+              <span className="text-light-text-color font-medium">THE HUB</span>
+            </div>
+          </div>
+        )}
+      </Link>
+      <Link href={"/task-center"} className="w-full">
+        {pathname === "/task-center" ? (
+          <div className="py-4 bg-[#DDE7F0] w-full rounded-[50px] flex items-center justify-center gap-2 shadow-[inset_4px_4px_30px_0px_#A7BCCF,inset_-7px_-7px_30px_0px_#FFFFFF99]">
+            <img
+              src="/assets/task-center-selected-icon.svg"
+              alt="task-center-selected-icon"
+            />
+            <span className="text-primary font-medium">TASK CENTER</span>
+          </div>
+        ) : (
+          <div className="p-[3px] bg-gradient-to-br from-[#D8E2EB] to-[#E2ECF5] rounded-[50px] shadow-[7px_7px_30px_0px_#A7BCCF,7px_-7px_30px_0px_#FFFFFF99]">
+            <div className="py-4 bg-white w-full rounded-[50px] flex items-center justify-center gap-2">
+              <img src="/assets/task-center-icon.svg" alt="marketplace-icon" />
+              <span className="text-light-text-color font-medium">
+                TASK CENTER
+              </span>
+            </div>
+          </div>
+        )}
       </Link>
       <div
         className="p-4 bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] w-full flex flex-col items-start gap-4 max-h-[300px] overflow-y-auto"
