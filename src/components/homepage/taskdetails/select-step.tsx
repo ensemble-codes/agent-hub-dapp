@@ -1,8 +1,9 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { gql, useQuery } from "@apollo/client";
 import Loader from "@/components/loader";
 import { formatEther } from "ethers";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface SelectAgentStepProps {
   selectedAgent: (agent: number) => void;
@@ -11,24 +12,58 @@ interface SelectAgentStepProps {
 const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
   const searchParams = useSearchParams();
   const selectedService = searchParams.get("service");
+  const proposalId = searchParams.get("proposal");
 
-  const GET_PROPOSALS = gql`
-    query MyQuery {
-      proposals(where: { service: "${selectedService?.split(' ').join('-')}" }) {
-        id
-        service
-        price
-        issuer {
-          agentUri
+  const GET_PROPOSALS = useMemo(
+    () => gql`
+      query MyQuery {
+        proposals${
+          proposalId || selectedService
+            ? `(where: { ${
+                selectedService
+                  ? `service: "${selectedService?.split(" ").join("-")}"`
+                  : ""
+              }${
+                proposalId
+                  ? `${selectedService ? ", " : ""}id: "${proposalId}"`
+                  : ""
+              } })`
+            : ""
+        } {
           id
-          isRegistered
-          name
-          owner
-          reputation
-        }
+          issuer {
+      agentUri
+      id
+      isRegistered
+      metadata {
+        description
+        dexscreener
+        github
+        id
+        imageUri
+        name
+        telegram
+        twitter
+      }
+      name
+      owner
+      reputation
+      tasks {
+        id
+        issuer
+        prompt
+        proposalId
+        result
+        status
       }
     }
-  `;
+    price
+    service
+        }
+      }
+    `,
+    [selectedService, proposalId]
+  );
 
   const { data, loading, error } = useQuery(GET_PROPOSALS);
 
@@ -42,22 +77,23 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
     <></>
   ) : (
     <div className="flex flex-wrap gap-8">
-      {data.proposals
-        .filter((da: any) => da.service === "Bull-Post")
-        .map((agent: any) => (
-          <AgentCard
-            key={agent.id}
-            id={agent.id}
-            img={agent.issuer.uri || "/assets/cook-capital-profile.png"}
-            name={agent.issuer.name}
-            jobs={agent.issuer.jobs || 0}
-            price={Number(formatEther(agent.price))}
-            rating={Number(agent.issuer.reputation) || 0}
-            telegram={agent.telegram || ""}
-            twitter={agent.twitter || ""}
-            selectedAgent={(val) => selectedAgent(val)}
-          />
-        ))}
+      {data.proposals.map((agent: any) => (
+        <AgentCard
+          key={agent.issuer.name}
+          id={agent.id}
+          img={
+            agent.issuer.metadata.imageUri || "/assets/cook-capital-profile.png"
+          }
+          name={agent.issuer.name}
+          jobs={agent.issuer.tasks.length || 0}
+          price={Number(formatEther(agent.price))}
+          rating={Number(agent.issuer.reputation) || 0}
+          telegram={agent.issuer.metadata.telegram || ""}
+          twitter={agent.issuer.metadata.twitter || ""}
+          github={agent.issuer.metadata.github || ""}
+          selectedAgent={(val) => selectedAgent(val)}
+        />
+      ))}
     </div>
   );
 };
@@ -73,6 +109,7 @@ interface AgentCardProps {
   rating: number;
   twitter: string;
   telegram: string;
+  github: string;
   selectedAgent: (agent: number) => void;
 }
 
@@ -85,6 +122,7 @@ const AgentCard: FC<AgentCardProps> = ({
   rating,
   twitter,
   telegram,
+  github,
   selectedAgent,
 }) => {
   const ratingsArray = new Array(rating);
@@ -162,19 +200,32 @@ const AgentCard: FC<AgentCardProps> = ({
           Links
         </p>
         <div className="flex items-center gap-1">
-          {twitter ? (
-            <img
-              src="/assets/agent-telegram-icon.svg"
-              alt="telegram"
-              className="w-8 h-8 cursor-pointer"
-            />
-          ) : null}
           {telegram ? (
-            <img
-              src="/assets/agent-twitter-icon.svg"
-              alt="twitter"
-              className="w-8 h-8 cursor-pointer"
-            />
+            <Link href={telegram} target="_blank" rel="noreferrer noopener">
+              <img
+                src="/assets/agent-list-card-tg-icon.svg"
+                alt="telegram"
+                className="w-8 h-8 cursor-pointer"
+              />
+            </Link>
+          ) : null}
+          {twitter ? (
+            <Link href={twitter} target="_blank" rel="noreferrer noopener">
+              <img
+                src="/assets/agent-list-card-x-icon.svg"
+                alt="twitter"
+                className="w-8 h-8 cursor-pointer"
+              />
+            </Link>
+          ) : null}
+          {github ? (
+            <Link href={github} target="_blank" rel="noreferrer noopener">
+              <img
+                src="/assets/agent-list-card-gh-icon.svg"
+                alt="github"
+                className="w-8 h-8 cursor-pointer"
+              />
+            </Link>
           ) : null}
         </div>
       </div>
