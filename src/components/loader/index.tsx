@@ -1,7 +1,7 @@
 "use client";
 
 interface LoaderProps {
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
   color?: "primary" | "white";
 }
 
@@ -9,7 +9,9 @@ const Loader = ({ size = "md", color = "primary" }: LoaderProps) => {
   const sizeClasses = {
     sm: "w-4 h-4",
     md: "w-6 h-6",
-    lg: "w-8 h-8"
+    lg: "w-8 h-8",
+    xl: "w-10 h-10",
+    "2xl": "w-12 h-12" 
   };
 
   const borderColorClasses = {

@@ -69,7 +69,7 @@ export default function Home() {
 
   const { data, loading } = useQuery(GET_AGENTS);
   const agents = data?.agents || [];
-  console.log({ agents });
+  // console.log({ agents });
   // just testing services
   // console.log({
   //   agents: agents.map((a: any) => a.metadata.imageUri),
@@ -136,7 +136,7 @@ export default function Home() {
                       {a.metadata && (
                         <div className="flex items-center justify-start gap-2">
                           <img
-                            className="w-14 h-14 rounded-full"
+                            className="w-14 h-14 rounded-full object-cover"
                             alt="img"
                             src={a.metadata.imageUri.startsWith('https://') 
                               ? a.metadata.imageUri 

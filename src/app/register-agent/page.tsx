@@ -1,7 +1,7 @@
 "use client";
 import { AppHeader, SideMenu } from "@/components";
 import axios from "axios";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { useSdk } from "@/sdk-config";
 import { config } from "@/components/onchainconfig/config";
@@ -66,6 +66,8 @@ const Page = () => {
     );
   const [agentServicePrice, setAgentServicePrice] = useState("");
   const [loadingRegister, setLoadingRegister] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [registerFailure, setRegisterFailure] = useState(false);
 
   const handleUploadToPinata = useCallback(async (file: File) => {
     try {
@@ -115,10 +117,15 @@ const Page = () => {
           servicePrice
         );
 
-        if (boolean) push(`/`);
+        if (boolean) {
+          setRegisterSuccess(true);
+        } else {
+          setRegisterFailure(true);
+        }
       }
     } catch (error) {
       console.log(error);
+      setRegisterFailure(true);
     } finally {
       setLoadingRegister(false);
     }
@@ -165,6 +172,16 @@ const Page = () => {
       !agentServicePrice,
     [disableNext, selectedAgentService, agentAddress]
   );
+
+  useEffect(() => {
+    if (registerFailure) {
+      const timer = setTimeout(() => {
+        setRegisterFailure(false);
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [registerFailure]);
 
   return (
     <div>
@@ -491,7 +508,53 @@ const Page = () => {
                   preview
                 </p>
               </div>
-              {agentPfp ? (
+              {loadingRegister ? (
+                <div className="w-[243px] h-[192px] mx-auto flex flex-col gap-4 items-center justify-center">
+                  <Loader size="xl" />
+                  <p className="text-text-color text-[14px] font-bold leading-[19px]">
+                    Confirming tx to deploy agent...
+                  </p>
+                </div>
+              ) : registerSuccess ? (
+                <div className="relative w-[243px] h-[192px] mx-auto flex flex-col gap-4 items-center justify-center">
+                  <img
+                    src="/assets/register-success-confetti.gif"
+                    alt="confetti"
+                    className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
+                  />
+                  <img
+                    src="/assets/register-success-check.gif"
+                    alt="success"
+                    className="w-12 h-12 rounded-full"
+                  />
+                  <p className="text-text-color text-[14px] font-bold leading-[19px] text-center">
+                    Agent deployed!
+                    <br />
+                    welcome to the future...
+                  </p>
+                </div>
+              ) : registerFailure ? (
+                <>
+                  <div
+                    className="w-[243px] rounded-[8px] h-[192px] mx-auto flex flex-col gap-4 items-center justify-center"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(239, 68, 68, 0.28) -38.54%, #FAFAFA 80.21%, #ffffff)",
+                    }}
+                  >
+                    <img
+                      src="/assets/register-failure.gif"
+                      alt="failure"
+                      className="w-[90px] h-[90px]"
+                    />
+                    <p className="text-text-color text-[14px] font-bold leading-[19px] text-center">
+                      Error deploying!
+                      <br />
+                      please try again...
+                    </p>
+                  </div>
+                </>
+              ) : agentPfp ? (
                 <img
                   src={URL.createObjectURL(agentPfp)}
                   alt="Agent preview"
@@ -590,7 +653,7 @@ const Page = () => {
                     </p>
                   ) : null}
                 </div>
-                {detailsStep === "capabilities" ? (
+                {detailsStep === "capabilities" && !registerSuccess ? (
                   <button
                     className="w-full mt-4 space-x-2 flex items-center justify-center gap-1 rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] disabled:bg-[#FE460066] disabled:cursor-not-allowed"
                     onClick={registerAgent}

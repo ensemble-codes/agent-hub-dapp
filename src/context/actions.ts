@@ -1,1 +1,2 @@
 export const SET_TASK_PROMPT = 'SET_TASK_PROMPT';
+export const SET_IS_WHITELISTED = 'SET_IS_WHITELISTED';
