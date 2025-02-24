@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AppBg, Footer, GoogleTagManager } from "@/components";
+import { AppBg, Footer, GoogleTagManager, Wrapper } from "@/components";
 import OnchainProvider from "@/components/onchainconfig/provider";
 import { AppContextProvider } from "@/context";
 
@@ -49,11 +49,13 @@ export default function RootLayout({
         )}
         <OnchainProvider>
           <AppContextProvider>
-            <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">
-              <AppBg />
-              {children}
-            </main>
-            <Footer />
+            {/* <Wrapper> */}
+              <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">
+                <AppBg />
+                {children}
+              </main>
+              <Footer />
+            {/* </Wrapper> */}
           </AppContextProvider>
         </OnchainProvider>
       </body>

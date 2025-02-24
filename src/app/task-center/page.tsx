@@ -1,18 +1,17 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppHeader, HomeMain, SideMenu, TaskDetails } from "@/components";
-
-import { Suspense } from 'react';
+import { Suspense } from "react";
 
 export default function Page() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <InternalPage />
+      <PageContent />
     </Suspense>
   );
 }
 
-const InternalPage = () => {
+const PageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedService = searchParams.get("service");
