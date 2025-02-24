@@ -3,8 +3,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AppHeader, HomeMain, SideMenu, TaskDetails } from "@/components";
 import { Suspense } from "react";
 
-import { Suspense } from 'react';
-
 export default function Page() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
