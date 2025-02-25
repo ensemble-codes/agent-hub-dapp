@@ -5,7 +5,7 @@ import Modal from "../modal";
 import { metaMask } from "wagmi/connectors";
 import { baseSepolia } from "viem/chains";
 import Loader from "../loader";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -14,15 +14,9 @@ interface WrapperProps {
 const Wrapper: FC<WrapperProps> = ({ children }) => {
   const { isConnected, address } = useAccount();
   const { connect } = useConnect();
-  const { push } = useRouter();
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(true);
   const [checkingEligibility, setCheckingEligibility] = useState(false);
   const [eligibility, setEligibility] = useState(false);
-
-  const onModalClose = () => {
-    localStorage.setItem("show-agenthub-register-modal", "true");
-    setShowRegisterModal(false);
-  };
 
   const checkWallet = useCallback(async () => {
     try {
@@ -39,6 +33,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
       );
       const data = await response.json();
       setEligibility(data.length > 0);
+      setShowRegisterModal(!(data.length > 0));
     } catch (error) {
       console.log(error);
       setEligibility(false);
@@ -51,20 +46,10 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
     if (address) checkWallet();
   }, [address]);
 
-  useEffect(() => {
-    const showModal = localStorage.getItem("show-agenthub-register-modal");
-    if (showModal) setShowRegisterModal(false);
-    else setShowRegisterModal(true);
-  }, []);
-
-  useEffect(() => {
-    if (eligibility) onModalClose();
-  }, [eligibility]);
-
   return (
     <>
       {children}
-      <Modal isOpen={showRegisterModal} onClose={onModalClose}>
+      <Modal isOpen={showRegisterModal}>
         <div className="p-12 relative overflow-hidden w-[600px] h-[400px] flex flex-col items-center justify-between">
           <img
             className="absolute top-0 left-0 object-cover w-full h-full z-[-1]"
@@ -112,14 +97,6 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
                   This won't be long!
                 </p>
               </div>
-              <button
-                className="w-auto space-x-2 flex items-center justify-between rounded-[50px] border border-[#3D3D3D66] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-[12px] px-[16px]"
-                onClick={onModalClose}
-              >
-                <span className="font-medium text-[#3d3d3d] leading-[24px]">
-                  Cancel
-                </span>
-              </button>
             </>
           ) : (
             <>
@@ -136,31 +113,27 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
                   Please register your agent to be part of the Beta
                 </p>
               </div>
-              <div 
-                className="p-[3.47px] bg-gradient-to-br from-[#FE4600] to-[#E2ECF5] rounded-[50px] shadow-[8.11px_8.11px_18.53px_0px_rgba(202,221,237,1),-8.11px_-8.11px_18.53px_0px_rgba(202,221,237,0.6)]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
+              <Link
+                href="https://88phxim41aw.typeform.com/to/MBZRyY88"
+                target="_blank"
+                rel="noreferrer noopener"
               >
-                <button
-                  type="button"
-                  className="w-full flex items-center gap-2 justify-between rounded-[50px] py-[12px] px-[16px] bg-gradient-to-br from-[#FE4600] to-[#FF7541] cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    push("/register-agent");
-                    onModalClose();
-                  }}
-                >
-                  <img
-                    src="/assets/register-icon.svg"
-                    alt="register"
-                    className="w-6 h-6"
-                  />
-                  <span className="text-white text-[16px] font-[700] leading-[24px]">
-                    Register Agent
-                  </span>
-                </button>
-              </div>
+                <div className="p-[3.47px] bg-gradient-to-br from-[#FE4600] to-[#E2ECF5] rounded-[50px] shadow-[8.11px_8.11px_18.53px_0px_rgba(202,221,237,1),-8.11px_-8.11px_18.53px_0px_rgba(202,221,237,0.6)]">
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-2 justify-between rounded-[50px] py-[12px] px-[16px] bg-gradient-to-br from-[#FE4600] to-[#FF7541] cursor-pointer"
+                  >
+                    <img
+                      src="/assets/register-icon.svg"
+                      alt="register"
+                      className="w-6 h-6"
+                    />
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      Register Agent
+                    </span>
+                  </button>
+                </div>
+              </Link>
             </>
           )}
         </div>

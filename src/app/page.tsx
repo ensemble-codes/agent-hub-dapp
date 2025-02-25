@@ -1,5 +1,5 @@
 "use client";
-import { AppHeader, SideMenu } from "@/components";
+import { AppHeader, Loader, SideMenu } from "@/components";
 import { gql, useQuery } from "@apollo/client";
 import { formatEther } from "ethers";
 import Link from "next/link";
@@ -52,6 +52,11 @@ export default function Home() {
           }
           name
           owner
+          proposals {
+            id
+            price
+            service
+          }
           reputation
           tasks {
             id
@@ -69,12 +74,6 @@ export default function Home() {
 
   const { data, loading } = useQuery(GET_AGENTS);
   const agents = data?.agents || [];
-  // console.log({ agents });
-  // just testing services
-  // console.log({
-  //   agents: agents.map((a: any) => a.metadata.imageUri),
-  //   loading,
-  // });
 
   return (
     <>
@@ -125,173 +124,186 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <div className="flex items-center justify-start gap-6 flex-wrap">
-              {agents.map((a: any) => (
-                <div
-                  key={a.id}
-                  className="p-[1px] bg-gradient-to-br from-[#D8E2EB] to-[#E2ECF5] rounded-[8px] shadow-[4px_4px_8px_0px_#A7BCCF66,-4px_-4px_8px_0px_#FFFFFF3D]"
-                >
-                  <div className="md:min-w-[282px] w-full p-3 bg-[#fafafa] rounded-[8px]">
-                    <div className="flex items-center justify-between gap-12">
-                      {a.metadata && (
-                        <div className="flex items-center justify-start gap-2">
-                          <img
-                            className="w-14 h-14 rounded-full object-cover"
-                            alt="img"
-                            src={a.metadata.imageUri.startsWith('https://') 
-                              ? a.metadata.imageUri 
-                              : `https://${a.metadata.imageUri}`
-                            }
-                          />
-                          <div>
-                            <p className="font-bold text-[14px] leading-[19px] text-text-color">
-                              {a.metadata.name}
-                            </p>
-                            <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
-                              {a.owner.slice(0, 4)}...
-                              {a.owner.slice(-4)}
-                            </p>
+            {loading ? (
+              <Loader size="xl" />
+            ) : (
+              <div className="flex items-center justify-start gap-6 flex-wrap">
+                {agents.map((a: any) => (
+                  <div
+                    key={a.id}
+                    className="p-[1px] bg-gradient-to-br from-[#D8E2EB] to-[#E2ECF5] rounded-[8px] shadow-[4px_4px_8px_0px_#A7BCCF66,-4px_-4px_8px_0px_#FFFFFF3D]"
+                  >
+                    <div className="md:min-w-[282px] w-full p-3 bg-[#fafafa] rounded-[8px]">
+                      <div className="flex items-center justify-between gap-12">
+                        {a.metadata && (
+                          <div className="flex items-center justify-start gap-2">
+                            <img
+                              className="w-14 h-14 rounded-full object-cover"
+                              alt="img"
+                              src={
+                                a.metadata.imageUri.startsWith("https://")
+                                  ? a.metadata.imageUri
+                                  : `https://${a.metadata.imageUri}`
+                              }
+                            />
+                            <div>
+                              <p className="font-bold text-[14px] leading-[19px] text-text-color">
+                                {a.metadata.name}
+                              </p>
+                              <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
+                                {a.owner.slice(0, 4)}...
+                                {a.owner.slice(-4)}
+                              </p>
+                            </div>
                           </div>
+                        )}
+                        <div className="p-2 rounded-[200px] bg-[#8F95B229] flex items-center gap-1">
+                          <img
+                            src="/assets/star-icon.svg"
+                            alt="star"
+                            className="w-3 h-3"
+                          />
+                          <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
+                            {a.reputation}
+                          </p>
                         </div>
-                      )}
-                      <div className="p-2 rounded-[200px] bg-[#8F95B229] flex items-center gap-1">
-                        <img
-                          src="/assets/star-icon.svg"
-                          alt="star"
-                          className="w-3 h-3"
-                        />
-                        <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
-                          {a.reputation}
-                        </p>
                       </div>
+                      <div className="pt-2 pb-4">
+                        <hr
+                          className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
+                          style={{
+                            borderImageSource:
+                              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                            borderImageSlice: "1",
+                          }}
+                        />
+                        <div className="flex items-center gap-2">
+                          <img
+                            src="/assets/agent-list-card-dollar-icon.svg"
+                            alt="dollar"
+                            className="w-4 h-4"
+                          />
+                          {a?.proposals?.length ? (
+                            <p className="font-bold text-[14px] leading-[19px] text-primary">
+                              {formatEther(a.proposals[0].price)} WETH per task
+                            </p>
+                          ) : null}
+                        </div>
+                        <hr
+                          className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
+                          style={{
+                            borderImageSource:
+                              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                            borderImageSlice: "1",
+                          }}
+                        />
+                        <div className="flex items-center gap-2">
+                          <img
+                            src="/assets/agent-list-card-wrench-icon.svg"
+                            alt="wrench"
+                            className="w-4 h-4"
+                          />
+                          <p className="font-normal text-[14px] leading-[19px] text-text-color">
+                            {a.tasks.length} tasks
+                          </p>
+                        </div>
+                        <hr
+                          className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
+                          style={{
+                            borderImageSource:
+                              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                            borderImageSlice: "1",
+                          }}
+                        />
+                        <div className="flex items-center gap-2">
+                          <img
+                            src="/assets/agent-list-card-pulse-icon.svg"
+                            alt="pulse"
+                            className="w-4 h-4"
+                          />
+                          {a?.proposals?.length ? (
+                            <p className="font-normal text-[14px] leading-[19px] text-text-color">
+                              {a.proposals[0].service}
+                            </p>
+                          ) : null}
+                        </div>
+                        <hr
+                          className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
+                          style={{
+                            borderImageSource:
+                              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                            borderImageSlice: "1",
+                          }}
+                        />
+                        <div className="flex items-center gap-2">
+                          <img
+                            src="/assets/agent-list-card-social-icon.svg"
+                            alt="social"
+                            className="w-4 h-4"
+                          />
+                          {a?.metadata?.twitter ? (
+                            <Link
+                              href={a.metadata.twitter}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              <img
+                                src="/assets/agent-list-card-x-icon.svg"
+                                alt="x"
+                                className="w-5 h-5"
+                              />
+                            </Link>
+                          ) : null}
+                          {a?.metadata?.telegram ? (
+                            <Link
+                              href={a.metadata.telegram}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              <img
+                                src="/assets/agent-list-card-tg-icon.svg"
+                                alt="tg"
+                                className="w-5 h-5"
+                              />
+                            </Link>
+                          ) : null}
+                          {a?.metadata?.github ? (
+                            <Link
+                              href={a.metadata.github}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              <img
+                                src="/assets/agent-list-card-gh-icon.svg"
+                                alt="gh"
+                                className="w-5 h-5"
+                              />
+                            </Link>
+                          ) : null}
+                        </div>
+                      </div>
+                      <button
+                        className="w-full border border-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
+                        onClick={() =>
+                          push(
+                            `/task-center?service=${a.service}&proposal=${a.id}`
+                          )
+                        }
+                      >
+                        <img
+                          src="/assets/bolt-primary-icon.svg"
+                          alt="bolt"
+                          className="w-4 h-4"
+                        />
+                        <p className="font-bold text-primary leading-[20px]">
+                          Assign
+                        </p>
+                      </button>
                     </div>
-                    <div className="pt-2 pb-4">
-                      <hr
-                        className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
-                        style={{
-                          borderImageSource:
-                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
-                          borderImageSlice: "1",
-                        }}
-                      />
-                      <div className="flex items-center gap-2">
-                        <img
-                          src="/assets/agent-list-card-dollar-icon.svg"
-                          alt="dollar"
-                          className="w-4 h-4"
-                        />
-                        {/* <p className="font-bold text-[14px] leading-[19px] text-primary">
-                          {formatEther(a.price)} WETH per task
-                        </p> */}
-                      </div>
-                      <hr
-                        className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
-                        style={{
-                          borderImageSource:
-                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
-                          borderImageSlice: "1",
-                        }}
-                      />
-                      <div className="flex items-center gap-2">
-                        <img
-                          src="/assets/agent-list-card-wrench-icon.svg"
-                          alt="wrench"
-                          className="w-4 h-4"
-                        />
-                        <p className="font-normal text-[14px] leading-[19px] text-text-color">
-                          {a.tasks.length} tasks
-                        </p>
-                      </div>
-                      <hr
-                        className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
-                        style={{
-                          borderImageSource:
-                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
-                          borderImageSlice: "1",
-                        }}
-                      />
-                      <div className="flex items-center gap-2">
-                        <img
-                          src="/assets/agent-list-card-pulse-icon.svg"
-                          alt="pulse"
-                          className="w-4 h-4"
-                        />
-                        <p className="font-normal text-[14px] leading-[19px] text-text-color">
-                          {a.service}
-                        </p>
-                      </div>
-                      <hr
-                        className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
-                        style={{
-                          borderImageSource:
-                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
-                          borderImageSlice: "1",
-                        }}
-                      />
-                      <div className="flex items-center gap-2">
-                        <img
-                          src="/assets/agent-list-card-social-icon.svg"
-                          alt="social"
-                          className="w-4 h-4"
-                        />
-                        {a?.metadata?.twitter ? (
-                          <Link
-                            href={a.metadata.twitter}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                          >
-                            <img
-                              src="/assets/agent-list-card-x-icon.svg"
-                              alt="x"
-                              className="w-5 h-5"
-                            />
-                          </Link>
-                        ) : null}
-                        {a?.metadata?.telegram ? (
-                          <Link
-                            href={a.metadata.telegram}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                          >
-                            <img
-                              src="/assets/agent-list-card-tg-icon.svg"
-                              alt="tg"
-                              className="w-5 h-5"
-                            />
-                          </Link>
-                        ) : null}
-                        {a?.metadata?.github ? (
-                          <Link
-                            href={a.metadata.github}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                          >
-                            <img
-                              src="/assets/agent-list-card-gh-icon.svg"
-                              alt="gh"
-                              className="w-5 h-5"
-                            />
-                          </Link>
-                        ) : null}
-                      </div>
-                    </div>
-                    <button
-                      className="w-full border border-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
-                      onClick={() => push(`/task-center?service=${a.service}&proposal=${a.id}`)}
-                    >
-                      <img
-                        src="/assets/bolt-primary-icon.svg"
-                        alt="bolt"
-                        className="w-4 h-4"
-                      />
-                      <p className="font-bold text-primary leading-[20px]">
-                        Assign
-                      </p>
-                    </button>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
