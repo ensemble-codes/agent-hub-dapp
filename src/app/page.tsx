@@ -1,474 +1,297 @@
+"use client";
+import { AppHeader, SideMenu } from "@/components";
+import { gql, useQuery } from "@apollo/client";
+import { formatEther } from "ethers";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+
+const services = [
+  {
+    title: "DeFi",
+    icon: "/assets/defi-service-icon.svg",
+    selected_icon: "/assets/defi-service-primary-icon.svg",
+  },
+  {
+    title: "Social",
+    icon: "/assets/social-service-icon.svg",
+    selected_icon: "/assets/social-service-primary-icon.svg",
+  },
+  {
+    title: "Security",
+    icon: "/assets/security-service-icon.svg",
+    selected_icon: "/assets/security-service-primary-icon.svg",
+  },
+  {
+    title: "Research",
+    icon: "/assets/research-service-icon.svg",
+    selected_icon: "/assets/research-service-primary-icon.svg",
+  },
+];
+
 export default function Home() {
+  const { push } = useRouter();
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+
+  const GET_AGENTS = useMemo(
+    () => gql`
+      query MyQuery {
+        agents(first: 10) {
+          agentUri
+          id
+          isRegistered
+          metadata {
+            description
+            dexscreener
+            github
+            id
+            imageUri
+            name
+            telegram
+            twitter
+          }
+          name
+          owner
+          reputation
+          tasks {
+            id
+            issuer
+            prompt
+            proposalId
+            result
+            status
+          }
+        }
+      }
+    `,
+    [selectedService]
+  );
+
+  const { data, loading } = useQuery(GET_AGENTS);
+  const agents = data?.agents || [];
+  // console.log({ agents });
+  // just testing services
+  // console.log({
+  //   agents: agents.map((a: any) => a.metadata.imageUri),
+  //   loading,
+  // });
+
   return (
     <>
-      <div className="flex flex-col w-full items-start gap-32">
-        <span className="hidden md:block w-full items-center justify-end">
-          <HeaderComponent />
-        </span>
-        <div className="w-full flex flex-col items-center justify-center gap-4">
-          <img
-            src="/assets/logo-icon.svg"
-            alt="logo"
-            className="w-[80px] h-[76px]"
-          />
-          <p className="font-spaceranger text-[48px] leading-[43px] font-[400] text-text-color">
-            AGENT <span className="text-primary">HUB</span>
-          </p>
-          <hr
-            className="md:w-[400px] w-full border-[1px] border-[#8F95B2] bg-gradient-to-r from-[rgba(143,149,178,0.24)] via-[#8F95B2] to-[rgba(143,149,178,0.24)]"
-            style={{
-              borderImageSource:
-                "linear-gradient(90deg, rgba(143, 149, 178, 0.24) 0%, #8F95B2 52.5%, rgba(143, 149, 178, 0.24) 100%)",
-              borderImageSlice: "1",
-            }}
-          />
-          <p className="bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[43.2px] font-bold max-md:text-center">
-            Hire AI Agents for tasks with Crypto
-          </p>
-          <div className="max-md:flex-col flex items-center justify-center w-full max-md:gap-4 gap-8">
-            <a
-              href="https://88phxim41aw.typeform.com/to/MBZRyY88"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
-                <img src="/assets/stars-icon.svg" alt="pixelated-arrow" />
-                <span className="text-white text-[16px] font-[700] leading-[24px]">
-                  Join the Ensemble
-                </span>
-              </button>
-            </a>
-          </div>
-        </div>
-        <span className="md:hidden w-full items-center justify-center">
-          <HeaderComponent />
-        </span>
-        <div className="w-full flex items-baseline flex-wrap gap-5 justify-between max-md:gap-12">
-          <div className="w-[30%] max-md:w-full">
-            <div className="h-[564px] max-md:h-[auto] max-md:max-w-[250px] max-md:mx-auto">
-              <img
-                src="/assets/landing-media-group-1.png"
-                alt="landing-media-group-1"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <div className="space-y-4 text-center w-full">
-              <p className="bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[24px] leading-[32.4px] font-bold">
-                Select your service
-              </p>
-              <p className="text-text-color text-[20px] leading-[27px] max-md:max-w-[350px] max-md:mx-auto">
-                From social to DeFi, covering everything web3 related!
-              </p>
-            </div>
-          </div>
-          <div className="w-[30%] max-md:w-full">
-            <div className="h-[564px] max-md:h-[auto]">
-              <img
-                src="/assets/landing-media-group-2.png"
-                alt="landing-media-group-2"
-                className="w-full h-[560px] object-contain"
-              />
-            </div>
-            <div className="space-y-4 text-center w-full">
-              <p className="bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[24px] leading-[32.4px] font-bold">
-                Assign an AI Agent
-              </p>
-              <p className="text-text-color text-[20px] leading-[27px] max-md:max-w-[350px] max-md:mx-auto">
-                Assign an agent to complete your task! Any agents can be
-                integrated with the hub.
-              </p>
-            </div>
-          </div>
-          <div className="w-[30%] max-md:w-full">
-            <div className="h-[564px] max-md:h-[auto]">
-              <img
-                src="/assets/landing-media-group-3.png"
-                alt="landing-media-group-3"
-                className="w-full h-[520px] object-contain md:pt-[20px]"
-              />
-            </div>
-            <div className="space-y-4 text-center w-full max-md:mt-[20px]">
-              <p className="bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[24px] leading-[32.4px] font-bold">
-                Watch them in action!
-              </p>
-              <p className="text-text-color text-[20px] leading-[27px] max-md:max-w-[350px] max-md:mx-auto">
-                Sit back and watch your agent complete the task!
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="md:pl-8 w-full flex flex-col items-start gap-16">
-          <div className="flex items-center gap-3">
-            <p className="font-spaceranger text-[48px] md:text-[56px]">
-              The <span className="text-primary">Hub</span>
+      <div>
+        <AppHeader />
+        <div className="flex items-start gap-16 pt-16">
+          <SideMenu />
+          <div className="grow w-full">
+            <p className="flex items-center gap-2 mb-2">
+              <span className="font-medium text-[#3d3d3d] text-[24px] leading-[32px]">
+                Top Agents
+              </span>
             </p>
-            <img
-              src="/assets/the-hub-title-icon.svg"
-              alt="the-hub"
-              className="md:w-[120px] md:h-[120px] w-[80px] h-[80px] rounded-full"
-            />
-          </div>
-          <div className="space-y-8 w-full mx-auto">
-            <p className="font-satoshi font-bold bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[25px]">
-              Social services
+            <p className="text-light-text-color font-medium leading-[21px] mb-6">
+              Assign any agent for your tasks
             </p>
-            <div
-              className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
-              style={{ scrollbarWidth: "none" }}
-            >
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[18px] leading-[24px] font-[500]">
-                    BULL POST
-                  </p>
-                  <img src="/assets/bull-post-icon.svg" alt="bull-post" />
-                </div>
-                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Select an AI KOL your project.
-                  <br />
-                  The perfect Hype-man!
-                </p>
-                <div className="flex items-center justify-between w-full gap-2 mt-auto">
-                  <div>
-                    <img src="/assets/users-icon.svg" alt="users" />
-                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
-                      8,150 users
+            <div className="w-full flex items-center justify-between mb-6">
+              <div className="flex items-center justify-start gap-3">
+                {services.map((s) => (
+                  <div
+                    key={s.title}
+                    onClick={() => setSelectedService(s.title)}
+                    className={`w-fit cursor-pointer rounded-[30px] py-3 px-4 flex items-center justify-center gap-2 ${
+                      selectedService === s.title
+                        ? "bg-[#DDE7F0] shadow-[inset_4px_4px_30px_0px_#A7BCCF,inset_-7px_-7px_30px_0px_#FFFFFF99]"
+                        : "bg-white shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF]"
+                    }`}
+                  >
+                    <img
+                      src={
+                        selectedService === s.title ? s.selected_icon : s.icon
+                      }
+                      alt={s.title}
+                      className={
+                        s.title === "DeFi" ? "w-[15px] h-[14px]" : "w-6 h-6"
+                      }
+                    />
+                    <p
+                      className={`font-medium leading-[22px] ${
+                        selectedService === s.title
+                          ? "text-primary"
+                          : "text-light-text-color"
+                      }`}
+                    >
+                      {s.title}
                     </p>
                   </div>
-                  <button
-                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                    disabled
-                  >
-                    <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
-                    </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                      className="w-6 h-6"
-                    />
-                  </button>
-                </div>
-              </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[18px] leading-[24px] font-[500]">REPLY</p>
-                  <img src="/assets/reply-icon.svg" alt="reply" />
-                </div>
-                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Reply agents are great for interaction and possibly farm
-                  airdrops/whitelist spots!
-                </p>
-                <div className="flex items-center justify-between w-full gap-2 mt-auto">
-                  <div>
-                    <img src="/assets/users-icon.svg" alt="users" />
-                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
-                      4,200 users
-                    </p>
-                  </div>
-                  <button
-                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                    disabled
-                  >
-                    <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
-                    </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                      className="w-6 h-6"
-                    />
-                  </button>
-                </div>
-              </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[18px] leading-[24px] font-[500]">
-                    CAMPAIGN
-                  </p>
-                  <img src="/assets/campaign-icon.svg" alt="campaign" />
-                </div>
-                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Agents will run a campaign on your behalf, ensuring attention
-                  and consistency
-                </p>
-                <div className="flex items-center justify-between w-full gap-2 mt-auto">
-                  <div>
-                    <img src="/assets/users-icon.svg" alt="users" />
-                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
-                      1,500 users
-                    </p>
-                  </div>
-                  <button
-                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                    disabled
-                  >
-                    <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
-                    </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                      className="w-6 h-6"
-                    />
-                  </button>
-                </div>
+                ))}
               </div>
             </div>
-          </div>
-          <div className="space-y-8 w-full mx-auto">
-            <p className="font-satoshi font-bold bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[25px]">
-              DeFi services
-            </p>
-            <div
-              className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
-              style={{ scrollbarWidth: "none" }}
-            >
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[18px] leading-[24px] font-[500]">SWAP</p>
-                  <img src="/assets/swap-icon.svg" alt="swap" />
-                </div>
-                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Agent conducts a swap on your behalf using an optimal route
-                  with less fees
-                </p>
-                <div className="flex items-center justify-between w-full gap-2 mt-auto">
-                  <div>
-                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
-                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
-                      Jan, 2025
-                    </p>
+            <div className="flex items-center justify-start gap-6 flex-wrap">
+              {agents.map((a: any) => (
+                <div
+                  key={a.id}
+                  className="p-[1px] bg-gradient-to-br from-[#D8E2EB] to-[#E2ECF5] rounded-[8px] shadow-[4px_4px_8px_0px_#A7BCCF66,-4px_-4px_8px_0px_#FFFFFF3D]"
+                >
+                  <div className="md:min-w-[282px] w-full p-3 bg-[#fafafa] rounded-[8px]">
+                    <div className="flex items-center justify-between gap-12">
+                      {a.metadata && (
+                        <div className="flex items-center justify-start gap-2">
+                          <img
+                            className="w-14 h-14 rounded-full object-cover"
+                            alt="img"
+                            src={a.metadata.imageUri.startsWith('https://') 
+                              ? a.metadata.imageUri 
+                              : `https://${a.metadata.imageUri}`
+                            }
+                          />
+                          <div>
+                            <p className="font-bold text-[14px] leading-[19px] text-text-color">
+                              {a.metadata.name}
+                            </p>
+                            <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
+                              {a.owner.slice(0, 4)}...
+                              {a.owner.slice(-4)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      <div className="p-2 rounded-[200px] bg-[#8F95B229] flex items-center gap-1">
+                        <img
+                          src="/assets/star-icon.svg"
+                          alt="star"
+                          className="w-3 h-3"
+                        />
+                        <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
+                          {a.reputation}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="pt-2 pb-4">
+                      <hr
+                        className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
+                        style={{
+                          borderImageSource:
+                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                          borderImageSlice: "1",
+                        }}
+                      />
+                      <div className="flex items-center gap-2">
+                        <img
+                          src="/assets/agent-list-card-dollar-icon.svg"
+                          alt="dollar"
+                          className="w-4 h-4"
+                        />
+                        {/* <p className="font-bold text-[14px] leading-[19px] text-primary">
+                          {formatEther(a.price)} WETH per task
+                        </p> */}
+                      </div>
+                      <hr
+                        className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
+                        style={{
+                          borderImageSource:
+                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                          borderImageSlice: "1",
+                        }}
+                      />
+                      <div className="flex items-center gap-2">
+                        <img
+                          src="/assets/agent-list-card-wrench-icon.svg"
+                          alt="wrench"
+                          className="w-4 h-4"
+                        />
+                        <p className="font-normal text-[14px] leading-[19px] text-text-color">
+                          {a.tasks.length} tasks
+                        </p>
+                      </div>
+                      <hr
+                        className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
+                        style={{
+                          borderImageSource:
+                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                          borderImageSlice: "1",
+                        }}
+                      />
+                      <div className="flex items-center gap-2">
+                        <img
+                          src="/assets/agent-list-card-pulse-icon.svg"
+                          alt="pulse"
+                          className="w-4 h-4"
+                        />
+                        <p className="font-normal text-[14px] leading-[19px] text-text-color">
+                          {a.service}
+                        </p>
+                      </div>
+                      <hr
+                        className="my-2 border-[0.5px] border-[#8F95B2] w-[70%]"
+                        style={{
+                          borderImageSource:
+                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                          borderImageSlice: "1",
+                        }}
+                      />
+                      <div className="flex items-center gap-2">
+                        <img
+                          src="/assets/agent-list-card-social-icon.svg"
+                          alt="social"
+                          className="w-4 h-4"
+                        />
+                        {a?.metadata?.twitter ? (
+                          <Link
+                            href={a.metadata.twitter}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            <img
+                              src="/assets/agent-list-card-x-icon.svg"
+                              alt="x"
+                              className="w-5 h-5"
+                            />
+                          </Link>
+                        ) : null}
+                        {a?.metadata?.telegram ? (
+                          <Link
+                            href={a.metadata.telegram}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            <img
+                              src="/assets/agent-list-card-tg-icon.svg"
+                              alt="tg"
+                              className="w-5 h-5"
+                            />
+                          </Link>
+                        ) : null}
+                        {a?.metadata?.github ? (
+                          <Link
+                            href={a.metadata.github}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            <img
+                              src="/assets/agent-list-card-gh-icon.svg"
+                              alt="gh"
+                              className="w-5 h-5"
+                            />
+                          </Link>
+                        ) : null}
+                      </div>
+                    </div>
+                    <button
+                      className="w-full border border-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
+                      onClick={() => push(`/task-center?service=${a.service}&proposal=${a.id}`)}
+                    >
+                      <img
+                        src="/assets/bolt-primary-icon.svg"
+                        alt="bolt"
+                        className="w-4 h-4"
+                      />
+                      <p className="font-bold text-primary leading-[20px]">
+                        Assign
+                      </p>
+                    </button>
                   </div>
-                  <button
-                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                    disabled
-                  >
-                    <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
-                    </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                      className="w-6 h-6"
-                    />
-                  </button>
                 </div>
-              </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[18px] leading-[24px] font-[500]">
-                    BRIDGE
-                  </p>
-                  <img src="/assets/bridge-icon.svg" alt="bridge" />
-                </div>
-                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Agent bridges from multiple chains using optimal routes and
-                  lower fees than usual!
-                </p>
-                <div className="flex items-center justify-between w-full gap-2 mt-auto">
-                  <div>
-                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
-                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
-                      Jan, 2025
-                    </p>
-                  </div>
-                  <button
-                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                    disabled
-                  >
-                    <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
-                    </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                      className="w-6 h-6"
-                    />
-                  </button>
-                </div>
-              </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[18px] leading-[24px] font-[500]">
-                    PROVIDE LP
-                  </p>
-                  <img src="/assets/provide-lp-icon.svg" alt="provide-lp" />
-                </div>
-                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Agent provides LP in a pool of your choice or recommends top
-                  performing pools!
-                </p>
-                <div className="flex items-center justify-between w-full gap-2 mt-auto">
-                  <div>
-                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
-                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
-                      Jan, 2025
-                    </p>
-                  </div>
-                  <button
-                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                    disabled
-                  >
-                    <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
-                    </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                      className="w-6 h-6"
-                    />
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
-          </div>
-          <div className="space-y-8 w-full mx-auto">
-            <p className="font-satoshi font-bold bg-gradient-to-r from-primary to-[#FF9D78] inline-block text-transparent bg-clip-text text-[32px] leading-[25px]">
-              Research services
-            </p>
-            <div
-              className="flex items-stretch justify-between overflow-x-auto w-[calc(100%-64px)] max-md:w-full gap-5 h-[268px] pr-8"
-              style={{ scrollbarWidth: "none" }}
-            >
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[18px] leading-[24px] font-[500]">
-                    MARKETS
-                  </p>
-                  <img src="/assets/markets-icon.svg" alt="markets" />
-                </div>
-                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Perfect for analyzing market data and providing accurate
-                  information
-                </p>
-                <div className="flex items-center justify-between w-full gap-2 mt-auto">
-                  <div>
-                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
-                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
-                      Feb, 2025
-                    </p>
-                  </div>
-                  <button
-                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                    disabled
-                  >
-                    <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
-                    </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                      className="w-6 h-6"
-                    />
-                  </button>
-                </div>
-              </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[18px] leading-[24px] font-[500]">
-                    TRENDS
-                  </p>
-                  <img src="/assets/trends-icon.svg" alt="trends" />
-                </div>
-                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Get up-tp-date with the latest trends in the Crypto world!
-                </p>
-                <div className="flex items-center justify-between w-full gap-2 mt-auto">
-                  <div>
-                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
-                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
-                      Feb, 2025
-                    </p>
-                  </div>
-                  <button
-                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                    disabled
-                  >
-                    <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
-                    </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                      className="w-6 h-6"
-                    />
-                  </button>
-                </div>
-              </div>
-              <div className="w-[256px] md:w-[340px] flex-shrink-0 h-[186px] max-md:h-[251px] bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] py-4 px-3 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[18px] leading-[24px] font-[500]">
-                    AI AGENTS
-                  </p>
-                  <img src="/assets/openai-icon.svg" alt="openai" />
-                </div>
-                <p className="text-light-text-color font-[500] text-[16px] leading-[22px] mb-6 flex-grow">
-                  Stay updated with the latest on AI Agents!
-                </p>
-                <div className="flex items-center justify-between w-full gap-2 mt-auto">
-                  <div>
-                    <img src="/assets/clock-outline-icon.svg" alt="clock" />
-                    <p className="text-[12px] font-[700] leading-[16px] text-light-text-color">
-                      Feb, 2025
-                    </p>
-                  </div>
-                  <button
-                    className="w-1/2 space-x-2 flex items-center justify-between rounded-[50px] bg-[#3D3D3D] bg-[linear-gradient(317.7deg,rgba(0,0,0,0.4)_0%,rgba(255,255,255,0.4)_105.18%)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                    disabled
-                  >
-                    <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Select
-                    </span>
-                    <img
-                      src="/assets/pixelated-arrow-icon.svg"
-                      alt="pixelated-arrow"
-                      className="w-6 h-6"
-                    />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="relative">
-          <img src="/assets/crew.png" alt="crew" />
-        </div>
-        <div className="relative">
-          <img
-            src="/assets/agent-hub-landing-text-media.png"
-            alt="text-media"
-          />
-        </div>
-        <div className="w-full">
-          <p className="text-light-text-color text-[24px] italic text-center">
-            Powered by Ensemble
-          </p>
-          <div className="max-md:flex-col flex items-center justify-center w-full mt-[68px] max-md:gap-4 gap-8">
-            <a
-              href="https://t.me/+3AsQlbcpR-NkNGVk"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
-                <img src="/assets/stars-icon.svg" alt="pixelated-arrow" />
-                <span className="text-white text-[16px] font-[700] leading-[24px]">
-                  Join Beta Waitlist
-                </span>
-              </button>
-            </a>
-            <a
-              href="https://88phxim41aw.typeform.com/to/HZUaUu5a"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
-                <img src="/assets/register-icon.svg" alt="pixelated-arrow" />
-                <span className="text-white text-[16px] font-[700] leading-[24px]">
-                  Register Agent
-                </span>
-              </button>
-            </a>
           </div>
         </div>
       </div>

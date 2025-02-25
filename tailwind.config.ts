@@ -20,6 +20,9 @@ export default {
         "placeholder-text": "#6F6D66",
         "alternate-black-text-color": "#B2B1AA"
       },
+      animation: {
+        'spin-slow': 'spin 4s linear infinite',
+      },
     },
   },
   plugins: [],
