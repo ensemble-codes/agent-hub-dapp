@@ -82,7 +82,10 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
           key={agent.issuer.name}
           id={agent.id}
           img={
-            agent.issuer.metadata.imageUri || "/assets/cook-capital-profile.png"
+            agent?.issuer?.metadata?.imageUri.startsWith("https://")
+              ? agent?.issuer?.metadata?.imageUri
+              : `https://${agent?.issuer?.metadata?.imageUri}` ||
+                "/assets/cook-capital-profile.png"
           }
           name={agent.issuer.name}
           jobs={agent.issuer.tasks.length || 0}
@@ -131,7 +134,7 @@ const AgentCard: FC<AgentCardProps> = ({
     <div className="w-[256px] bg-white rounded-[10px] p-4 shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF]">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-2">
-          <img src={img} alt={name} className="w-8 h-8 rounded-full" />
+          <img src={img} alt={name} className="w-8 h-8 rounded-full object-cover" />
           <p className="text-[14px] leading-[18.9px] font-[500]">{name}</p>
         </div>
       </div>

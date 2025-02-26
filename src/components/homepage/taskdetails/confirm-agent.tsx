@@ -70,10 +70,10 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   const { data } = useQuery(GET_PROPOSAL);
 
   const ratingsArray = new Array(
-    data && data.proposal ? data.proposal.issuer.reputation : 0
+    data && data?.proposal ? data?.proposal.issuer.reputation : 0
   );
 
-  const proposal = data.proposal ? data.proposal : undefined;
+  const proposal = data && data.proposal ? data?.proposal : undefined;
 
   const filteredTweetStyles = useMemo(() => {
     return (
@@ -223,14 +223,14 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                 <img
                   src={
                     proposal?.issuer?.metadata?.imageUri.startsWith(
-                      "httroposal?s://"
+                      "https://"
                     )
                       ? proposal?.issuer?.metadata?.imageUri
                       : `https://${proposal?.issuer?.metadata?.imageUri}` ||
                         "/assets/cook-capital-profile.png"
                   }
                   alt={proposal?.issuer?.metadata?.name}
-                  className="w-8 h-8 rounded-full"
+                  className="w-8 h-8 rounded-full object-cover"
                 />
                 <div className="space-y-1">
                   <p className="font-medium">
