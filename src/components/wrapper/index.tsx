@@ -119,19 +119,12 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
                 rel="noreferrer noopener"
               >
                 <div className="p-[3.47px] bg-gradient-to-br from-[#FE4600] to-[#E2ECF5] rounded-[50px] shadow-[8.11px_8.11px_18.53px_0px_rgba(202,221,237,1),-8.11px_-8.11px_18.53px_0px_rgba(202,221,237,0.6)]">
-                  <button
-                    type="button"
-                    className="w-full flex items-center gap-2 justify-between rounded-[50px] py-[12px] px-[16px] bg-gradient-to-br from-[#FE4600] to-[#FF7541] cursor-pointer"
-                  >
-                    <img
-                      src="/assets/register-icon.svg"
-                      alt="register"
-                      className="w-6 h-6"
-                    />
-                    <span className="text-white text-[16px] font-[700] leading-[24px]">
-                      Register Agent
-                    </span>
-                  </button>
+                <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                  <img src="/assets/stars-icon.svg" alt="pixelated-arrow" />
+                  <span className="text-white text-[16px] font-[700] leading-[24px]">
+                    Join the Ensemble
+                  </span>
+                </button>
                 </div>
               </Link>
             </>
