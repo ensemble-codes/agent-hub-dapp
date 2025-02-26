@@ -286,7 +286,7 @@ export default function Home() {
                         className="w-full border border-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
                         onClick={() =>
                           push(
-                            `/task-center?service=${a.service}&proposal=${a.id}`
+                            `/task-center?service=${a.proposals[0].service}&proposal=${a.proposals[0].id}`
                           )
                         }
                       >
