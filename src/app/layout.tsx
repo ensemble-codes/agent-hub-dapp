@@ -49,13 +49,13 @@ export default function RootLayout({
         )}
         <OnchainProvider>
           <AppContextProvider>
-            {/* <Wrapper> */}
+            <Wrapper>
               <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">
                 <AppBg />
                 {children}
               </main>
               <Footer />
-            {/* </Wrapper> */}
+            </Wrapper>
           </AppContextProvider>
         </OnchainProvider>
       </body>
