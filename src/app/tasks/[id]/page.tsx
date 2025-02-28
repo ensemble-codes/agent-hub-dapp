@@ -1,6 +1,6 @@
 "use client";
 import { AppHeader, SideMenu } from "@/components";
-import { FC, use, useEffect } from "react";
+import { FC, use, useEffect, useState } from "react";
 import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 
@@ -39,20 +39,24 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   `;
 
   const { data: task, loading, startPolling, stopPolling } = useQuery(GET_TASK);
+  const [isPolling, setIsPolling] = useState(false);
 
   useEffect(() => {
     // Start polling when component mounts
     startPolling(7000);
-
+    setIsPolling(true);
+    
     // Stop polling when task.result is available
     if (task?.task?.result) {
       stopPolling();
+      setIsPolling(false);
       console.log("Polling stopped: task result received");
     }
-
+    
     // Clean up by stopping polling when component unmounts
     return () => {
       stopPolling();
+      setIsPolling(false);
     };
   }, [task?.task?.result, startPolling, stopPolling]);
 
@@ -81,6 +85,13 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
             className="w-full h-[450px] overflow-auto relative"
             style={{ scrollbarWidth: "none" }}
           >
+            {isPolling && !task?.task?.result && (
+              <div className="absolute top-0 right-0 flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
+                <Loader size="sm" />
+                <span className="text-sm text-light-text-color">Waiting for result...</span>
+              </div>
+            )}
+
             {/* <button
               className="absolute top-0 right-0 w-[226px] flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
               // onClick={() => selectedAgent(id)}
