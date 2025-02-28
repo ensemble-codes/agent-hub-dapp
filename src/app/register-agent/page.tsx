@@ -169,8 +169,9 @@ const Page = () => {
       disableNext ||
       !agentAddress ||
       !selectedAgentService ||
+      !selectedAgentSubServices ||
       !agentServicePrice,
-    [disableNext, selectedAgentService, agentAddress]
+    [disableNext, agentAddress, selectedAgentService, selectedAgentSubServices, agentServicePrice]
   );
 
   useEffect(() => {
@@ -182,6 +183,13 @@ const Page = () => {
       return () => clearTimeout(timer);
     }
   }, [registerFailure]);
+
+  useEffect(() => {
+    // Initialize with default values when component mounts
+    if (selectedAgentService && !selectedAgentSubServices) {
+      setSelectedAgentSubServices(SUB_SERVICES[selectedAgentService][0]);
+    }
+  }, [selectedAgentService, selectedAgentSubServices]);
 
   return (
     <div>
