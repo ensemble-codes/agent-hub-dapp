@@ -34,8 +34,8 @@ const services = [
 
 const SUB_SERVICES = {
   DeFi: ["Swap", "Bridge", "Provide LP"],
-  Social: ["Bull Post", "Reply", "Campaign"],
-  Security: ["Audit"],
+  Social: ["Bull-Post", "Reply", "Campaign"],
+  Security: ["Smart Contract Audit"],
   Research: ["Markets", "Trends", "AI Agents LP"],
 } as const;
 
@@ -97,7 +97,7 @@ const Page = () => {
       if (agentPfp) {
         const imgUri = await handleUploadToPinata(agentPfp);
 
-        const service = selectedAgentSubServices.replace(" ", "-");
+        const service = selectedAgentSubServices;
         const servicePrice = parseEther(agentServicePrice).toString();
 
         const boolean = await sdk.registerAgent(
