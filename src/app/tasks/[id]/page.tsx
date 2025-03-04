@@ -1,6 +1,6 @@
 "use client";
 import { AppHeader, SideMenu } from "@/components";
-import { FC, use } from "react";
+import { FC, use, useEffect, useState } from "react";
 import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 
@@ -14,11 +14,22 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     issuer
     prompt
     proposalId
+    result
     status
     assignee {
       agentUri
       id
       isRegistered
+      metadata {
+        description
+        dexscreener
+        github
+        id
+        imageUri
+        name
+        telegram
+        twitter
+      }
       name
       owner
       reputation
@@ -27,7 +38,27 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
 }
   `;
 
-  const { data: task, loading } = useQuery(GET_TASK);
+  const { data: task, loading, startPolling, stopPolling } = useQuery(GET_TASK);
+  const [isPolling, setIsPolling] = useState(false);
+
+  useEffect(() => {
+    // Start polling when component mounts
+    startPolling(7000);
+    setIsPolling(true);
+    
+    // Stop polling when task.result is available
+    if (task?.task?.result) {
+      stopPolling();
+      setIsPolling(false);
+      console.log("Polling stopped: task result received");
+    }
+    
+    // Clean up by stopping polling when component unmounts
+    return () => {
+      stopPolling();
+      setIsPolling(false);
+    };
+  }, [task?.task?.result, startPolling, stopPolling]);
 
   if (loading) {
     return (
@@ -54,6 +85,13 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
             className="w-full h-[450px] overflow-auto relative"
             style={{ scrollbarWidth: "none" }}
           >
+            {isPolling && !task?.task?.result && (
+              <div className="absolute top-0 right-0 flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
+                <Loader size="sm" />
+                <span className="text-sm text-light-text-color">Waiting for result...</span>
+              </div>
+            )}
+
             {/* <button
               className="absolute top-0 right-0 w-[226px] flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
               // onClick={() => selectedAgent(id)}
@@ -67,15 +105,19 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                 className="w-[18px] h-[18px]"
               />
             </button> */}
-            <div className="rounded-[8px] border border-light-text-color py-4 px-3 w-fit mb-4">
-              {/* <p className="text-[14px] font-bold text-primary leading-[18.9px] mb-4">
+
+            {task?.task?.prompt ? (
+              <div className="rounded-[8px] border border-light-text-color py-4 px-3 w-fit mb-4">
+                {/* <p className="text-[14px] font-bold text-primary leading-[18.9px] mb-4">
                 Bullpost
               </p> */}
-              <div className="flex items-start gap-2">
-                {/* <div className="border border-light-text-color rounded-full h-4 w-4 relative top-[2px]" /> */}
-                <div className="space-y-3">
-                  <p className="font-medium leading-[21.6px]">{task?.task?.prompt}</p>
-                  {/* <div className="w-[280px] border border-primary rounded-[16px] p-4 flex items-center gap-2">
+                <div className="flex items-start gap-2">
+                  {/* <div className="border border-light-text-color rounded-full h-4 w-4 relative top-[2px]" /> */}
+                  <div className="space-y-3">
+                    <p className="font-medium leading-[21.6px]">
+                      {task?.task?.prompt}
+                    </p>
+                    {/* <div className="w-[280px] border border-primary rounded-[16px] p-4 flex items-center gap-2">
                     <img
                       src="/assets/fwog-token-icon.png"
                       alt="fwog"
@@ -88,9 +130,39 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       </p>
                     </div>
                   </div> */}
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : null}
+
+            {task?.task?.result ? (
+              <div className="rounded-[8px] border border-light-text-color py-4 px-3 w-fit mb-4">
+                {/* <p className="text-[14px] font-bold text-primary leading-[18.9px] mb-4">
+                Bullpost
+              </p> */}
+                <div className="flex items-start gap-2">
+                  {/* <div className="border border-light-text-color rounded-full h-4 w-4 relative top-[2px]" /> */}
+                  <div className="space-y-3">
+                    <p className="font-medium leading-[21.6px]">
+                      {task?.task?.result}
+                    </p>
+                    {/* <div className="w-[280px] border border-primary rounded-[16px] p-4 flex items-center gap-2">
+                    <img
+                      src="/assets/fwog-token-icon.png"
+                      alt="fwog"
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div className="space-y-1">
+                      <p className="font-bold leading-[21.6px]">FWOG ($fwog)</p>
+                      <p className="text-[14px] leading-[18.9px]">
+                        Just a lil fwog in a big pond
+                      </p>
+                    </div>
+                  </div> */}
+                  </div>
+                </div>
+              </div>
+            ) : null}
             {/* <div className="flex items-center gap-3 mb-4">
               <img
                 src="/assets/cook-capital-profile.png"
