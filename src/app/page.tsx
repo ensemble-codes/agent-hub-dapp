@@ -36,7 +36,7 @@ export default function Home() {
   const GET_AGENTS = useMemo(
     () => gql`
       query MyQuery {
-        agents(first: 10) {
+        agents(first: 20) {
           agentUri
           id
           isRegistered
