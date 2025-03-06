@@ -34,7 +34,7 @@ const services = [
 
 const SUB_SERVICES = {
   DeFi: ["Swap", "Bridge", "Provide LP"],
-  Social: ["Bull-Post", "Reply", "Campaign"],
+  Social: ["Bull-Post", "Reply", "Campaign", "Bless Me"],
   Security: ["Smart Contract Audit"],
   Research: ["Markets", "Trends", "AI Agents LP"],
 } as const;
