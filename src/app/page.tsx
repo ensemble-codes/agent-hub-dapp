@@ -73,8 +73,11 @@ export default function Home() {
   );
 
   const { data, loading } = useQuery(GET_AGENTS);
-  const agents = data?.agents || [];
-
+  const agentsToFilter = ["0x83df687c3642b6ac84a5083206eac69a9fd918f9", "0xe03ce825669af732a59ae4dbf2f95c5caed48a23", "0x114375c8b0a6231449c6961b0746cb0117d66f4f"]
+  debugger
+  const agents = (data?.agents || []).filter((a: any) => !agentsToFilter.includes(a.id));
+  debugger
+  // agents
   return (
     <>
       <div>
