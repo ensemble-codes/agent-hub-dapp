@@ -21,7 +21,7 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
           proposalId || selectedService
             ? `(where: { ${
                 selectedService
-                  ? `service: "${selectedService?.split(" ").join("-")}"`
+                  ? `service: "${selectedService}"`
                   : ""
               }${
                 proposalId
@@ -64,7 +64,7 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
     `,
     [selectedService, proposalId]
   );
-
+  debugger
   const { data, loading, error } = useQuery(GET_PROPOSALS);
 
   return loading ? (
