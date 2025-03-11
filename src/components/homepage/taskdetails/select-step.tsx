@@ -64,7 +64,6 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
     `,
     [selectedService, proposalId]
   );
-
   const { data, loading, error } = useQuery(GET_PROPOSALS);
 
   return loading ? (
