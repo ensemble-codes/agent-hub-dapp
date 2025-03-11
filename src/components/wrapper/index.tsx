@@ -16,7 +16,6 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
   const { connect } = useConnect();
   const [showRegisterModal, setShowRegisterModal] = useState(true);
   const [checkingEligibility, setCheckingEligibility] = useState(false);
-  const [eligibility, setEligibility] = useState(false);
 
   const checkWallet = useCallback(async () => {
     try {
@@ -32,11 +31,9 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
         }
       );
       const data = await response.json();
-      setEligibility(data.length > 0);
       setShowRegisterModal(!(data.length > 0));
     } catch (error) {
       console.log(error);
-      setEligibility(false);
     } finally {
       setCheckingEligibility(false);
     }
@@ -46,10 +43,25 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
     if (address) checkWallet();
   }, [address]);
 
+  // Disable body scrolling when modal is open
+  useEffect(() => {
+    if (showRegisterModal) {
+      // Save the current overflow value to restore it later
+      const originalOverflow = document.body.style.overflow;
+      // Disable scrolling
+      document.body.style.overflow = 'hidden';
+      
+      // Cleanup function to re-enable scrolling when component unmounts or modal closes
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [showRegisterModal]);
+
   return (
     <>
       {children}
-      <Modal isOpen={showRegisterModal}>
+      <Modal isOpen={showRegisterModal} overlayClassName="bg-black/90">
         <div className="p-12 relative overflow-hidden w-[600px] h-[400px] flex flex-col items-center justify-between">
           <img
             className="absolute top-0 left-0 object-cover w-full h-full z-[-1]"

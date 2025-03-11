@@ -5,7 +5,7 @@ import { getTaskStatusText } from "@/utils";
 import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FC, use, useState } from "react";
+import { FC, use, useMemo, useState } from "react";
 import { formatEther } from "viem";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
@@ -57,7 +57,23 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
 
   const { data: agent, loading } = useQuery(GET_AGENT);
 
-  console.log(agent);
+  const GET_SERVICE = useMemo(
+    () => gql`
+    query MyQuery {
+  service(id: "${agent?.agent?.proposals[0]?.service}") {
+    name
+    category
+    description
+    id
+  }
+}
+  `,
+    [agent]
+  );
+
+  const { data: service } = useQuery(GET_SERVICE);
+
+  console.log(service);
 
   return (
     <div>
@@ -153,7 +169,23 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       {agent.agent.metadata?.description}
                     </p>
                   </div>
-                  <div className="p-3 border border-light-text-color bg-white w-full rounded-[4px] flex items-start justify-start gap-10 mb-6">
+                  <hr
+                    className="mb-6 border-[1px] border-[#8F95B2]"
+                    style={{
+                      borderImageSource:
+                        "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                      borderImageSlice: "1",
+                    }}
+                  />
+                  <div className="mb-6">
+                    <p className="text-light-text-color font-medium leading-[100%] mb-3">
+                      Capabilities
+                    </p>
+                    <p className="text-[14px] font-medium text-text-color">
+                      {service?.service?.description}
+                    </p>
+                  </div>
+                  <div className="p-3 border border-light-text-color bg-white w-full rounded-[4px] flex items-start justify-between mb-6">
                     <div className="flex flex-col items-center justify-center gap-1">
                       <p className="flex items-center gap-1">
                         <img
@@ -233,7 +265,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       className="w-4 h-4"
                     />
                     <span className="text-white text-[18px] font-[700] leading-[24px]">
-                      Assign
+                      {agent.agent.proposals &&
+                        agent.agent.proposals.length &&
+                        agent.agent.proposals[0].service}
                     </span>
                   </button>
                 </div>
