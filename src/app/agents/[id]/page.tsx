@@ -73,7 +73,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
             <Loader size="xl" />
           ) : agent && agent.agent ? (
             <div className="flex items-start gap-4 w-full">
-              <div className="grow rounded-[10px] bg-gradient-to-r from-[rgba(255,255,255,0.4)] to-[rgba(255,255,255,0)] p-[1px]">
+              <div className="max-w-[720px] grow rounded-[10px] bg-gradient-to-r from-[rgba(255,255,255,0.4)] to-[rgba(255,255,255,0)] p-[1px]">
                 <div className="py-8 px-5 rounded-[10px] w-full shadow-[inset_5px_5px_10px_0px_#D8D8D8,inset_-5px_-5px_10px_0px_#FAFBFF] bg-[#FAFAFA]">
                   <div className="flex w-full items-start justify-between mb-6">
                     <div className="flex flex-start gap-4">
@@ -161,13 +161,13 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           alt="dollar"
                           className="w-4 h-4"
                         />
-                        <p className="text-[14px] text-light-text-color font-bold">
+                        <span className="text-[14px] text-light-text-color font-bold">
                           Price
-                        </p>
+                        </span>
                       </p>
                       {agent.agent?.proposals?.length ? (
                         <p className="font-bold leading-[19px] text-primary">
-                          {formatEther(agent.agent?.proposals[0].price)} WETH
+                          {formatEther(agent.agent?.proposals[0].price)} ETH
                         </p>
                       ) : null}
                     </div>
@@ -178,9 +178,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           alt="wrench"
                           className="w-4 h-4"
                         />
-                        <p className="text-[14px] text-light-text-color font-bold">
+                        <span className="text-[14px] text-light-text-color font-bold">
                           Tasks
-                        </p>
+                        </span>
                       </p>
                       <p className="font-bold leading-[19px] text-text-color">
                         {agent.agent.tasks.length}
@@ -193,9 +193,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           alt="star"
                           className="w-3 h-3"
                         />
-                        <p className="text-[14px] text-light-text-color font-bold">
+                        <span className="text-[14px] text-light-text-color font-bold">
                           Rating
-                        </p>
+                        </span>
                       </p>
                       <p className="font-bold leading-[19px] text-text-color">
                         {agent.agent.reputation}
@@ -208,9 +208,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           alt="pulse"
                           className="w-4 h-4"
                         />
-                        <p className="text-[14px] text-light-text-color font-bold">
+                        <span className="text-[14px] text-light-text-color font-bold">
                           Skills
-                        </p>
+                        </span>
                       </p>
                       <p className="font-bold leading-[19px] text-text-color">
                         {agent.agent.proposals &&

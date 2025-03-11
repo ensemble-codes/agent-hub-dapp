@@ -259,7 +259,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
               </p>
               {proposal && proposal.price ? (
                 <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
-                  {Number(formatEther(proposal?.price))} WETH per tweet
+                  {Number(formatEther(proposal?.price))} ETH per tweet
                 </p>
               ) : null}
             </div>
