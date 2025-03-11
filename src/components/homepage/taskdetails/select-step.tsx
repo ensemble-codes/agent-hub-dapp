@@ -143,7 +143,7 @@ const AgentCard: FC<AgentCardProps> = ({
           Price
         </p>
         <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-[500]">
-          {price} WETH per tweet
+          {price} ETH per tweet
         </p>
       </div>
 

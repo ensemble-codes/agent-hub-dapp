@@ -8,73 +8,115 @@ import { useMemo, useState } from "react";
 
 const services = [
   {
-    title: "DeFi",
-    icon: "/assets/defi-service-icon.svg",
-    selected_icon: "/assets/defi-service-primary-icon.svg",
+    title: "All",
+    icon: "/assets/beta-gray-icon.svg",
+    selected_icon: "/assets/beta-primary-icon.svg",
   },
   {
-    title: "Social",
-    icon: "/assets/social-service-icon.svg",
-    selected_icon: "/assets/social-service-primary-icon.svg",
-  },
-  {
-    title: "Security",
-    icon: "/assets/security-service-icon.svg",
-    selected_icon: "/assets/security-service-primary-icon.svg",
-  },
-  {
-    title: "Research",
-    icon: "/assets/research-service-icon.svg",
-    selected_icon: "/assets/research-service-primary-icon.svg",
+    title: "Active",
+    icon: "/assets/active-icon.svg",
+    selected_icon: "/assets/active-icon.svg",
   },
 ];
 
 export default function Home() {
   const { push } = useRouter();
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<"All" | "Active">(
+    "All"
+  );
 
   const GET_AGENTS = useMemo(
-    () => gql`
-      query MyQuery {
-        agents(first: 20) {
-          agentUri
-          id
-          isRegistered
-          metadata {
-            description
-            dexscreener
-            github
-            id
-            imageUri
-            name
-            telegram
-            twitter
-          }
-          name
-          owner
-          proposals {
-            id
-            price
-            service
-          }
-          reputation
-          tasks {
-            id
-            issuer
-            prompt
-            proposalId
-            result
-            status
-          }
-        }
-      }
-    `,
+    () =>
+      selectedService === "Active"
+        ? gql`
+            query MyQuery {
+              agents(
+                where: {
+                  id_in: [
+                    "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                    "0xfdcb66224f433f3f7bff246571c1c26b071ed952"
+                  ]
+                }
+              ) {
+                agentUri
+                id
+                isRegistered
+                metadata {
+                  description
+                  dexscreener
+                  github
+                  id
+                  imageUri
+                  name
+                  telegram
+                  twitter
+                }
+                name
+                owner
+                proposals {
+                  id
+                  price
+                  service
+                }
+                reputation
+                tasks {
+                  id
+                  issuer
+                  prompt
+                  proposalId
+                  result
+                  status
+                }
+              }
+            }
+          `
+        : gql`
+            query MyQuery {
+              agents {
+                agentUri
+                id
+                isRegistered
+                metadata {
+                  description
+                  dexscreener
+                  github
+                  id
+                  imageUri
+                  name
+                  telegram
+                  twitter
+                }
+                name
+                owner
+                proposals {
+                  id
+                  price
+                  service
+                }
+                reputation
+                tasks {
+                  id
+                  issuer
+                  prompt
+                  proposalId
+                  result
+                  status
+                }
+              }
+            }
+          `,
     [selectedService]
   );
 
   const { data, loading } = useQuery(GET_AGENTS);
-  const agentsToFilter = ["0x83df687c3642b6ac84a5083206eac69a9fd918f9", "0xe03ce825669af732a59ae4dbf2f95c5caed48a23", "0x114375c8b0a6231449c6961b0746cb0117d66f4f"]
-  const agents = (data?.agents || []).filter((a: any) => !agentsToFilter.includes(a.id));
+  const agentsToFilter = [
+    "0x83df687c3642b6ac84a5083206eac69a9fd918f9",
+    "0xe03ce825669af732a59ae4dbf2f95c5caed48a23",
+    "0x114375c8b0a6231449c6961b0746cb0117d66f4f",
+  ];
+  const agents = (data?.agents || []).filter(
+    (a: any) => !agentsToFilter.includes(a.id)
+  );
   // agents
   return (
     <>
@@ -96,7 +138,9 @@ export default function Home() {
                 {services.map((s) => (
                   <div
                     key={s.title}
-                    onClick={() => setSelectedService(s.title)}
+                    onClick={() =>
+                      setSelectedService(s.title as typeof selectedService)
+                    }
                     className={`w-fit cursor-pointer rounded-[30px] py-3 px-4 flex items-center justify-center gap-2 ${
                       selectedService === s.title
                         ? "bg-[#DDE7F0] shadow-[inset_4px_4px_30px_0px_#A7BCCF,inset_-7px_-7px_30px_0px_#FFFFFF99]"
@@ -108,9 +152,7 @@ export default function Home() {
                         selectedService === s.title ? s.selected_icon : s.icon
                       }
                       alt={s.title}
-                      className={
-                        s.title === "DeFi" ? "w-[15px] h-[14px]" : "w-6 h-6"
-                      }
+                      className={s.title === "Active" ? "w-2 h-2" : "w-4 h-4"}
                     />
                     <p
                       className={`font-medium leading-[22px] ${
@@ -138,15 +180,32 @@ export default function Home() {
                       <div className="flex items-center justify-between gap-12">
                         {a.metadata && (
                           <div className="flex items-center justify-start gap-2">
-                            <img
-                              className="w-14 h-14 rounded-full object-cover"
-                              alt="img"
-                              src={
-                                a.metadata.imageUri.startsWith("https://")
-                                  ? a.metadata.imageUri
-                                  : `https://${a.metadata.imageUri}`
-                              }
-                            />
+                            <Link
+                              className="cursor-pointer"
+                              href={`/agents/${a.id}`}
+                            >
+                              <div className="w-14 h-14 rounded-full relative">
+                                <img
+                                  className="w-full h-full rounded-full object-cover"
+                                  alt="img"
+                                  src={
+                                    a.metadata.imageUri.startsWith("https://")
+                                      ? a.metadata.imageUri
+                                      : `https://${a.metadata.imageUri}`
+                                  }
+                                />
+                                {a.id ===
+                                  "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d" ||
+                                a.id ===
+                                  "0xfdcb66224f433f3f7bff246571c1c26b071ed952" ? (
+                                  <img
+                                    src="/assets/active-icon.svg"
+                                    alt="active"
+                                    className="w-2 h-2 absolute bottom-0 right-2"
+                                  />
+                                ) : null}
+                              </div>
+                            </Link>
                             <div>
                               <p className="font-bold text-[14px] leading-[19px] text-text-color">
                                 {a.metadata.name}
@@ -186,7 +245,7 @@ export default function Home() {
                           />
                           {a?.proposals?.length ? (
                             <p className="font-bold text-[14px] leading-[19px] text-primary">
-                              {formatEther(a.proposals[0].price)} WETH per task
+                              {formatEther(a.proposals[0].price)} ETH per task
                             </p>
                           ) : null}
                         </div>
@@ -285,11 +344,7 @@ export default function Home() {
                       </div>
                       <button
                         className="w-full border border-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
-                        onClick={() =>
-                          push(
-                            `/task-center?service=${a.proposals[0].service}&proposal=${a.proposals[0].id}`
-                          )
-                        }
+                        onClick={() => push(`/agents/${a.id}`)}
                       >
                         <img
                           src="/assets/bolt-primary-icon.svg"

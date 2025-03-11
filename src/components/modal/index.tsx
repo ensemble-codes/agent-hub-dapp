@@ -5,25 +5,19 @@ interface ModalProps {
   isOpen: boolean;
   onClose?: () => void;
   children: React.ReactNode;
+  overlayClassName?: string;
 }
 
-const Modal: FC<ModalProps> = ({ isOpen, onClose, children }) => {
+const Modal: FC<ModalProps> = ({ isOpen, onClose, children, overlayClassName = "bg-black/50" }) => {
   if (!isOpen) return null;
 
   return (
-    <>
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-        onClick={onClose}
-      >
-        <div
-          className="bg-white rounded-lg relative z-50"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {children}
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className={`fixed inset-0 ${overlayClassName} transition-opacity`}></div>
+      <div className="z-50 bg-white rounded-[16px] shadow-xl transform transition-all">
+        {children}
       </div>
-    </>
+    </div>
   );
 };
 
