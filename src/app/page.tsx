@@ -73,10 +73,16 @@ export default function Home() {
   );
 
   const { data, loading } = useQuery(GET_AGENTS);
-  const agentsToFilter = ["0x83df687c3642b6ac84a5083206eac69a9fd918f9", "0xe03ce825669af732a59ae4dbf2f95c5caed48a23", "0x114375c8b0a6231449c6961b0746cb0117d66f4f"]
-  debugger
-  const agents = (data?.agents || []).filter((a: any) => !agentsToFilter.includes(a.id));
-  debugger
+  const agentsToFilter = [
+    "0x83df687c3642b6ac84a5083206eac69a9fd918f9",
+    "0xe03ce825669af732a59ae4dbf2f95c5caed48a23",
+    "0x114375c8b0a6231449c6961b0746cb0117d66f4f",
+  ];
+  // debugger
+  const agents = (data?.agents || []).filter(
+    (a: any) => !agentsToFilter.includes(a.id)
+  );
+  // debugger
   // agents
   return (
     <>
@@ -140,15 +146,20 @@ export default function Home() {
                       <div className="flex items-center justify-between gap-12">
                         {a.metadata && (
                           <div className="flex items-center justify-start gap-2">
-                            <img
-                              className="w-14 h-14 rounded-full object-cover"
-                              alt="img"
-                              src={
-                                a.metadata.imageUri.startsWith("https://")
-                                  ? a.metadata.imageUri
-                                  : `https://${a.metadata.imageUri}`
-                              }
-                            />
+                            <Link
+                              className="cursor-pointer"
+                              href={`/agents/${a.id}`}
+                            >
+                              <img
+                                className="w-14 h-14 rounded-full object-cover"
+                                alt="img"
+                                src={
+                                  a.metadata.imageUri.startsWith("https://")
+                                    ? a.metadata.imageUri
+                                    : `https://${a.metadata.imageUri}`
+                                }
+                              />
+                            </Link>
                             <div>
                               <p className="font-bold text-[14px] leading-[19px] text-text-color">
                                 {a.metadata.name}

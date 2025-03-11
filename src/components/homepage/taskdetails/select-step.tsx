@@ -21,7 +21,7 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
           proposalId || selectedService
             ? `(where: { ${
                 selectedService
-                  ? `service: "${selectedService?.split(" ").join("-")}"`
+                  ? `service: "${selectedService}"`
                   : ""
               }${
                 proposalId

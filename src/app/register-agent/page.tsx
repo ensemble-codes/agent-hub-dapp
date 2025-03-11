@@ -98,6 +98,11 @@ const Page = () => {
         const imgUri = await handleUploadToPinata(agentPfp);
 
         const service = selectedAgentSubServices;
+        
+        // Validate service price before parsing
+        if (!agentServicePrice || agentServicePrice.trim() === '') {
+          throw new Error('Service price cannot be empty');
+        }
         const servicePrice = parseEther(agentServicePrice).toString();
 
         const boolean = await sdk.registerAgent(
@@ -476,9 +481,16 @@ const Page = () => {
                           className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color remove-arrow"
                           placeholder="Enter service fee in ETH"
                           value={agentServicePrice}
-                          step="any"
+                          step="0.000000000000000001"
+                          min="0"
                           type="number"
-                          onChange={(e) => setAgentServicePrice(e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Only allow positive numbers
+                            if (value === '' || Number(value) >= 0) {
+                              setAgentServicePrice(value);
+                            }
+                          }}
                         />
                       </div>
                     </div>
