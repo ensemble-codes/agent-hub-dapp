@@ -57,10 +57,6 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
   const generatePrompt = useCallback(() => {
     if (!taskTopic) return "";
 
-    // const styleText = selectedTweetStyles.length
-    //   ? `tweet style should be ${selectedTweetStyles.join(", ")}.`
-    //   : "";
-    debugger
     dispatch({
       type: SET_TASK_PROMPT,
       payload: `topic: ${taskTopic}. adjective: ${selectedTweetStyles.join(", ")}`.trim(),

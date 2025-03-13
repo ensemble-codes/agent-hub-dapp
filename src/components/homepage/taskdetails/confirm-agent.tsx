@@ -86,7 +86,6 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   const createTask = useCallback(async () => {
     try {
       setLoadingCreate(true);
-      debugger
       const task = await sdk.createTask({
         prompt: state.taskPrompt,
         proposalId: selectedAgent.toString(),
