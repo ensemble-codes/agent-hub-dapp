@@ -67,7 +67,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
     }
   `;
 
-  const { data } = useQuery(GET_PROPOSAL);
+  const { data, loading } = useQuery(GET_PROPOSAL);
 
   const ratingsArray = new Array(
     data && data?.proposal ? data?.proposal.issuer.reputation : 0
@@ -169,7 +169,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
           </button>
         </div>
         <div className="flex-grow max-w-[412px] max-md:w-full max-md:mx-auto">
-          <div
+          {loading ? <Loader size="lg" /> : <div
             className="w-full p-4 rounded-[10px] shadow-[inset_5px_5px_10px_0px_#D8D8D8,inset_-5px_-5px_10px_0px_#FAFBFF] border-[1px]"
             style={{
               borderImageSource:
@@ -302,7 +302,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                 ))}
               </div>
             </div>
-          </div>
+          </div>}
         </div>
       </div>
     </>

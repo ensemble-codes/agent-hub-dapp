@@ -55,26 +55,6 @@ const SideMenu = () => {
           </div>
         )}
       </Link>
-      <Link href={"/task-center"} className="w-full">
-        {pathname === "/task-center" ? (
-          <div className="py-4 bg-[#DDE7F0] w-full rounded-[50px] flex items-center justify-center gap-2 shadow-[inset_4px_4px_30px_0px_#A7BCCF,inset_-7px_-7px_30px_0px_#FFFFFF99]">
-            <img
-              src="/assets/task-center-selected-icon.svg"
-              alt="task-center-selected-icon"
-            />
-            <span className="text-primary font-medium">TASK CENTER</span>
-          </div>
-        ) : (
-          <div className="p-[3px] bg-gradient-to-br from-[#D8E2EB] to-[#E2ECF5] rounded-[50px] shadow-[7px_7px_30px_0px_#A7BCCF,7px_-7px_30px_0px_#FFFFFF99]">
-            <div className="py-4 bg-white w-full rounded-[50px] flex items-center justify-center gap-2">
-              <img src="/assets/task-center-icon.svg" alt="marketplace-icon" />
-              <span className="text-light-text-color font-medium">
-                TASK CENTER
-              </span>
-            </div>
-          </div>
-        )}
-      </Link>
       <div
         className="p-4 bg-white rounded-[8px] shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF] w-full flex flex-col items-start gap-4 max-h-[300px] overflow-y-auto"
         style={{ scrollbarWidth: "none" }}
@@ -110,14 +90,14 @@ const SideMenu = () => {
           className="cursor-not-allowed opacity-[0.5]"
         />
         <Link
-          href={"https://t.me/+3AsQlbcpR-NkNGVk"}
+          href={"https://docs.ensemble.codes/"}
           rel="nofollower noopener"
           target="_blank"
         >
           <img
-            src="/assets/help-icon.svg"
+            src="/assets/docs-icon.svg"
             alt="help"
-            className="cursor-pointer"
+            className="cursor-pointer w-6 h-6"
           />
         </Link>
         <img
