@@ -8,6 +8,7 @@ import { config } from "@/components/onchainconfig/config";
 import Loader from "@/components/loader";
 import { parseEther } from "ethers";
 import { useRouter } from "next/navigation";
+import { Switch } from "@/components";
 
 const services = [
   {
@@ -32,15 +33,81 @@ const services = [
   },
 ];
 
-const SUB_SERVICES = {
-  DeFi: ["Swap", "Bridge", "Provide LP"],
-  Social: ["Bull-Post", "Reply", "Campaign", "Bless Me"],
-  Security: ["Smart Contract Audit"],
-  Research: ["Markets", "Trends", "AI Agents LP"],
-} as const;
+const SUB_SERVICES_LIST = {
+  DeFi: [
+    {
+      name: "Swap",
+      description:
+        "Agent conducts a swap on your behalf using an optimal route with less fees",
+      icon: "/assets/swap-icon.svg",
+    },
+    {
+      name: "Bridge",
+      description:
+        "Agent bridges from multiple chains using optimal routes and lower fees!",
+      icon: "/assets/bridge-icon.svg",
+    },
+    {
+      name: "Provide LP",
+      description: "Agent provides LP in a pool of your choice!",
+      icon: "/assets/provide-lp-icon.svg",
+    },
+  ],
+  Social: [
+    {
+      name: "Bull-Post",
+      description: "Select an AI KOL your project. The perfect Hype-man!",
+      icon: "/assets/bull-post-icon.svg",
+    },
+    {
+      name: "Reply",
+      description:
+        "Reply agents are great for interaction and possibly farm airdrops/whitelist spots!",
+      icon: "/assets/reply-icon.svg",
+    },
+    {
+      name: "Campaign",
+      description:
+        "Agents will run a campaign on your behalf, ensuring attention and consistency",
+      icon: "/assets/campaign-icon.svg",
+    },
+    {
+      name: "Bless Me",
+      description:
+        "Man plans, and God laughs. I'm here to take your wishes and convince god to make them real!",
+      icon: "/assets/vibes-icon.svg",
+    },
+  ],
+  Security: [
+    {
+      name: "Smart Contract Audit",
+      description:
+        "Agent audits your smart contract for any bugs or vulnerabilities",
+      icon: "/assets/smart-contract-audit-icon.svg",
+    },
+  ],
+  Research: [
+    {
+      name: "Markets",
+      description:
+        "Perfect for analyzing market data and providing accurate information",
+      icon: "/assets/markets-icon.svg",
+    },
+    {
+      name: "Trends",
+      description: "Get up-tp-date with the latest trends in the Crypto world!",
+      icon: "/assets/trends-icon.svg",
+    },
+    {
+      name: "AI Agents LP",
+      description: "Stay updated with the latest on AI Agents!",
+      icon: "/assets/ai-agents-icon.svg",
+    },
+  ],
+};
 
 const Page = () => {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient({
     config: config,
   });
@@ -54,7 +121,7 @@ const Page = () => {
   const [agentPfp, setAgentPfp] = useState<File | null>(null);
   const [agentDescription, setAgentDescription] = useState("");
   const [agentXProfile, setAgentXProfile] = useState("");
-  const [agentTelegram, setAgentTelegram] = useState("");
+  const [agentWebsite, setAgentWebsite] = useState("");
   const [agentAddress, setAgentAddress] = useState("");
   const [agentGitHub, setAgentGitHub] = useState("");
   const [selectedAgentService, setSelectedAgentService] = useState<
@@ -62,12 +129,38 @@ const Page = () => {
   >("DeFi");
   const [selectedAgentSubServices, setSelectedAgentSubServices] =
     useState<string>(
-      SUB_SERVICES["DeFi"][0] // Initialize with "Swap"
+      SUB_SERVICES_LIST["DeFi"][0].name // Initialize with "Swap"
     );
   const [agentServicePrice, setAgentServicePrice] = useState("");
   const [loadingRegister, setLoadingRegister] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [registerFailure, setRegisterFailure] = useState(false);
+
+  // Add validation states
+  const [isValidXProfile, setIsValidXProfile] = useState(false);
+  const [isValidGitHub, setIsValidGitHub] = useState(false);
+  const [isValidWebsite, setIsValidWebsite] = useState(false);
+
+  // Validation functions
+  const validateXProfile = (url: string) => {
+    // Check if the URL contains twitter.com or x.com
+    return url.includes("twitter.com") || url.includes("x.com");
+  };
+
+  const validateGitHub = (url: string) => {
+    // Check if the URL contains github.com
+    return url.includes("github.com");
+  };
+
+  const validateWebsite = (url: string) => {
+    // Basic URL validation
+    try {
+      new URL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
 
   const handleUploadToPinata = useCallback(async (file: File) => {
     try {
@@ -98,10 +191,10 @@ const Page = () => {
         const imgUri = await handleUploadToPinata(agentPfp);
 
         const service = selectedAgentSubServices;
-        
+
         // Validate service price before parsing
-        if (!agentServicePrice || agentServicePrice.trim() === '') {
-          throw new Error('Service price cannot be empty');
+        if (!agentServicePrice || agentServicePrice.trim() === "") {
+          throw new Error("Service price cannot be empty");
         }
         const servicePrice = parseEther(agentServicePrice).toString();
 
@@ -112,7 +205,8 @@ const Page = () => {
             description: agentDescription,
             socials: {
               twitter: agentXProfile,
-              telegram: agentTelegram,
+              telegram: "",
+              website: agentWebsite,
               dexscreener: "",
               github: agentGitHub,
             },
@@ -139,7 +233,8 @@ const Page = () => {
     agentPfp,
     agentDescription,
     agentXProfile,
-    agentTelegram,
+    agentWebsite,
+    agentGitHub,
     selectedAgentService,
     selectedAgentSubServices,
     agentAddress,
@@ -159,24 +254,46 @@ const Page = () => {
 
   const disableNext = useMemo(
     () =>
+      !isConnected ||
       !(
         agentName &&
         agentPfp &&
         agentDescription &&
         agentXProfile &&
-        agentTelegram
+        isValidXProfile &&
+        agentWebsite &&
+        isValidWebsite &&
+        agentGitHub &&
+        isValidGitHub
       ),
-    [agentName, agentPfp, agentDescription, agentXProfile, agentTelegram]
+    [
+      agentName,
+      agentPfp,
+      agentDescription,
+      agentXProfile,
+      isValidXProfile,
+      agentGitHub,
+      isValidGitHub,
+      agentWebsite,
+      isValidWebsite,
+    ]
   );
 
   const disableRegister = useMemo(
     () =>
       disableNext ||
+      !isConnected ||
       !agentAddress ||
       !selectedAgentService ||
       !selectedAgentSubServices ||
       !agentServicePrice,
-    [disableNext, agentAddress, selectedAgentService, selectedAgentSubServices, agentServicePrice]
+    [
+      disableNext,
+      agentAddress,
+      selectedAgentService,
+      selectedAgentSubServices,
+      agentServicePrice,
+    ]
   );
 
   useEffect(() => {
@@ -192,7 +309,9 @@ const Page = () => {
   useEffect(() => {
     // Initialize with default values when component mounts
     if (selectedAgentService && !selectedAgentSubServices) {
-      setSelectedAgentSubServices(SUB_SERVICES[selectedAgentService][0]);
+      setSelectedAgentSubServices(
+        SUB_SERVICES_LIST[selectedAgentService][0].name
+      );
     }
   }, [selectedAgentService, selectedAgentSubServices]);
 
@@ -263,8 +382,15 @@ const Page = () => {
                   <div className="w-full">
                     <div className="flex items-center gap-4">
                       <div className="flex-1 max-w-[300px]">
-                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color">
+                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color flex items-center gap-2">
                           Name
+                          {agentName ? (
+                            <img
+                              src="/assets/check-fill-icon.svg"
+                              alt="fill"
+                              className="w-5 h-5"
+                            />
+                          ) : null}
                         </p>
                         <input
                           className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color"
@@ -275,8 +401,15 @@ const Page = () => {
                       </div>
 
                       <div className="flex-1 max-w-[300px]">
-                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color">
+                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color flex items-center gap-2">
                           PFP
+                          {agentPfp ? (
+                            <img
+                              src="/assets/check-fill-icon.svg"
+                              alt="fill"
+                              className="w-5 h-5"
+                            />
+                          ) : null}
                         </p>
                         <input
                           type="file"
@@ -311,8 +444,15 @@ const Page = () => {
                       }}
                     />
                     <div className="max-w-[616px] mt-6">
-                      <p className="font-medium leading-[21.6px] mb-2 text-light-text-color">
+                      <p className="font-medium leading-[21.6px] mb-2 text-light-text-color flex items-center gap-2">
                         Describe your agent
+                        {agentDescription ? (
+                          <img
+                            src="/assets/check-fill-icon.svg"
+                            alt="fill"
+                            className="w-5 h-5"
+                          />
+                        ) : null}
                       </p>
                       <textarea
                         className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color resize-none"
@@ -331,27 +471,92 @@ const Page = () => {
                       }}
                     />
                     <div className="flex items-center gap-4 mt-6">
-                      <div className="flex-1 max-w-[300px]">
-                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color">
+                      <div className="flex-1 w-[176px]">
+                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color flex items-center gap-2">
                           X Profile
+                          {agentXProfile && isValidXProfile ? (
+                            <img
+                              src="/assets/check-fill-icon.svg"
+                              alt="fill"
+                              className="w-5 h-5"
+                            />
+                          ) : null}
                         </p>
-                        <input
-                          className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color"
-                          placeholder="Enter X Profile link"
-                          value={agentXProfile}
-                          onChange={(e) => setAgentXProfile(e.target.value)}
-                        />
+                        <div className="flex items-center gap-2 py-4 px-2 border border-light-text-color rounded-[4px]">
+                          <img
+                            src="/assets/og-x-icon.svg"
+                            alt="x"
+                            className="w-6 h-6"
+                          />
+                          <input
+                            className="w-full outline-none focus:outline-none placeholder:text-light-text-color bg-inherit"
+                            placeholder="Enter X link"
+                            value={agentXProfile}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setAgentXProfile(value);
+                              setIsValidXProfile(validateXProfile(value));
+                            }}
+                          />
+                        </div>
                       </div>
-                      <div className="flex-1 max-w-[300px]">
-                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color">
-                          Telegram
+                      <div className="flex-1 w-[176px]">
+                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color flex items-center gap-2">
+                          GitHub
+                          {agentGitHub && isValidGitHub ? (
+                            <img
+                              src="/assets/check-fill-icon.svg"
+                              alt="fill"
+                              className="w-5 h-5"
+                            />
+                          ) : null}
                         </p>
-                        <input
-                          className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color"
-                          placeholder="Enter telegram link"
-                          value={agentTelegram}
-                          onChange={(e) => setAgentTelegram(e.target.value)}
-                        />
+                        <div className="flex items-center gap-2 py-4 px-2 border border-light-text-color rounded-[4px]">
+                          <img
+                            src="/assets/og-github-icon.svg"
+                            alt="github"
+                            className="w-6 h-6"
+                          />
+                          <input
+                            className="w-full outline-none focus:outline-none placeholder:text-light-text-color bg-inherit"
+                            placeholder="Enter GitHub link"
+                            value={agentGitHub}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setAgentGitHub(value);
+                              setIsValidGitHub(validateGitHub(value));
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex-1 w-[176px]">
+                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color flex items-center gap-2">
+                          Website
+                          {agentWebsite && isValidWebsite ? (
+                            <img
+                              src="/assets/check-fill-icon.svg"
+                              alt="fill"
+                              className="w-5 h-5"
+                            />
+                          ) : null}
+                        </p>
+                        <div className="flex items-center gap-2 py-4 px-2 border border-light-text-color rounded-[4px]">
+                          <img
+                            src="/assets/website-icon.svg"
+                            alt="website"
+                            className="w-6 h-6"
+                          />
+                          <input
+                            className="w-full outline-none focus:outline-none placeholder:text-light-text-color bg-inherit"
+                            placeholder="Enter Website link"
+                            value={agentWebsite}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setAgentWebsite(value);
+                              setIsValidWebsite(validateWebsite(value));
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -360,7 +565,7 @@ const Page = () => {
                     <div className="flex items-center gap-4">
                       <div className="flex-1 max-w-[300px]">
                         <p className="font-medium leading-[21.6px] mb-2 text-light-text-color">
-                          Deployed address (connected)
+                          Owner address (connected)
                         </p>
                         <input
                           className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color cursor-not-allowed"
@@ -370,8 +575,25 @@ const Page = () => {
                         />
                       </div>
                       <div className="flex-1 max-w-[300px]">
-                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color">
+                        <p className="font-medium leading-[21.6px] mb-2 text-light-text-color flex items-center gap-2">
                           Agent address
+                          <div className="relative group">
+                            <img
+                              src="/assets/tooltip-icon.svg"
+                              alt="tooltip"
+                              className="w-4 h-4 cursor-help"
+                            />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-[#FE460033] w-[230px] px-3 py-1 rounded-[2000px] text-[12px] leading-[24px] text-text-color z-10">
+                              Smart contract address of your agent
+                            </div>
+                          </div>
+                          {agentAddress ? (
+                            <img
+                              src="/assets/check-fill-icon.svg"
+                              alt="fill"
+                              className="w-5 h-5"
+                            />
+                          ) : null}
                         </p>
                         <input
                           className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color"
@@ -406,7 +628,7 @@ const Page = () => {
                               setSelectedAgentService(newService);
                               // Set first subservice as default
                               const firstSubService =
-                                SUB_SERVICES[newService][0];
+                                SUB_SERVICES_LIST[newService][0].name;
                               setSelectedAgentSubServices(firstSubService);
                             }}
                             className={`w-auto space-x-2 flex items-center justify-between rounded-[50px] py-[12px] px-[16px] ${
@@ -440,59 +662,56 @@ const Page = () => {
                           </button>
                         ))}
                       </div>
-                      {selectedAgentService &&
-                        SUB_SERVICES[selectedAgentService].length > 0 && (
-                          <div className="mt-4 flex items-center gap-4">
-                            {SUB_SERVICES[selectedAgentService].map(
-                              (service) => (
-                                <label
-                                  key={service}
-                                  className="flex items-center gap-2 cursor-pointer"
-                                >
-                                  <div className="relative w-5 h-5 border border-light-text-color rounded-[4px]">
-                                    <input
-                                      type="checkbox"
-                                      className="appearance-none w-5 h-5 cursor-pointer"
-                                      checked={
-                                        selectedAgentSubServices === service
-                                      }
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                          setSelectedAgentSubServices(service);
-                                        }
-                                      }}
+                      {selectedAgentService && (
+                        <div className="mt-4 space-y-3">
+                          {SUB_SERVICES_LIST[selectedAgentService].map(
+                            (service) => (
+                              <div
+                                key={service.name}
+                                className="border border-light-text-color rounded-[8px] p-4 flex items-center justify-between"
+                              >
+                                <div className="flex items-start gap-2">
+                                  {service.icon ? (
+                                    <img
+                                      src={service.icon}
+                                      alt={service.name.toLowerCase()}
+                                      className={`${
+                                        service.name === "Smart Contract Audit"
+                                          ? "w-5 h-5"
+                                          : "w-6 h-6"
+                                      }`}
                                     />
-                                    {selectedAgentSubServices === service && (
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="w-3 h-3 bg-primary rounded-sm" />
-                                      </div>
-                                    )}
+                                  ) : null}
+                                  <div className="flex flex-col items-start gap-1">
+                                    <p className="font-bold text-text-color text-[14px]">
+                                      {service.name.toUpperCase()}
+                                    </p>
+                                    <p className="font-medium text-text-color text-[14px]">
+                                      {service.description}
+                                    </p>
                                   </div>
-                                  <span className="text-[#3d3d3d] text-[14px]">
-                                    {service}
-                                  </span>
-                                </label>
-                              )
-                            )}
-                          </div>
-                        )}
-                      <div className="flex-1 max-w-[300px] mt-3">
-                        <input
-                          className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color remove-arrow"
-                          placeholder="Enter service fee in ETH"
-                          value={agentServicePrice}
-                          step="0.000000000000000001"
-                          min="0"
-                          type="number"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            // Only allow positive numbers
-                            if (value === '' || Number(value) >= 0) {
-                              setAgentServicePrice(value);
-                            }
-                          }}
-                        />
-                      </div>
+                                </div>
+                                <Switch
+                                  checked={
+                                    selectedAgentSubServices === service.name
+                                  }
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setSelectedAgentSubServices(service.name);
+                                    } else if (
+                                      selectedAgentSubServices === service.name
+                                    ) {
+                                      // When unchecking the currently selected service, select none
+                                      setSelectedAgentSubServices("");
+                                    }
+                                  }}
+                                  size="default"
+                                />
+                              </div>
+                            )
+                          )}
+                        </div>
+                      )}
                     </div>
                     <hr
                       className="my-2 border-[0.5px] border-[#8F95B2] w-[50%] mt-6"
@@ -504,13 +723,22 @@ const Page = () => {
                     />
                     <div className="flex-1 max-w-[300px] mt-6">
                       <p className="font-medium leading-[21.6px] mb-2 text-light-text-color">
-                        GitHub link <i>(optional)</i>
+                        Rate per Task
                       </p>
                       <input
-                        className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color"
-                        placeholder="Enter agent GitHub"
-                        value={agentGitHub}
-                        onChange={(e) => setAgentGitHub(e.target.value)}
+                        className="w-full border border-light-text-color rounded-[4px] outline-none focus:outline-none py-4 px-2 placeholder:text-light-text-color remove-arrow"
+                        placeholder="0.05 ETH"
+                        value={agentServicePrice}
+                        step="0.000000000000000001"
+                        min="0"
+                        type="number"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Only allow positive numbers
+                          if (value === "" || Number(value) >= 0) {
+                            setAgentServicePrice(value);
+                          }
+                        }}
                       />
                     </div>
                   </div>
@@ -632,21 +860,21 @@ const Page = () => {
                     Socials
                   </p>
                   <div className="flex items-center justify-end gap-2">
-                    {agentXProfile ? (
+                    {agentXProfile && isValidXProfile ? (
                       <img
                         src="/assets/og-x-icon.svg"
                         alt="X"
                         className="w-6 h-6"
                       />
                     ) : null}
-                    {agentTelegram ? (
+                    {agentWebsite && isValidWebsite ? (
                       <img
-                        src="/assets/og-tg-icon.svg"
-                        alt="TG"
+                        src="/assets/website-icon.svg"
+                        alt="website"
                         className="w-6 h-6"
                       />
                     ) : null}
-                    {agentGitHub ? (
+                    {agentGitHub && isValidGitHub ? (
                       <img
                         src="/assets/og-github-icon.svg"
                         alt="GitHub"

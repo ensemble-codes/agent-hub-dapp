@@ -8,4 +8,5 @@ export { default as Loader } from "./loader";
 export { default as GoogleTagManager } from "./googletagmanager";
 export { default as Wrapper } from "./wrapper";
 export { default as Modal } from "./modal";
+export { Switch } from "./switch";
 export * from "./homepage";

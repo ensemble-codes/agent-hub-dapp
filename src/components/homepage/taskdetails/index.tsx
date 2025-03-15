@@ -5,12 +5,15 @@ import SelectAgentStep from "./select-step";
 import ConfirmAgent from "./confirm-agent";
 import { AppContext } from "@/context";
 import { SET_TASK_PROMPT } from "@/context/actions";
+import { useSearchParams } from "next/navigation";
 
 interface TaskDetailsProps {
   selectedService: string;
 }
 
 const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
+  const searchParams = useSearchParams();
+  const proposalId = searchParams.get("proposal");
   const [, dispatch] = useContext(AppContext);
   const [detailStep, setDetailStep] = useState<string>("details");
   const [selectedAgent, setSelectedAgent] = useState<number>(1);
@@ -129,7 +132,7 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
             {detailStep === "details" ? (
               <DetailStep
                 setDetailStep={(val) => {
-                  setDetailStep(val);
+                  setDetailStep(proposalId ? "confirm" : val);
                   generatePrompt();
                 }}
                 selectedTweetStyles={selectedTweetStyles}
