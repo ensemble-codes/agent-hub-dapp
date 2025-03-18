@@ -153,9 +153,15 @@ const Page = () => {
   };
 
   const validateWebsite = (url: string) => {
+    // If URL doesn't start with a protocol, prepend https://
+    let urlToTest = url;
+    if (url && url.match(/^(?:(ftp|http|https):\/\/)?(?:[\w-]+\.)+[a-z]{2,6}$/)) {
+      urlToTest = 'https://' + url;
+    }
+    
     // Basic URL validation
     try {
-      new URL(url);
+      new URL(urlToTest);
       return true;
     } catch (e) {
       return false;
@@ -197,6 +203,22 @@ const Page = () => {
           throw new Error("Service price cannot be empty");
         }
         const servicePrice = parseEther(agentServicePrice).toString();
+
+        console.log({
+          agentAddress,
+          name: agentName,
+          description: agentDescription,
+          socials: {
+            twitter: agentXProfile,
+            telegram: "",
+            website: agentWebsite,
+            dexscreener: "",
+            github: agentGitHub,
+          },
+          imageURI: imgUri,
+          service,
+          servicePrice,
+        });
 
         const boolean = await sdk.registerAgent(
           agentAddress,
@@ -262,9 +284,7 @@ const Page = () => {
         agentXProfile &&
         isValidXProfile &&
         agentWebsite &&
-        isValidWebsite &&
-        agentGitHub &&
-        isValidGitHub
+        isValidWebsite
       ),
     [
       agentName,
@@ -273,7 +293,6 @@ const Page = () => {
       agentXProfile,
       isValidXProfile,
       agentGitHub,
-      isValidGitHub,
       agentWebsite,
       isValidWebsite,
     ]
@@ -732,13 +751,7 @@ const Page = () => {
                         step="0.000000000000000001"
                         min="0"
                         type="number"
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          // Only allow positive numbers
-                          if (value === "" || Number(value) >= 0) {
-                            setAgentServicePrice(value);
-                          }
-                        }}
+                        onChange={(e) => setAgentServicePrice(e.target.value)}
                       />
                     </div>
                   </div>
