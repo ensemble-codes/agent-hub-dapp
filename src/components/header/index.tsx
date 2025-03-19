@@ -1,11 +1,10 @@
 "use client";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { usePathname, useRouter } from "next/navigation";
-import { baseSepolia } from "viem/chains";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { metaMask } from "wagmi/connectors";
+import { useAccount, useDisconnect } from "wagmi";
 
 const AppHeader = () => {
-  const { connect } = useConnect();
+  const { openConnectModal } = useConnectModal();
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { push } = useRouter();
@@ -66,9 +65,7 @@ const AppHeader = () => {
         ) : (
           <button
             className="w-auto mt-6 space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-            onClick={() =>
-              connect({ connector: metaMask(), chainId: baseSepolia.id })
-            }
+            onClick={openConnectModal}
           >
             <img src="/assets/connect-wallet-icon.svg" alt="connect-wallet" />
             <span className="text-white text-[16px] font-[700] leading-[24px]">

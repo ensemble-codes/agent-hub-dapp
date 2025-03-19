@@ -4,6 +4,7 @@ import "./globals.css";
 import { AppBg, Footer, GoogleTagManager, Wrapper } from "@/components";
 import OnchainProvider from "@/components/onchainconfig/provider";
 import { AppContextProvider } from "@/context";
+import '@rainbow-me/rainbowkit/styles.css';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
