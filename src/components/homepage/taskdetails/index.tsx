@@ -18,6 +18,7 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
   const [detailStep, setDetailStep] = useState<string>("details");
   const [selectedAgent, setSelectedAgent] = useState<number>(1);
   const [selectedTweetStyles, setSelectedTweetStyles] = useState<string[]>([]);
+  const [vibesXUsername, setVibesXUsername] = useState("");
   const [taskTopic, setTaskTopic] = useState<string>("");
 
   // Add beforeunload event listener
@@ -60,26 +61,61 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
   const generatePrompt = useCallback(() => {
     if (!taskTopic) return "";
 
+    const payload =
+      selectedService?.toLowerCase() === "bull-post"
+        ? `topic: ${taskTopic}. adjective: ${selectedTweetStyles.join(
+            ", "
+          )}`.trim()
+        : selectedService?.toLowerCase() === "bless me"
+        ? `topic: ${taskTopic}. username: ${vibesXUsername}`.trim()
+        : `topic: ${taskTopic}`;
+
     dispatch({
       type: SET_TASK_PROMPT,
-      payload: `topic: ${taskTopic}. adjective: ${selectedTweetStyles.join(", ")}`.trim(),
+      payload: payload,
     });
-  }, [taskTopic, selectedTweetStyles]);
+  }, [taskTopic, selectedTweetStyles, vibesXUsername]);
 
   return (
     <div className="flex flex-col items-start w-full">
       <div className="mb-5">
         <p className="text-[18px] font-bold leading-[24.3px] flex items-center gap-1 mb-1">
           {selectedService.toUpperCase()}
-          <img
-            src="/assets/bull-post-icon.svg"
-            alt="bull-post"
-            className="w-7 h-7"
-          />
+          {selectedService.toLowerCase() === "bull-post" ? (
+            <img
+              src="/assets/bull-post-icon.svg"
+              alt="bull-post"
+              className="w-7 h-7"
+            />
+          ) : selectedService.toLowerCase() === "bless me" ? (
+            <img src="/assets/vibes-icon.svg" alt="vibes" className="w-7 h-7" />
+          ) : selectedService === "veterinary" ? (
+            <img src="/assets/vet-icon.svg" alt="vet" className="w-7 h-7" />
+          ) : (
+            <img
+              src="/assets/smart-contract-audit-primary-icon.svg"
+              alt="audit"
+              className="w-7 h-7"
+            />
+          )}
         </p>
-        <p className="text-[16px] font-medium leading-[21.56px] text-[#8F95B2]">
-          Select an AI KOL your project. The perfect Hype-man!
-        </p>
+        {selectedService.toLowerCase() === "bull-post" ? (
+          <p className="text-[16px] font-medium leading-[21.56px] text-[#8F95B2]">
+            Select an AI KOL your project. The perfect Hype-man!
+          </p>
+        ) : selectedService.toLowerCase() === "bless me" ? (
+          <p className="text-[16px] font-medium leading-[21.56px] text-[#8F95B2]">
+            Send good vibes to your near and dear ones
+          </p>
+        ) : selectedService.toLowerCase() === "veterinary" ? (
+          <p className="text-[16px] font-medium leading-[21.56px] text-[#8F95B2]">
+            Instant AI analysis for your pets
+          </p>
+        ) : (
+          <p className="text-[16px] font-medium leading-[21.56px] text-[#8F95B2]">
+            On-demand security expert when you need it!
+          </p>
+        )}
       </div>
       <div className="relative w-full max-w-[900px]">
         <div className="w-full rounded-[10px] bg-gradient-to-r from-[rgba(255,255,255,0.4)] to-[rgba(255,255,255,0)] p-[1px]">
@@ -139,6 +175,8 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
                 setSelectedTweetStyles={setSelectedTweetStyles}
                 topic={taskTopic}
                 setTopic={setTaskTopic}
+                vibesXUsername={vibesXUsername}
+                setVibesXUsername={setVibesXUsername}
               />
             ) : detailStep === "select" ? (
               <SelectAgentStep
@@ -152,6 +190,7 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
                 selectedAgent={selectedAgent}
                 selectedTweetStyles={selectedTweetStyles}
                 topic={taskTopic}
+                vibesXUsername={vibesXUsername}
               />
             )}
           </div>

@@ -211,8 +211,8 @@ export default function Home() {
                                 {a.metadata.name}
                               </p>
                               <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
-                                {a.owner.slice(0, 4)}...
-                                {a.owner.slice(-4)}
+                                {a.id.slice(0, 4)}...
+                                {a.id.slice(-4)}
                               </p>
                             </div>
                           </div>

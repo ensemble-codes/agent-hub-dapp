@@ -60,7 +60,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
   return (
     <>
       {children}
-      <Modal isOpen={showRegisterModal} overlayClassName="bg-black/90">
+      <Modal isOpen={false} overlayClassName="bg-black/90">
         <div className="p-12 relative overflow-hidden w-[600px] h-[400px] flex flex-col items-center justify-between">
           <img
             className="absolute top-0 left-0 object-cover w-full h-full z-[-1]"
