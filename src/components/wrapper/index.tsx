@@ -1,6 +1,6 @@
 "use client";
 import { FC, useCallback, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
 import Modal from "../modal";
 import Loader from "../loader";
 import Link from "next/link";
@@ -12,6 +12,7 @@ interface WrapperProps {
 
 const Wrapper: FC<WrapperProps> = ({ children }) => {
   const { openConnectModal } = useConnectModal();
+  const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
   const [showRegisterModal, setShowRegisterModal] = useState(true);
   const [checkingEligibility, setCheckingEligibility] = useState(false);
@@ -48,8 +49,8 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
       // Save the current overflow value to restore it later
       const originalOverflow = document.body.style.overflow;
       // Disable scrolling
-      document.body.style.overflow = 'hidden';
-      
+      document.body.style.overflow = "hidden";
+
       // Cleanup function to re-enable scrolling when component unmounts or modal closes
       return () => {
         document.body.style.overflow = originalOverflow;
@@ -60,7 +61,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
   return (
     <>
       {children}
-      <Modal isOpen={false} overlayClassName="bg-black/90">
+      <Modal isOpen={showRegisterModal} overlayClassName="bg-black/90">
         <div className="p-12 relative overflow-hidden w-[600px] h-[400px] flex flex-col items-center justify-between">
           <img
             className="absolute top-0 left-0 object-cover w-full h-full z-[-1]"
@@ -122,20 +123,28 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
                   Please register your agent to be part of the Beta
                 </p>
               </div>
-              <Link
-                href="https://88phxim41aw.typeform.com/to/MBZRyY88"
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <div className="p-[3.47px] bg-gradient-to-br from-[#FE4600] to-[#E2ECF5] rounded-[50px] shadow-[8.11px_8.11px_18.53px_0px_rgba(202,221,237,1),-8.11px_-8.11px_18.53px_0px_rgba(202,221,237,0.6)]">
-                <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
-                  <img src="/assets/stars-icon.svg" alt="pixelated-arrow" />
-                  <span className="text-white text-[16px] font-[700] leading-[24px]">
-                    Join the Ensemble
-                  </span>
-                </button>
-                </div>
-              </Link>
+              <div className="w-full flex items-center justify-center gap-4">
+                <Link
+                  href="https://88phxim41aw.typeform.com/to/MBZRyY88"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <div className="p-[3.47px] bg-gradient-to-br from-[#FE4600] to-[#E2ECF5] rounded-[50px] shadow-[8.11px_8.11px_18.53px_0px_rgba(202,221,237,1),-8.11px_-8.11px_18.53px_0px_rgba(202,221,237,0.6)]">
+                    <button className="w-[256px] space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]">
+                      <img src="/assets/stars-icon.svg" alt="pixelated-arrow" />
+                      <span className="text-white text-[16px] font-[700] leading-[24px]">
+                        Join the Ensemble
+                      </span>
+                    </button>
+                  </div>
+                </Link>
+                <img
+                  src="/assets/power-icon.svg"
+                  alt="power"
+                  className="cursor-pointer"
+                  onClick={() => disconnect()}
+                />
+              </div>
             </>
           )}
         </div>
