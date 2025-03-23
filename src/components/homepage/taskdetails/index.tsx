@@ -89,8 +89,8 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
             />
           ) : selectedService.toLowerCase() === "bless me" ? (
             <img src="/assets/vibes-icon.svg" alt="vibes" className="w-7 h-7" />
-          ) : selectedService === "veterinary" ? (
-            <img src="/assets/vet-icon.svg" alt="vet" className="w-7 h-7" />
+          ) : selectedService === "pet symptom analyzer" ? (
+            <img src="/assets/pet-icon.svg" alt="p" className="w-7 h-7" />
           ) : (
             <img
               src="/assets/smart-contract-audit-primary-icon.svg"
@@ -107,7 +107,7 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
           <p className="text-[16px] font-medium leading-[21.56px] text-[#8F95B2]">
             Send good vibes to your near and dear ones
           </p>
-        ) : selectedService.toLowerCase() === "veterinary" ? (
+        ) : selectedService.toLowerCase() === "pet symptom analyzer" ? (
           <p className="text-[16px] font-medium leading-[21.56px] text-[#8F95B2]">
             Instant AI analysis for your pets
           </p>

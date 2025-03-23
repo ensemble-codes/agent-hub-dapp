@@ -103,6 +103,11 @@ const SUB_SERVICES_LIST = {
       description: "Stay updated with the latest on AI Agents!",
       icon: "/assets/ai-agents-icon.svg",
     },
+    {
+      name: "Pet Symptom Analyzer",
+      description: "AI-powered veterinary diagnostic service that evaluates your pet's symptoms and generates detailed assessment reports.",
+      icon: "/assets/pet-gray-icon.svg",
+    },
   ],
 };
 
@@ -261,6 +266,7 @@ const Page = () => {
     selectedAgentSubServices,
     agentAddress,
     address,
+    agentServicePrice
   ]);
 
   const getProgressWidth = useCallback(() => {
