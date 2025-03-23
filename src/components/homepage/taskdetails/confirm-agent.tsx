@@ -2,7 +2,7 @@
 import { FC, useCallback, useContext, useMemo, useState } from "react";
 import AGENTSLIST from "@/dummydata/agents.json";
 import TWEETSTYLES from "@/dummydata/tweetstyles.json";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AppContext } from "@/context";
 import { initSdk, useSdk } from "@/sdk-config";
 import Loader from "@/components/loader";
@@ -16,13 +16,17 @@ interface ConfirmAgentProps {
   selectedAgent: number;
   selectedTweetStyles: string[];
   topic: string;
+  vibesXUsername: string;
 }
 
 const ConfirmAgent: FC<ConfirmAgentProps> = ({
   selectedAgent,
   selectedTweetStyles,
   topic,
+  vibesXUsername,
 }) => {
+  const searchParams = useSearchParams();
+  const selectedService = searchParams.get("service");
   const [state] = useContext(AppContext);
   const router = useRouter();
   const { data: walletClient } = useWalletClient({
@@ -86,6 +90,10 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   const createTask = useCallback(async () => {
     try {
       setLoadingCreate(true);
+      console.log({
+        prompt: state.taskPrompt,
+        proposalId: selectedAgent.toString(),
+      })
       const task = await sdk.createTask({
         prompt: state.taskPrompt,
         proposalId: selectedAgent.toString(),
@@ -129,22 +137,35 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
               </p>
               <p className="font-medium">{topic}</p>
             </div>
-            {filteredTweetStyles.length ? (
-              <div className="space-y-[6px]">
-                <p className="text-light-text-color text-[18px] leading-[24px] font-bold">
-                  Tweet Style
-                </p>
-                <div className="w-full flex items-center justify-start gap-2 flex-wrap">
-                  {filteredTweetStyles.map((ts) => (
-                    <p
-                      key={ts.value}
-                      className={`rounded-[20px] text-[14px] border-[${ts.color}] flex-shrink-0 cursor-pointer px-2 py-[2px] border-[0.5px] shadow-[0px_2px_4px_0px_#0000001F]`}
-                    >
-                      {ts.label}
+            {selectedService?.toLowerCase() === "bull-post" ? (
+              <>
+                {filteredTweetStyles.length ? (
+                  <div className="space-y-[6px]">
+                    <p className="text-light-text-color text-[18px] leading-[24px] font-bold">
+                      Tweet Style
                     </p>
-                  ))}
+                    <div className="w-full flex items-center justify-start gap-2 flex-wrap">
+                      {filteredTweetStyles.map((ts) => (
+                        <p
+                          key={ts.value}
+                          className={`rounded-[20px] text-[14px] border-[${ts.color}] flex-shrink-0 cursor-pointer px-2 py-[2px] border-[0.5px] shadow-[0px_2px_4px_0px_#0000001F]`}
+                        >
+                          {ts.label}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </>
+            ) : selectedService?.toLowerCase() === "bless me" ? (
+              <>
+                <div className="space-y-[6px] mb-5">
+                  <p className="text-[14px] font-bold text-primary leading-[18.9px]">
+                    X Username
+                  </p>
+                  <p className="font-medium">{vibesXUsername}</p>
                 </div>
-              </div>
+              </>
             ) : null}
           </div>
           <button
@@ -169,140 +190,144 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
           </button>
         </div>
         <div className="flex-grow max-w-[412px] max-md:w-full max-md:mx-auto">
-          {loading ? <Loader size="lg" /> : <div
-            className="w-full p-4 rounded-[10px] shadow-[inset_5px_5px_10px_0px_#D8D8D8,inset_-5px_-5px_10px_0px_#FAFBFF] border-[1px]"
-            style={{
-              borderImageSource:
-                "linear-gradient(91.95deg, rgba(255, 255, 255, 0.4) -4.26%, rgba(255, 255, 255, 0) 107.52%)",
-              borderImageSlice: "1",
-            }}
-          >
-            <div className="flex items-center justify-between w-full">
-              <p className="text-light-text-color text-[18px] leading-[24px] font-bold">
-                Agent details
-              </p>
-              <div className="flex items-center gap-1">
-                {proposal?.issuer?.metadata?.telegram ? (
-                  <Link
-                    href={proposal?.issuer?.metadata?.telegram}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    <img
-                      src="/assets/agent-telegram-icon.svg"
-                      alt="telegram"
-                      className="w-8 h-8 cursor-pointer"
-                    />
-                  </Link>
-                ) : null}
-                {proposal?.issuer?.metadata?.twitter ? (
-                  <Link
-                    href={proposal?.issuer?.metadata?.twitter}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    <img
-                      src="/assets/agent-twitter-icon.svg"
-                      alt="twitter"
-                      className="w-8 h-8 cursor-pointer"
-                    />
-                  </Link>
-                ) : null}
-              </div>
-            </div>
-            <hr
-              className="my-5 border-[1px] border-[#8F95B2]"
+          {loading ? (
+            <Loader size="lg" />
+          ) : (
+            <div
+              className="w-full p-4 rounded-[10px] shadow-[inset_5px_5px_10px_0px_#D8D8D8,inset_-5px_-5px_10px_0px_#FAFBFF] border-[1px]"
               style={{
                 borderImageSource:
-                  "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                  "linear-gradient(91.95deg, rgba(255, 255, 255, 0.4) -4.26%, rgba(255, 255, 255, 0) 107.52%)",
                 borderImageSlice: "1",
               }}
-            />
-            <div className="w-full flex items-center justify-between">
-              <div className="flex space-x-2">
-                <img
-                  src={
-                    proposal?.issuer?.metadata?.imageUri.startsWith(
-                      "https://"
-                    )
-                      ? proposal?.issuer?.metadata?.imageUri
-                      : `https://${proposal?.issuer?.metadata?.imageUri}` ||
-                        "/assets/cook-capital-profile.png"
-                  }
-                  alt={proposal?.issuer?.metadata?.name}
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <div className="space-y-1">
-                  <p className="font-medium">
-                    {proposal?.issuer?.metadata?.name}
+            >
+              <div className="flex items-center justify-between w-full">
+                <p className="text-light-text-color text-[18px] leading-[24px] font-bold">
+                  Agent details
+                </p>
+                <div className="flex items-center gap-1">
+                  {proposal?.issuer?.metadata?.telegram ? (
+                    <Link
+                      href={proposal?.issuer?.metadata?.telegram}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      <img
+                        src="/assets/agent-telegram-icon.svg"
+                        alt="telegram"
+                        className="w-8 h-8 cursor-pointer"
+                      />
+                    </Link>
+                  ) : null}
+                  {proposal?.issuer?.metadata?.twitter ? (
+                    <Link
+                      href={proposal?.issuer?.metadata?.twitter}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      <img
+                        src="/assets/agent-twitter-icon.svg"
+                        alt="twitter"
+                        className="w-8 h-8 cursor-pointer"
+                      />
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
+              <hr
+                className="my-5 border-[1px] border-[#8F95B2]"
+                style={{
+                  borderImageSource:
+                    "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                  borderImageSlice: "1",
+                }}
+              />
+              <div className="w-full flex items-center justify-between">
+                <div className="flex space-x-2">
+                  <img
+                    src={
+                      proposal?.issuer?.metadata?.imageUri.startsWith(
+                        "https://"
+                      )
+                        ? proposal?.issuer?.metadata?.imageUri
+                        : `https://${proposal?.issuer?.metadata?.imageUri}` ||
+                          "/assets/cook-capital-profile.png"
+                    }
+                    alt={proposal?.issuer?.metadata?.name}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div className="space-y-1">
+                    <p className="font-medium">
+                      {proposal?.issuer?.metadata?.name}
+                    </p>
+                  </div>
+                </div>
+                <div className="rounded-[200px] border-none bg-[#AB21FF3D] px-[12px] py-[4px]">
+                  <p className="text-[#AB21FF] leading-[24px] text-center font-bold text-[12px]">
+                    {proposal?.issuer?.id?.slice(0, 4)}...
+                    {proposal?.issuer?.id?.slice(-4)}
                   </p>
                 </div>
               </div>
-              <div className="rounded-[200px] border-none bg-[#AB21FF3D] px-[12px] py-[4px]">
-                <p className="text-[#AB21FF] leading-[24px] text-center font-bold text-[12px]">
-                  {proposal?.issuer?.owner?.slice(0, 4)}...
-                  {proposal?.issuer?.owner?.slice(-4)}
+              <hr
+                className="my-5 border-[1px] border-[#8F95B2]"
+                style={{
+                  borderImageSource:
+                    "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                  borderImageSlice: "1",
+                }}
+              />
+              <div className="w-full flex items-center justify-between">
+                <p className="font-medium text-light-text-color text-[14px] leading-[18.9px]">
+                  Price
+                </p>
+                {proposal && proposal.price ? (
+                  <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
+                    {Number(formatEther(proposal?.price))} ETH per tweet
+                  </p>
+                ) : null}
+              </div>
+              <hr
+                className="my-5 border-[1px] border-[#8F95B2]"
+                style={{
+                  borderImageSource:
+                    "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                  borderImageSlice: "1",
+                }}
+              />
+              <div className="w-full flex items-center justify-between">
+                <p className="font-medium text-light-text-color text-[14px] leading-[18.9px]">
+                  Jobs done
+                </p>
+                <p className="text-[14px] leading-[21.6px] font-bold">
+                  {proposal?.issuer?.tasks?.length || 0}
                 </p>
               </div>
-            </div>
-            <hr
-              className="my-5 border-[1px] border-[#8F95B2]"
-              style={{
-                borderImageSource:
-                  "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                borderImageSlice: "1",
-              }}
-            />
-            <div className="w-full flex items-center justify-between">
-              <p className="font-medium text-light-text-color text-[14px] leading-[18.9px]">
-                Price
-              </p>
-              {proposal && proposal.price ? (
-                <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
-                  {Number(formatEther(proposal?.price))} ETH per tweet
+              <hr
+                className="my-5 border-[1px] border-[#8F95B2]"
+                style={{
+                  borderImageSource:
+                    "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                  borderImageSlice: "1",
+                }}
+              />
+              <div className="w-full flex items-center justify-between">
+                <p className="font-medium text-light-text-color text-[14px] leading-[18.9px]">
+                  Average rating
                 </p>
-              ) : null}
-            </div>
-            <hr
-              className="my-5 border-[1px] border-[#8F95B2]"
-              style={{
-                borderImageSource:
-                  "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                borderImageSlice: "1",
-              }}
-            />
-            <div className="w-full flex items-center justify-between">
-              <p className="font-medium text-light-text-color text-[14px] leading-[18.9px]">
-                Jobs done
-              </p>
-              <p className="text-[14px] leading-[21.6px] font-bold">
-                {proposal?.issuer?.tasks?.length || 0}
-              </p>
-            </div>
-            <hr
-              className="my-5 border-[1px] border-[#8F95B2]"
-              style={{
-                borderImageSource:
-                  "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                borderImageSlice: "1",
-              }}
-            />
-            <div className="w-full flex items-center justify-between">
-              <p className="font-medium text-light-text-color text-[14px] leading-[18.9px]">
-                Average rating
-              </p>
-              <div className="flex items-center gap-1">
-                {ratingsArray.fill(0).map((star, index) => (
-                  <img
-                    key={`${star}-${index}`}
-                    src="/assets/star-icon.svg"
-                    alt="star"
-                    className="w-5 h-5"
-                  />
-                ))}
+                <div className="flex items-center gap-1">
+                  {ratingsArray.fill(0).map((star, index) => (
+                    <img
+                      key={`${star}-${index}`}
+                      src="/assets/star-icon.svg"
+                      alt="star"
+                      className="w-5 h-5"
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>}
+          )}
         </div>
       </div>
     </>
