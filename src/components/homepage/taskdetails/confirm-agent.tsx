@@ -27,6 +27,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
 }) => {
   const searchParams = useSearchParams();
   const selectedService = searchParams.get("service");
+  const selectedProposal = searchParams.get("proposal");
   const [state] = useContext(AppContext);
   const router = useRouter();
   const { data: walletClient } = useWalletClient({
@@ -37,7 +38,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
 
   const GET_PROPOSAL = gql`
     query MyQuery {
-      proposal(id: "${selectedAgent}") {
+      proposal(id: "${selectedProposal}") {
     id
     issuer {
       agentUri
@@ -89,14 +90,16 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
 
   const createTask = useCallback(async () => {
     try {
+      if (!selectedProposal) return;
+
       setLoadingCreate(true);
       console.log({
         prompt: state.taskPrompt,
-        proposalId: selectedAgent.toString(),
+        proposalId: selectedProposal,
       })
       const task = await sdk.createTask({
         prompt: state.taskPrompt,
-        proposalId: selectedAgent.toString(),
+        proposalId: selectedProposal,
       });
       if (task.id) {
         router.push(`/tasks/${task.id}`);
