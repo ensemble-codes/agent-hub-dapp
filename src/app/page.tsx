@@ -113,6 +113,9 @@ export default function Home() {
     "0x83df687c3642b6ac84a5083206eac69a9fd918f9",
     "0xe03ce825669af732a59ae4dbf2f95c5caed48a23",
     "0x114375c8b0a6231449c6961b0746cb0117d66f4f",
+    "0xfdcb66224f433f3f7bff246571c1c26b071ed952",
+    "0xf74faaeee3be756d2e5238e2e067f33a3cf0ba36",
+    "0x515e4af972d84920a9e774881003b2bd797c4d4b"
   ];
   const agents = (data?.agents || []).filter(
     (a: any) => !agentsToFilter.includes(a.id)
