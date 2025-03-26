@@ -67,7 +67,7 @@ const TaskDetails: FC<TaskDetailsProps> = ({ selectedService }) => {
             ", "
           )}`.trim()
         : selectedService?.toLowerCase() === "bless me"
-        ? `topic: ${taskTopic}. username: ${vibesXUsername}`.trim()
+        ? `greeting: ${taskTopic}. recipient: ${vibesXUsername}`.trim()
         : `topic: ${taskTopic}`;
 
     dispatch({
