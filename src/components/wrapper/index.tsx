@@ -17,7 +17,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
   const [showRegisterModal, setShowRegisterModal] = useState(true);
   const [checkingEligibility, setCheckingEligibility] = useState(false);
 
-  const checkWallet = useCallback(async () => {
+  /* const checkWallet = useCallback(async () => {
     try {
       setCheckingEligibility(true);
       const response = await fetch(
@@ -37,9 +37,9 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
     } finally {
       setCheckingEligibility(false);
     }
-  }, [address]);
+  }, [address]); */
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (address) checkWallet();
   }, [address]);
 
@@ -56,12 +56,12 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
         document.body.style.overflow = originalOverflow;
       };
     }
-  }, [showRegisterModal]);
+  }, [showRegisterModal]); */
 
   return (
     <>
       {children}
-      <Modal isOpen={showRegisterModal} overlayClassName="bg-black/90">
+      {/* <Modal isOpen={showRegisterModal} overlayClassName="bg-black/90">
         <div className="p-12 relative overflow-hidden w-[600px] h-[400px] flex flex-col items-center justify-between">
           <img
             className="absolute top-0 left-0 object-cover w-full h-full z-[-1]"
@@ -148,7 +148,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
             </>
           )}
         </div>
-      </Modal>
+      </Modal> */}
     </>
   );
 };
