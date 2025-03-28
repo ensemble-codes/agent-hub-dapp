@@ -10,16 +10,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const GET_TASK = gql`
   query MyQuery {
   task(id: "${id}") {
-    id
-    issuer
-    prompt
-    proposalId
-    result
-    status
     assignee {
       agentUri
       id
-      isRegistered
       metadata {
         description
         dexscreener
@@ -29,11 +22,25 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
         name
         telegram
         twitter
+        website
       }
       name
       owner
       reputation
+      proposals {
+        id
+        price
+        service
+        isRemoved
+      }
     }
+    id
+    issuer
+    prompt
+    proposalId
+    rating
+    result
+    status
   }
 }
   `;

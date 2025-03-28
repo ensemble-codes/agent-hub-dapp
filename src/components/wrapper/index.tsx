@@ -1,10 +1,12 @@
 "use client";
 import { FC, useCallback, useEffect, useState } from "react";
-import { useAccount, useDisconnect } from "wagmi";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 import Modal from "../modal";
 import Loader from "../loader";
 import Link from "next/link";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { metaMask } from "wagmi/connectors";
+import { baseSepolia } from "viem/chains";
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -12,6 +14,7 @@ interface WrapperProps {
 
 const Wrapper: FC<WrapperProps> = ({ children }) => {
   const { openConnectModal } = useConnectModal();
+  const { connect } = useConnect();
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
   const [showRegisterModal, setShowRegisterModal] = useState(true);
@@ -85,7 +88,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
               </div>
               <button
                 className="w-auto mt-6 space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                onClick={openConnectModal}
+                onClick={() => connect({ connector: metaMask(), chainId: baseSepolia.id })}
               >
                 <img
                   src="/assets/connect-wallet-icon.svg"
