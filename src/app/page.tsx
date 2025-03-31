@@ -117,9 +117,9 @@ export default function Home() {
     "0xf74faaeee3be756d2e5238e2e067f33a3cf0ba36",
     "0x515e4af972d84920a9e774881003b2bd797c4d4b"
   ];
-  const agents = (data?.agents || []).filter(
-    (a: any) => !agentsToFilter.includes(a.id)
-  );
+  const agents = (data?.agents || [])
+    .filter((a: any) => !agentsToFilter.includes(a.id))
+    .sort((a: any, b: any) => b.tasks.length - a.tasks.length);
   // agents
   return (
     <>
