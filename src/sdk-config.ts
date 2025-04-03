@@ -73,7 +73,7 @@ export function initSdk(walletClient: any) {
     pinataGateway: process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL!,
   });
   
-  return new Ensemble(config, signer, pinata);
+  return Ensemble.create(config, signer, pinata);
   // const { data: walletClient } = useWalletClient({
   //   config: config
   // });
