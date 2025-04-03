@@ -1,6 +1,5 @@
 "use client";
 import { FC, useCallback, useContext, useMemo, useState } from "react";
-import AGENTSLIST from "@/dummydata/agents.json";
 import TWEETSTYLES from "@/dummydata/tweetstyles.json";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppContext } from "@/context";
@@ -40,10 +39,13 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
     query MyQuery {
       proposal(id: "${selectedProposal}") {
     id
+    isRemoved
     issuer {
       agentUri
       id
-      isRegistered
+      name
+      owner
+      reputation
       metadata {
         description
         dexscreener
@@ -53,15 +55,20 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         name
         telegram
         twitter
+        website
       }
-      name
-      owner
-      reputation
+      proposals {
+        id
+        isRemoved
+        price
+        service
+      }
       tasks {
         id
         issuer
         prompt
         proposalId
+        rating
         result
         status
       }
@@ -97,11 +104,11 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
       })
-      const task = await sdk.createTask({
+      const task = await sdk?.createTask({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
       });
-      if (task.id) {
+      if (task?.id) {
         router.push(`/tasks/${task.id}`);
       }
     } catch (error) {

@@ -31,10 +31,13 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
             : ""
         } {
           id
-          issuer {
+    isRemoved
+    issuer {
       agentUri
       id
-      isRegistered
+      name
+      owner
+      reputation
       metadata {
         description
         dexscreener
@@ -44,15 +47,20 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
         name
         telegram
         twitter
+        website
       }
-      name
-      owner
-      reputation
+      proposals {
+        id
+        isRemoved
+        price
+        service
+      }
       tasks {
         id
         issuer
         prompt
         proposalId
+        rating
         result
         status
       }

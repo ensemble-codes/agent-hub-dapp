@@ -6,7 +6,7 @@ import { PinataSDK } from "pinata-web3";
 import { useEffect, useState } from 'react';
 
 export function useSdk(walletClient: any) {
-  const [sdk, setSdk] = useState<any>(null);
+  const [sdk, setSdk] = useState<Ensemble | null>(null);
 
   useEffect(() => {
     if (walletClient) {

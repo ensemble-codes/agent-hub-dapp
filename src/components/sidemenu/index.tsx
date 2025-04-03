@@ -16,18 +16,37 @@ const SideMenu = () => {
   const GET_TASKS = useMemo(
     () => gql`query MyQuery {
   tasks${address ? `(where: {issuer: "${address?.toLowerCase()}" })` : ""} {
+    issuer
     assignee {
       agentUri
       id
-      isRegistered
+      metadata {
+        description
+        dexscreener
+        id
+        github
+        imageUri
+        name
+        telegram
+        twitter
+        website
+      }
       name
       owner
       reputation
+      proposals {
+        id
+        isRemoved
+        price
+        service
+      }
     }
     prompt
-    proposalId
-    status
     id
+    proposalId
+    rating
+    result
+    status
   }
 }`,
     [address]

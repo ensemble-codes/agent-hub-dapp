@@ -13,7 +13,10 @@ const Modal: FC<ModalProps> = ({ isOpen, onClose, children, overlayClassName = "
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className={`fixed inset-0 ${overlayClassName} transition-opacity`}></div>
+      <div 
+        className={`fixed inset-0 ${overlayClassName} transition-opacity`} 
+        onClick={onClose}
+      ></div>
       <div className="z-50 bg-white rounded-[16px] shadow-xl transform transition-all">
         {children}
       </div>

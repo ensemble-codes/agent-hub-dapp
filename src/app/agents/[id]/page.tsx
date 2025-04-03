@@ -22,35 +22,37 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const GET_AGENT = gql`
     query MyQuery {
   agent(id: "${id}") {
-    agentUri
     id
-    isRegistered
-    metadata {
-      description
-      dexscreener
-      github
-      id
-      imageUri
-      name
-      telegram
-      twitter
-    }
-    name
-    owner
-    proposals {
-      id
-      price
-      service
-    }
-    reputation
-    tasks {
-      id
-      issuer
-      proposalId
-      prompt
-      result
-      status
-    }
+            agentUri
+            metadata {
+              description
+              dexscreener
+              github
+              id
+              imageUri
+              name
+              telegram
+              twitter
+              website
+            }
+            name
+            owner
+            reputation
+            tasks {
+              id
+              issuer
+              prompt
+              proposalId
+              rating
+              result
+              status
+            }
+            proposals {
+              id
+              isRemoved
+              price
+              service
+            }
   }
 }
   `;
@@ -73,7 +75,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
 
   const { data: service } = useQuery(GET_SERVICE);
 
-  console.log(service);
+  console.log(agent, service);
 
   return (
     <div>
