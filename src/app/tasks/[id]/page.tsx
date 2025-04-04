@@ -10,6 +10,7 @@ import { config } from "@/components/onchainconfig/config";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
+import Link from "next/link";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
@@ -210,7 +211,8 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
               ) : null}
               {task?.task?.result ? (
                 <>
-                  {task?.task?.assignee?.proposals[0]?.service === "Smart Contract Audit" ? (
+                  {task?.task?.assignee?.proposals[0]?.service ===
+                  "Smart Contract Audit" ? (
                     <div
                       className="rounded-[8px] border border-primary py-2 px-4 w-fit max-w-[350px] mb-4 cursor-pointer"
                       onClick={() => setOpenAuditMarkdown(true)}
@@ -260,13 +262,36 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       </div>
                     </div>
                   )}
-                  <div className="space-y-3">
+                  <div className="space-y-3 mb-4">
                     <p className="text-[18px] leading-[24.3px]">
                       Hello, looks like the task is done. Please let me know if
                       you need anything else.
                     </p>
                     <StarRating onClick={rateTask} />
                   </div>
+                  <Link
+                    href={`https://88phxim41aw.typeform.com/to/scj8k8mu`}
+                    target="_blank"
+                    rel="noreferrer noopener nofollower"
+                  >
+                    <div className="rounded-[2000px] border border-light-text-color py-1 px-3 w-fit">
+                      <div className="flex items-center justify-start gap-2">
+                        <img
+                          src="/assets/feedback-icon.svg"
+                          alt="feedback"
+                          className="w-4 h-4"
+                        />
+                        <p className="font-medium leading-[21.6px]">
+                          Got feedback? We'd love to hear it
+                        </p>
+                        <img
+                          src="/assets/arrow-top-right-icon.svg"
+                          alt="go"
+                          className="w-4 h-4"
+                        />
+                      </div>
+                    </div>
+                  </Link>
                 </>
               ) : null}
               {/* <div className="flex items-center gap-3 mb-4">
