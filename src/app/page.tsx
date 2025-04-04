@@ -26,56 +26,11 @@ export default function Home() {
   );
 
   const GET_AGENTS = useMemo(
-    () =>
-      selectedService === "Active"
-        ? gql`
-            query MyQuery {
-              agents(
-                where: {
-                  id_in: [
-                    "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                    "0xfdcb66224f433f3f7bff246571c1c26b071ed952"
-                  ]
-                }
-              ) {
-                agentUri
-                id
-                isRegistered
-                metadata {
-                  description
-                  dexscreener
-                  github
-                  id
-                  imageUri
-                  name
-                  telegram
-                  twitter
-                }
-                name
-                owner
-                proposals {
-                  id
-                  price
-                  service
-                }
-                reputation
-                tasks {
-                  id
-                  issuer
-                  prompt
-                  proposalId
-                  result
-                  status
-                }
-              }
-            }
-          `
-        : gql`
+    () => gql`
             query MyQuery {
               agents {
                 agentUri
                 id
-                isRegistered
                 metadata {
                   description
                   dexscreener
@@ -85,11 +40,13 @@ export default function Home() {
                   name
                   telegram
                   twitter
+                  website
                 }
                 name
                 owner
                 proposals {
                   id
+                  isRemoved
                   price
                   service
                 }
@@ -99,6 +56,7 @@ export default function Home() {
                   issuer
                   prompt
                   proposalId
+                  rating
                   result
                   status
                 }
@@ -115,11 +73,11 @@ export default function Home() {
     "0x114375c8b0a6231449c6961b0746cb0117d66f4f",
     "0xfdcb66224f433f3f7bff246571c1c26b071ed952",
     "0xf74faaeee3be756d2e5238e2e067f33a3cf0ba36",
-    "0x515e4af972d84920a9e774881003b2bd797c4d4b"
+    "0x515e4af972d84920a9e774881003b2bd797c4d4b",
   ];
-  const agents = (data?.agents || []).filter(
-    (a: any) => !agentsToFilter.includes(a.id)
-  );
+  const agents = (data?.agents || [])
+    .filter((a: any) => !agentsToFilter.includes(a.id))
+    .sort((a: any, b: any) => b.tasks.length - a.tasks.length);
   // agents
   return (
     <>

@@ -23,34 +23,36 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     query MyQuery {
   agent(id: "${id}") {
     agentUri
-    id
-    isRegistered
-    metadata {
-      description
-      dexscreener
-      github
-      id
-      imageUri
-      name
-      telegram
-      twitter
-    }
-    name
-    owner
-    proposals {
-      id
-      price
-      service
-    }
-    reputation
-    tasks {
-      id
-      issuer
-      proposalId
-      prompt
-      result
-      status
-    }
+                id
+                metadata {
+                  description
+                  dexscreener
+                  github
+                  id
+                  imageUri
+                  name
+                  telegram
+                  twitter
+                  website
+                }
+                name
+                owner
+                proposals {
+                  id
+                  isRemoved
+                  price
+                  service
+                }
+                reputation
+                tasks {
+                  id
+                  issuer
+                  prompt
+                  proposalId
+                  rating
+                  result
+                  status
+                }
   }
 }
   `;
@@ -61,10 +63,10 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     () => gql`
     query MyQuery {
   service(id: "${agent?.agent?.proposals[0]?.service}") {
-    name
     category
     description
     id
+    name
   }
 }
   `,

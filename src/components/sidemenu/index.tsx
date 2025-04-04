@@ -19,15 +19,34 @@ const SideMenu = () => {
     assignee {
       agentUri
       id
-      isRegistered
+      metadata {
+        description
+        dexscreener
+        github
+        id
+        imageUri
+        name
+        telegram
+        twitter
+        website
+      }
       name
       owner
       reputation
+      proposals {
+        id
+        price
+        service
+        isRemoved
+      }
     }
+    id
+    issuer
     prompt
     proposalId
+    rating
+    result
     status
-    id
   }
 }`,
     [address]

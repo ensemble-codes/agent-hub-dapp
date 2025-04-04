@@ -40,10 +40,22 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
     query MyQuery {
       proposal(id: "${selectedProposal}") {
     id
+    isRemoved
     issuer {
       agentUri
       id
-      isRegistered
+      name
+      owner
+      reputation
+      tasks {
+        id
+        issuer
+        prompt
+        proposalId
+        rating
+        result
+        status
+      }
       metadata {
         description
         dexscreener
@@ -53,17 +65,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         name
         telegram
         twitter
-      }
-      name
-      owner
-      reputation
-      tasks {
-        id
-        issuer
-        prompt
-        proposalId
-        result
-        status
+        website
       }
     }
     price
@@ -286,7 +288,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                 </p>
                 {proposal && proposal.price ? (
                   <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
-                    {Number(formatEther(proposal?.price))} ETH per tweet
+                    {formatEther(proposal.price)} ETH per tweet
                   </p>
                 ) : null}
               </div>
