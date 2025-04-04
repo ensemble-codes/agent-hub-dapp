@@ -27,43 +27,88 @@ export default function Home() {
 
   const GET_AGENTS = useMemo(
     () =>
-      gql`
-        query MyQuery {
-          agents {
-            id
-            agentUri
-            metadata {
-              description
-              dexscreener
-              github
-              id
-              imageUri
-              name
-              telegram
-              twitter
-              website
+      selectedService === "Active"
+        ? gql`
+            query MyQuery {
+              agents(
+                where: {
+                  id_in: [
+                    "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184"
+                    "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                  ]
+                }
+              ) {
+                id
+                agentUri
+                metadata {
+                  description
+                  dexscreener
+                  github
+                  id
+                  imageUri
+                  name
+                  telegram
+                  twitter
+                  website
+                }
+                name
+                owner
+                reputation
+                tasks {
+                  id
+                  issuer
+                  prompt
+                  proposalId
+                  rating
+                  result
+                  status
+                }
+                proposals {
+                  id
+                  isRemoved
+                  price
+                  service
+                }
+              }
             }
-            name
-            owner
-            reputation
-            tasks {
-              id
-              issuer
-              prompt
-              proposalId
-              rating
-              result
-              status
+          `
+        : gql`
+            query MyQuery {
+              agents {
+                id
+                agentUri
+                metadata {
+                  description
+                  dexscreener
+                  github
+                  id
+                  imageUri
+                  name
+                  telegram
+                  twitter
+                  website
+                }
+                name
+                owner
+                reputation
+                tasks {
+                  id
+                  issuer
+                  prompt
+                  proposalId
+                  rating
+                  result
+                  status
+                }
+                proposals {
+                  id
+                  isRemoved
+                  price
+                  service
+                }
+              }
             }
-            proposals {
-              id
-              isRemoved
-              price
-              service
-            }
-          }
-        }
-      `,
+          `,
     [selectedService]
   );
 
@@ -149,9 +194,9 @@ export default function Home() {
                                   }
                                 />
                                 {a.id ===
-                                  "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d" ||
+                                  "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ||
                                 a.id ===
-                                  "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
+                                  "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d" ? (
                                   <img
                                     src="/assets/active-icon.svg"
                                     alt="active"
