@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AppBg, Footer, GoogleTagManager, Wrapper } from "@/components";
+import { AppBg, Footer, Wrapper } from "@/components";
 import OnchainProvider from "@/components/onchainconfig/provider";
 import { AppContextProvider } from "@/context";
 import '@rainbow-me/rainbowkit/styles.css';
@@ -45,8 +46,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {process.env.NEXT_PUBLIC_GTM_ID && (
-          <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
         <OnchainProvider>
           <AppContextProvider>
