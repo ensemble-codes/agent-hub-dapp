@@ -188,7 +188,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         : "/assets/loader-group-icon.svg"
                     }
                     alt="check-icon"
-                    className="w-[18px] h-[18px] animate-spin-slow"
+                    className={`w-[18px] h-[18px] ${isPolling ? "animate-spin-slow" : ""}`}
                   />
                 </div>
                 <p className="text-[14px] leading-[18.9px] text-light-text-color font-medium">
