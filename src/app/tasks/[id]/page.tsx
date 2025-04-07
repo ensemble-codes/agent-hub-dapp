@@ -5,7 +5,7 @@ import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 import ReactMarkdown from "react-markdown";
 import { useSdk } from "@/sdk-config";
-import { useWalletClient } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { config } from "@/components/onchainconfig/config";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -14,6 +14,7 @@ import Link from "next/link";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
+  const { isConnected, address } = useAccount();
 
   const isTwitterLink = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -290,36 +291,40 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       </div>
                     </div>
                   )}
-                  <div className="space-y-3 mb-4">
-                    <p className="text-[18px] leading-[24.3px]">
-                      Hello, looks like the task is done. Please let me know if
-                      you need anything else.
-                    </p>
-                    <StarRating onClick={rateTask} />
-                  </div>
-                  <Link
-                    href={`https://88phxim41aw.typeform.com/to/scj8k8mu`}
-                    target="_blank"
-                    rel="noreferrer noopener nofollower"
-                  >
-                    <div className="rounded-[2000px] border border-light-text-color py-1 px-3 w-fit">
-                      <div className="flex items-center justify-start gap-2">
-                        <img
-                          src="/assets/feedback-icon.svg"
-                          alt="feedback"
-                          className="w-4 h-4"
-                        />
-                        <p className="font-medium leading-[21.6px]">
-                          Got feedback? We'd love to hear it
+                  {isConnected && address === task?.task?.issuer ? (
+                    <>
+                      <div className="space-y-3 mb-4">
+                        <p className="text-[18px] leading-[24.3px]">
+                          Hello, looks like the task is done. Please let me know
+                          if you need anything else.
                         </p>
-                        <img
-                          src="/assets/arrow-top-right-icon.svg"
-                          alt="go"
-                          className="w-4 h-4"
-                        />
+                        <StarRating onClick={rateTask} />
                       </div>
-                    </div>
-                  </Link>
+                      <Link
+                        href={`https://88phxim41aw.typeform.com/to/scj8k8mu`}
+                        target="_blank"
+                        rel="noreferrer noopener nofollower"
+                      >
+                        <div className="rounded-[2000px] border border-light-text-color py-1 px-3 w-fit">
+                          <div className="flex items-center justify-start gap-2">
+                            <img
+                              src="/assets/feedback-icon.svg"
+                              alt="feedback"
+                              className="w-4 h-4"
+                            />
+                            <p className="font-medium leading-[21.6px]">
+                              Got feedback? We'd love to hear it
+                            </p>
+                            <img
+                              src="/assets/arrow-top-right-icon.svg"
+                              alt="go"
+                              className="w-4 h-4"
+                            />
+                          </div>
+                        </div>
+                      </Link>
+                    </>
+                  ) : null}
                 </>
               ) : null}
               {/* <div className="flex items-center gap-3 mb-4">
