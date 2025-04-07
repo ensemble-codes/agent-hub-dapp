@@ -15,6 +15,14 @@ import Link from "next/link";
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
 
+  const isTwitterLink = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urls = text.match(urlRegex) || [];
+    return urls.some(
+      (url) => url.includes("twitter.com") || url.includes("x.com")
+    );
+  };
+
   const GET_TASK = gql`
   query MyQuery {
   task(id: "${id}") {
@@ -188,7 +196,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         : "/assets/loader-group-icon.svg"
                     }
                     alt="check-icon"
-                    className={`w-[18px] h-[18px] ${isPolling ? "animate-spin-slow" : ""}`}
+                    className={`w-[18px] h-[18px] ${
+                      isPolling ? "animate-spin-slow" : ""
+                    }`}
                   />
                 </div>
                 <p className="text-[14px] leading-[18.9px] text-light-text-color font-medium">
@@ -212,7 +222,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
               {task?.task?.result ? (
                 <>
                   {task?.task?.assignee?.proposals[0]?.service ===
-                  "Smart Contract Audit" ? (
+                    "Smart Contract Audit" ||
+                  task?.task?.assignee?.proposals[0]?.service ===
+                    "Pet Symptom Analyzer" ? (
                     <div
                       className="rounded-[8px] border border-primary py-2 px-4 w-fit max-w-[350px] mb-4 cursor-pointer"
                       onClick={() => setOpenAuditMarkdown(true)}
@@ -256,7 +268,23 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             </p>
                           </div>
                           <p className="font-medium leading-[21.6px]">
-                            {task?.task?.result}
+                            {task?.task?.result &&
+                            isTwitterLink(task.task.result) ? (
+                              <a
+                                href={
+                                  task.task.result.match(
+                                    /(https?:\/\/[^\s]+)/
+                                  )?.[0]
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline"
+                              >
+                                {task?.task?.result}
+                              </a>
+                            ) : (
+                              task?.task?.result
+                            )}
                           </p>
                         </div>
                       </div>
@@ -376,7 +404,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
         onClose={() => setOpenAuditMarkdown(false)}
       >
         <div
-          className="max-h-[80vh] overflow-y-auto p-8 bg-white rounded-lg"
+          className="max-h-[80vh] max-w-[80vw] overflow-y-auto p-8 bg-white rounded-lg"
           style={{ scrollbarWidth: "none" }}
         >
           <div className="prose prose-slate max-w-none">
