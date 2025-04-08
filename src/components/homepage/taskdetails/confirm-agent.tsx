@@ -1,6 +1,5 @@
 "use client";
 import { FC, useCallback, useContext, useMemo, useState } from "react";
-import AGENTSLIST from "@/dummydata/agents.json";
 import TWEETSTYLES from "@/dummydata/tweetstyles.json";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppContext } from "@/context";
@@ -47,15 +46,6 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
       name
       owner
       reputation
-      tasks {
-        id
-        issuer
-        prompt
-        proposalId
-        rating
-        result
-        status
-      }
       metadata {
         description
         dexscreener
@@ -66,6 +56,21 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         telegram
         twitter
         website
+      }
+      proposals {
+        id
+        isRemoved
+        price
+        service
+      }
+      tasks {
+        id
+        issuer
+        prompt
+        proposalId
+        rating
+        result
+        status
       }
     }
     price
@@ -99,11 +104,11 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
       })
-      const task = await sdk.createTask({
+      const task = await sdk?.createTask({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
       });
-      if (task.id) {
+      if (task?.id) {
         router.push(`/tasks/${task.id}`);
       }
     } catch (error) {
@@ -288,7 +293,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                 </p>
                 {proposal && proposal.price ? (
                   <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
-                    {formatEther(proposal.price)} ETH per tweet
+                    {Number(formatEther(proposal?.price))} ETH per tweet
                   </p>
                 ) : null}
               </div>

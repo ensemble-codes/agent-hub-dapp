@@ -22,37 +22,37 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const GET_AGENT = gql`
     query MyQuery {
   agent(id: "${id}") {
-    agentUri
-                id
-                metadata {
-                  description
-                  dexscreener
-                  github
-                  id
-                  imageUri
-                  name
-                  telegram
-                  twitter
-                  website
-                }
-                name
-                owner
-                proposals {
-                  id
-                  isRemoved
-                  price
-                  service
-                }
-                reputation
-                tasks {
-                  id
-                  issuer
-                  prompt
-                  proposalId
-                  rating
-                  result
-                  status
-                }
+    id
+            agentUri
+            metadata {
+              description
+              dexscreener
+              github
+              id
+              imageUri
+              name
+              telegram
+              twitter
+              website
+            }
+            name
+            owner
+            reputation
+            tasks {
+              id
+              issuer
+              prompt
+              proposalId
+              rating
+              result
+              status
+            }
+            proposals {
+              id
+              isRemoved
+              price
+              service
+            }
   }
 }
   `;
@@ -63,10 +63,10 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     () => gql`
     query MyQuery {
   service(id: "${agent?.agent?.proposals[0]?.service}") {
+    name
     category
     description
     id
-    name
   }
 }
   `,
@@ -75,7 +75,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
 
   const { data: service } = useQuery(GET_SERVICE);
 
-  console.log(service);
+  console.log(agent, service);
 
   return (
     <div>
