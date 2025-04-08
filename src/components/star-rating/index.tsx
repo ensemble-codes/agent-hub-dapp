@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-const StarRating = () => {
+const StarRating = ({ onClick }: { onClick?: (val: number) => void }) => {
   const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [selectedRating, setSelectedRating] = useState<number>(0);
 
@@ -15,6 +15,7 @@ const StarRating = () => {
 
   const handleClick = (rating: number) => {
     setSelectedRating(rating);
+    onClick?.(rating);
   };
 
   return (
@@ -36,4 +37,4 @@ const StarRating = () => {
   );
 };
 
-export default StarRating; 
+export default StarRating;

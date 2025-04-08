@@ -48,15 +48,6 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
       name
       owner
       reputation
-      tasks {
-        id
-        issuer
-        prompt
-        proposalId
-        rating
-        result
-        status
-      }
       metadata {
         description
         dexscreener
@@ -67,6 +58,21 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         telegram
         twitter
         website
+      }
+      proposals {
+        id
+        isRemoved
+        price
+        service
+      }
+      tasks {
+        id
+        issuer
+        prompt
+        proposalId
+        rating
+        result
+        status
       }
     }
     price
@@ -100,19 +106,19 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
       })
-      const task = await sdk.createTask({
+      const task = await sdk?.createTask({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
       });
 
       sendGAEvent('create_task', {
         agentId: selectedAgent,
-        taskId: task.id,
+        taskId: task?.id,
         proposalId: selectedProposal,
         service: selectedService,
       })
 
-      if (task.id) {
+      if (task?.id) {
         router.push(`/tasks/${task.id}`);
       }
     } catch (error) {
@@ -297,7 +303,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                 </p>
                 {proposal && proposal.price ? (
                   <p className="text-[#00D64F] text-[16px] leading-[21.6px] font-bold">
-                    {formatEther(proposal.price)} ETH per tweet
+                    {Number(formatEther(proposal?.price))} ETH per tweet
                   </p>
                 ) : null}
               </div>

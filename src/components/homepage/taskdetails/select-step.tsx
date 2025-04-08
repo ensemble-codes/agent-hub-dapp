@@ -38,15 +38,6 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
       name
       owner
       reputation
-      tasks {
-        id
-        issuer
-        prompt
-        proposalId
-        rating
-        result
-        status
-      }
       metadata {
         description
         dexscreener
@@ -57,6 +48,21 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
         telegram
         twitter
         website
+      }
+      proposals {
+        id
+        isRemoved
+        price
+        service
+      }
+      tasks {
+        id
+        issuer
+        prompt
+        proposalId
+        rating
+        result
+        status
       }
     }
     price

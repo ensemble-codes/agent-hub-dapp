@@ -16,14 +16,15 @@ const SideMenu = () => {
   const GET_TASKS = useMemo(
     () => gql`query MyQuery {
   tasks${address ? `(where: {issuer: "${address?.toLowerCase()}" })` : ""} {
+    issuer
     assignee {
       agentUri
       id
       metadata {
         description
         dexscreener
-        github
         id
+        github
         imageUri
         name
         telegram
@@ -35,14 +36,13 @@ const SideMenu = () => {
       reputation
       proposals {
         id
+        isRemoved
         price
         service
-        isRemoved
       }
     }
-    id
-    issuer
     prompt
+    id
     proposalId
     rating
     result

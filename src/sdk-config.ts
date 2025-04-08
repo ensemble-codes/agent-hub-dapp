@@ -1,12 +1,12 @@
 import { ethers } from "ethers";
-import { Ensemble } from "@ensemble-ai/sdk";
+import Ensemble from "@ensemble-ai/sdk";
 import { baseSepolia } from "viem/chains";
 import { PinataSDK } from "pinata-web3";
 
 import { useEffect, useState } from 'react';
 
 export function useSdk(walletClient: any) {
-  const [sdk, setSdk] = useState<any>(null);
+  const [sdk, setSdk] = useState<Ensemble | null>(null);
 
   useEffect(() => {
     if (walletClient) {
