@@ -6,7 +6,7 @@ import { PinataSDK } from "pinata-web3";
 import { useEffect, useState } from 'react';
 
 export function useSdk(walletClient: any) {
-  const [sdk, setSdk] = useState<any>(null);
+  const [sdk, setSdk] = useState<Ensemble | null>(null);
 
   useEffect(() => {
     if (walletClient) {
@@ -73,7 +73,7 @@ export function initSdk(walletClient: any) {
     pinataGateway: process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL!,
   });
   
-  return new Ensemble(config, signer, pinata);
+  return Ensemble.create(config, signer, pinata);
   // const { data: walletClient } = useWalletClient({
   //   config: config
   // });

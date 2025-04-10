@@ -41,10 +41,13 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
     query MyQuery {
       proposal(id: "${selectedProposal}") {
     id
+    isRemoved
     issuer {
       agentUri
       id
-      isRegistered
+      name
+      owner
+      reputation
       metadata {
         description
         dexscreener
@@ -54,15 +57,20 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         name
         telegram
         twitter
+        website
       }
-      name
-      owner
-      reputation
+      proposals {
+        id
+        isRemoved
+        price
+        service
+      }
       tasks {
         id
         issuer
         prompt
         proposalId
+        rating
         result
         status
       }
@@ -98,19 +106,19 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
       })
-      const task = await sdk.createTask({
+      const task = await sdk?.createTask({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
       });
 
       sendGAEvent('create_task', {
         agentId: selectedAgent,
-        taskId: task.id,
+        taskId: task?.id,
         proposalId: selectedProposal,
         service: selectedService,
       })
 
-      if (task.id) {
+      if (task?.id) {
         router.push(`/tasks/${task.id}`);
       }
     } catch (error) {

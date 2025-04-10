@@ -226,7 +226,7 @@ const Page = () => {
           servicePrice,
         });
 
-        const boolean = await sdk.registerAgent(
+        const boolean = await sdk?.registerAgent(
           agentAddress,
           {
             name: agentName,
@@ -238,10 +238,14 @@ const Page = () => {
               dexscreener: "",
               github: agentGitHub,
             },
+            attributes: [{
+              value: "",
+              trait_type: ""
+            }],
             imageURI: imgUri,
           },
           service,
-          servicePrice
+          Number(servicePrice)
         );
 
         sendGAEvent('register_agent', {

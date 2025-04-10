@@ -33,14 +33,13 @@ export default function Home() {
               agents(
                 where: {
                   id_in: [
+                    "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184"
                     "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                    "0xfdcb66224f433f3f7bff246571c1c26b071ed952"
                   ]
                 }
               ) {
-                agentUri
                 id
-                isRegistered
+                agentUri
                 metadata {
                   description
                   dexscreener
@@ -50,22 +49,25 @@ export default function Home() {
                   name
                   telegram
                   twitter
+                  website
                 }
                 name
                 owner
-                proposals {
-                  id
-                  price
-                  service
-                }
                 reputation
                 tasks {
                   id
                   issuer
                   prompt
                   proposalId
+                  rating
                   result
                   status
+                }
+                proposals {
+                  id
+                  isRemoved
+                  price
+                  service
                 }
               }
             }
@@ -73,9 +75,8 @@ export default function Home() {
         : gql`
             query MyQuery {
               agents {
-                agentUri
                 id
-                isRegistered
+                agentUri
                 metadata {
                   description
                   dexscreener
@@ -85,22 +86,25 @@ export default function Home() {
                   name
                   telegram
                   twitter
+                  website
                 }
                 name
                 owner
-                proposals {
-                  id
-                  price
-                  service
-                }
                 reputation
                 tasks {
                   id
                   issuer
                   prompt
                   proposalId
+                  rating
                   result
                   status
+                }
+                proposals {
+                  id
+                  isRemoved
+                  price
+                  service
                 }
               }
             }
@@ -109,17 +113,9 @@ export default function Home() {
   );
 
   const { data, loading } = useQuery(GET_AGENTS);
-  const agentsToFilter = [
-    "0x83df687c3642b6ac84a5083206eac69a9fd918f9",
-    "0xe03ce825669af732a59ae4dbf2f95c5caed48a23",
-    "0x114375c8b0a6231449c6961b0746cb0117d66f4f",
-    "0xfdcb66224f433f3f7bff246571c1c26b071ed952",
-    "0xf74faaeee3be756d2e5238e2e067f33a3cf0ba36",
-    "0x515e4af972d84920a9e774881003b2bd797c4d4b"
-  ];
-  const agents = (data?.agents || [])
-    .filter((a: any) => !agentsToFilter.includes(a.id))
-    .sort((a: any, b: any) => b.tasks.length - a.tasks.length);
+  const agents = [...(data?.agents || [])]?.sort(
+    (a: any, b: any) => b.tasks.length - a.tasks.length
+  );
   // agents
   return (
     <>
@@ -198,9 +194,9 @@ export default function Home() {
                                   }
                                 />
                                 {a.id ===
-                                  "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d" ||
+                                  "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ||
                                 a.id ===
-                                  "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
+                                  "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d" ? (
                                   <img
                                     src="/assets/active-icon.svg"
                                     alt="active"
@@ -369,44 +365,3 @@ export default function Home() {
     </>
   );
 }
-
-const HeaderComponent = () => (
-  <div className="top-buttons-container w-full flex justify-center md:justify-end items-center gap-4">
-    <a
-      href="https://github.com/ensemble-codes/ensemble-framework"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <button className="flex items-center justify-center rounded-[50px] py-2 px-4 bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
-        <img src="/assets/github-icon.svg" alt="github" className="w-5 h-5" />
-        <span className="hidden md:block text-[16px] font-[500] leading-[24px]">
-          Github
-        </span>
-      </button>
-    </a>
-    <a
-      href="https://www.npmjs.com/package/@ensemble-ai/sdk"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <button className="flex items-center justify-center rounded-[50px] py-2 px-4 bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
-        <img src="/assets/doc-2-icon.svg" alt="docs" />
-        <span className="hidden md:block text-[16px] font-[500] leading-[24px]">
-          Docs
-        </span>
-      </button>
-    </a>
-    <a
-      href="https://t.me/+V2yQK15ZYLw3YWU0"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <button className="flex items-center justify-center rounded-[50px] py-2 px-4 bg-white shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] gap-2">
-        <img src="/assets/telegram-icon.svg" alt="telegram" />
-        <span className="hidden md:block text-[16px] font-[500] leading-[24px]">
-          Join the community
-        </span>
-      </button>
-    </a>
-  </div>
-);
