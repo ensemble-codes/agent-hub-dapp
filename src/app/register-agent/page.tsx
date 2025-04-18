@@ -3,6 +3,7 @@ import { AppHeader, SideMenu } from "@/components";
 import axios from "axios";
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { useAccount, useWalletClient } from "wagmi";
+import { sendGAEvent } from '@next/third-parties/google'
 import { useSdk } from "@/sdk-config";
 import { config } from "@/components/onchainconfig/config";
 import Loader from "@/components/loader";
@@ -246,6 +247,13 @@ const Page = () => {
           service,
           Number(servicePrice)
         );
+
+        sendGAEvent('register_agent', {
+          agentName,
+          agentAddress,
+          service: selectedAgentSubServices,
+          servicePrice: agentServicePrice,
+        })
 
         if (boolean) {
           setRegisterSuccess(true);

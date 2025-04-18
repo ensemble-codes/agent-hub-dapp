@@ -1,5 +1,7 @@
 "use client";
 import { FC, useCallback, useContext, useMemo, useState } from "react";
+import { sendGAEvent } from '@next/third-parties/google'
+import AGENTSLIST from "@/dummydata/agents.json";
 import TWEETSTYLES from "@/dummydata/tweetstyles.json";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppContext } from "@/context";
@@ -108,6 +110,14 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
       });
+
+      sendGAEvent('create_task', {
+        agentId: selectedAgent,
+        taskId: task?.id,
+        proposalId: selectedProposal,
+        service: selectedService,
+      })
+
       if (task?.id) {
         router.push(`/tasks/${task.id}`);
       }
