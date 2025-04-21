@@ -297,45 +297,52 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       borderImageSlice: "1",
                     }}
                   />
-                  {agent.agent.tasks.map((td: any, index: number) => (
-                    <>
-                      <div key={`${td.id}-${td.prompt}`}>
-                        <Link
-                          href={`/tasks/${td.id}`}
-                          className="flex items-center justify-between"
-                        >
-                          <p className="text-light-text-color font-[500] max-w-[12ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                            {td.prompt}
-                          </p>
-                          <p
-                            className="text-[12px] font-bold"
-                            style={{
-                              color:
-                                Number(td.status) === TaskStatus.CREATED
-                                  ? "#3B82F6"
-                                  : Number(td.status) === TaskStatus.ASSIGNED
-                                  ? "#F59E0B"
-                                  : Number(td.status) === TaskStatus.COMPLETED
-                                  ? "#00D64F"
-                                  : "#EF4444",
-                            }}
+                  {[...agent.agent.tasks]
+                    .sort(
+                      (a: { id: string }, b: { id: string }) =>
+                        Number(b.id) - Number(a.id)
+                    )
+                    .map((td: any, index: number) => (
+                      <>
+                        <div key={`${td.id}-${td.prompt}`}>
+                          <Link
+                            href={`/tasks/${td.id}`}
+                            className="flex items-center justify-between"
                           >
-                            {getTaskStatusText(Number(td.status) as TaskStatus)}
-                          </p>
-                        </Link>
-                      </div>
-                      {index === agent.agent.tasks.length - 1 ? null : (
-                        <hr
-                          className="my-3 border-[0.5px] border-[#8F95B2] w-[70%]"
-                          style={{
-                            borderImageSource:
-                              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
-                            borderImageSlice: "1",
-                          }}
-                        />
-                      )}
-                    </>
-                  ))}
+                            <p className="text-light-text-color font-[500] max-w-[12ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                              {td.prompt}
+                            </p>
+                            <p
+                              className="text-[12px] font-bold"
+                              style={{
+                                color:
+                                  Number(td.status) === TaskStatus.CREATED
+                                    ? "#3B82F6"
+                                    : Number(td.status) === TaskStatus.ASSIGNED
+                                    ? "#F59E0B"
+                                    : Number(td.status) === TaskStatus.COMPLETED
+                                    ? "#00D64F"
+                                    : "#EF4444",
+                              }}
+                            >
+                              {getTaskStatusText(
+                                Number(td.status) as TaskStatus
+                              )}
+                            </p>
+                          </Link>
+                        </div>
+                        {index === agent.agent.tasks.length - 1 ? null : (
+                          <hr
+                            className="my-3 border-[0.5px] border-[#8F95B2] w-[70%]"
+                            style={{
+                              borderImageSource:
+                                "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                              borderImageSlice: "1",
+                            }}
+                          />
+                        )}
+                      </>
+                    ))}
                 </div>
               </div>
             </div>

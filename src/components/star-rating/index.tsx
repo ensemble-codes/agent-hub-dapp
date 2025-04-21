@@ -1,36 +1,44 @@
 "use client";
 import { useState } from "react";
 
-const StarRating = ({ onClick }: { onClick?: (val: number) => void }) => {
+const StarRating = ({ onClick, rating = "0" }: { onClick?: (val: number) => void; rating?: string }) => {
   const [hoveredRating, setHoveredRating] = useState<number>(0);
-  const [selectedRating, setSelectedRating] = useState<number>(0);
+  const numericRating = parseInt(rating, 10);
+  const starRating = numericRating === 0 ? 0 : Math.floor((numericRating / 25) + 1);
 
-  const handleMouseEnter = (rating: number) => {
-    setHoveredRating(rating);
+  const handleMouseEnter = (stars: number) => {
+    if (numericRating === 0) {
+      setHoveredRating(stars);
+    }
   };
 
   const handleMouseLeave = () => {
-    setHoveredRating(0);
+    if (numericRating === 0) {
+      setHoveredRating(0);
+    }
   };
 
-  const handleClick = (rating: number) => {
-    setSelectedRating(rating);
-    onClick?.(rating);
+  const handleClick = (stars: number) => {
+    if (numericRating === 0) {
+      // Convert stars back to 0-100 scale
+      const newRating = (stars - 1) * 25;
+      onClick?.(newRating);
+    }
   };
 
   return (
     <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((rating) => (
+      {[1, 2, 3, 4, 5].map((star) => (
         <img
-          key={rating}
+          key={star}
           src={`/assets/${
-            rating <= (hoveredRating || selectedRating) ? "star" : "empty-star"
+            star <= (hoveredRating || starRating) ? "star" : "empty-star"
           }-icon.svg`}
           alt="star"
-          className="w-4 h-4 cursor-pointer"
-          onMouseEnter={() => handleMouseEnter(rating)}
+          className={`w-4 h-4 ${numericRating === 0 ? "cursor-pointer" : ""}`}
+          onMouseEnter={() => handleMouseEnter(star)}
           onMouseLeave={handleMouseLeave}
-          onClick={() => handleClick(rating)}
+          onClick={() => handleClick(star)}
         />
       ))}
     </div>

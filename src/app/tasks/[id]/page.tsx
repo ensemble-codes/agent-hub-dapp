@@ -113,7 +113,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
         <div className="flex items-start gap-16 pt-16">
           <SideMenu />
           <div
-            className="w-full flex flex-col gap-6 rounded-[20px] pt-12 pb-6 px-8 bg-white border-[1px] shadow-[inset_5px_5px_10px_0px_#D9D9D9,inset_-5px_-5px_10px_0px_#E7EBF0]"
+            className="min-h-[575px] w-full flex flex-col gap-6 rounded-[20px] pt-12 pb-6 px-8 bg-white border-[1px] shadow-[inset_5px_5px_10px_0px_#D9D9D9,inset_-5px_-5px_10px_0px_#E7EBF0]"
             style={{
               borderImageSource:
                 "linear-gradient(91.95deg, rgba(255, 255, 255, 0.4) -4.26%, rgba(255, 255, 255, 0) 107.52%)",
@@ -121,7 +121,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
             }}
           >
             <div
-              className="w-full h-[450px] overflow-auto relative"
+              className="w-full h-full overflow-auto relative"
               style={{ scrollbarWidth: "none" }}
             >
               {/* <button
@@ -298,7 +298,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           Hello, looks like the task is done. Please let me know
                           if you need anything else.
                         </p>
-                        <StarRating onClick={rateTask} />
+                        <StarRating onClick={rateTask} rating={task?.task?.rating} />
                       </div>
                       <Link
                         href={`https://88phxim41aw.typeform.com/to/scj8k8mu`}
