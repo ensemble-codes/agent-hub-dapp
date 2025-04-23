@@ -1,6 +1,7 @@
 "use client";
 import { AppHeader, Loader, SideMenu } from "@/components";
 import { gql, useQuery } from "@apollo/client";
+import { convertRatingToStars } from "@/utils";
 import { formatEther } from "ethers";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -223,7 +224,7 @@ export default function Home() {
                             className="w-3 h-3"
                           />
                           <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
-                            {a.reputation}
+                            {convertRatingToStars(a.reputation)}
                           </p>
                         </div>
                       </div>

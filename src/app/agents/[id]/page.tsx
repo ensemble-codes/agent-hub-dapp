@@ -1,7 +1,7 @@
 "use client";
 import { AppHeader, Loader, SideMenu } from "@/components";
 import { TaskStatus } from "@/enum/taskstatus";
-import { getTaskStatusText } from "@/utils";
+import { convertRatingToStars, getTaskStatusText } from "@/utils";
 import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -232,7 +232,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         </span>
                       </p>
                       <p className="font-bold leading-[19px] text-text-color">
-                        {agent.agent.reputation}
+                        {convertRatingToStars(agent.agent.reputation)}
                       </p>
                     </div>
                     <div className="flex flex-col items-center justify-center gap-1">

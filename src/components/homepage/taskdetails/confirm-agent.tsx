@@ -1,11 +1,11 @@
 "use client";
 import { FC, useCallback, useContext, useMemo, useState } from "react";
-import { sendGAEvent } from '@next/third-parties/google'
-import AGENTSLIST from "@/dummydata/agents.json";
+import { sendGAEvent } from "@next/third-parties/google";
+import { convertRatingToStars } from "@/utils";
 import TWEETSTYLES from "@/dummydata/tweetstyles.json";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppContext } from "@/context";
-import { initSdk, useSdk } from "@/sdk-config";
+import { useSdk } from "@/sdk-config";
 import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 import { formatEther } from "ethers";
@@ -83,10 +83,6 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
 
   const { data, loading } = useQuery(GET_PROPOSAL);
 
-  const ratingsArray = new Array(
-    data && data?.proposal ? data?.proposal.issuer.reputation : 0
-  );
-
   const proposal = data && data.proposal ? data?.proposal : undefined;
 
   const filteredTweetStyles = useMemo(() => {
@@ -105,18 +101,18 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
       console.log({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
-      })
+      });
       const task = await sdk?.createTask({
         prompt: state.taskPrompt,
         proposalId: selectedProposal,
       });
 
-      sendGAEvent('create_task', {
+      sendGAEvent("create_task", {
         agentId: selectedAgent,
         taskId: task?.id,
         proposalId: selectedProposal,
         service: selectedService,
-      })
+      });
 
       if (task?.id) {
         router.push(`/tasks/${task.id}`);
@@ -127,6 +123,38 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
       setLoadingCreate(false);
     }
   }, [state.taskPrompt, sdk]);
+
+  const renderStar = (index: number) => {
+    const starRating = convertRatingToStars(
+      data?.proposal?.issuer?.reputation || 0
+    );
+    const isFilled = index < Math.floor(starRating);
+    const isPartial = !isFilled && index < starRating;
+    const partialFill = isPartial
+      ? (starRating - Math.floor(starRating)) * 100
+      : 0;
+
+    return (
+      <div key={index} className="relative w-5 h-5">
+        <img src="/assets/empty-star-icon.svg" alt="star" className="w-5 h-5" />
+        {isFilled && (
+          <img
+            src="/assets/star-icon.svg"
+            alt="star"
+            className="absolute top-0 left-0 w-5 h-5"
+          />
+        )}
+        {isPartial && (
+          <div
+            className="absolute top-0 left-0 overflow-hidden"
+            style={{ width: `${partialFill}%` }}
+          >
+            <img src="/assets/star-icon.svg" alt="star" className="w-5 h-5" />
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -336,14 +364,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                   Average rating
                 </p>
                 <div className="flex items-center gap-1">
-                  {ratingsArray.fill(0).map((star, index) => (
-                    <img
-                      key={`${star}-${index}`}
-                      src="/assets/star-icon.svg"
-                      alt="star"
-                      className="w-5 h-5"
-                    />
-                  ))}
+                  {[0, 1, 2, 3, 4].map(renderStar)}
                 </div>
               </div>
             </div>
