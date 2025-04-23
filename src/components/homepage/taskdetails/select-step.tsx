@@ -4,6 +4,7 @@ import Loader from "@/components/loader";
 import { formatEther } from "ethers";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { convertRatingToStars } from "@/utils";
 
 interface SelectAgentStepProps {
   selectedAgent: (agent: number) => void;
@@ -20,9 +21,7 @@ const SelectAgentStep: FC<SelectAgentStepProps> = ({ selectedAgent }) => {
         proposals${
           proposalId || selectedService
             ? `(where: { ${
-                selectedService
-                  ? `service: "${selectedService}"`
-                  : ""
+                selectedService ? `service: "${selectedService}"` : ""
               }${
                 proposalId
                   ? `${selectedService ? ", " : ""}id: "${proposalId}"`
@@ -135,13 +134,45 @@ const AgentCard: FC<AgentCardProps> = ({
   github,
   selectedAgent,
 }) => {
-  const ratingsArray = new Array(rating);
+  const renderStar = (index: number) => {
+    const starRating = convertRatingToStars(rating);
+    const isFilled = index < Math.floor(starRating);
+    const isPartial = !isFilled && index < starRating;
+    const partialFill = isPartial
+      ? (starRating - Math.floor(starRating)) * 100
+      : 0;
+
+    return (
+      <div key={index} className="relative w-5 h-5">
+        <img src="/assets/empty-star-icon.svg" alt="star" className="w-5 h-5" />
+        {isFilled && (
+          <img
+            src="/assets/star-icon.svg"
+            alt="star"
+            className="absolute top-0 left-0 w-5 h-5"
+          />
+        )}
+        {isPartial && (
+          <div
+            className="absolute top-0 left-0 overflow-hidden"
+            style={{ width: `${partialFill}%` }}
+          >
+            <img src="/assets/star-icon.svg" alt="star" className="w-5 h-5" />
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="w-[256px] bg-white rounded-[10px] p-4 shadow-[5px_5px_10px_0px_#D9D9D9,-5px_-5px_10px_0px_#FAFBFF]">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-2">
-          <img src={img} alt={name} className="w-8 h-8 rounded-full object-cover" />
+          <img
+            src={img}
+            alt={name}
+            className="w-8 h-8 rounded-full object-cover"
+          />
           <p className="text-[14px] leading-[18.9px] font-[500]">{name}</p>
         </div>
       </div>
@@ -185,14 +216,7 @@ const AgentCard: FC<AgentCardProps> = ({
           Average rating
         </p>
         <div className="flex items-center gap-1">
-          {ratingsArray.fill(0).map((star, index) => (
-            <img
-              key={`${star}-${index}`}
-              src="/assets/star-icon.svg"
-              alt="star"
-              className="w-5 h-5"
-            />
-          ))}
+          {[0, 1, 2, 3, 4].map(renderStar)}
         </div>
       </div>
 

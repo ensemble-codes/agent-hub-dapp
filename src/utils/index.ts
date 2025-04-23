@@ -29,3 +29,12 @@ export const switchFocusRing = [
   // outline color
   "outline-blue-500 dark:outline-blue-500",
 ]
+
+export function convertRatingToStars(rating: number | string): number {
+  const numericRating = typeof rating === 'string' ? parseInt(rating, 10) : rating;
+  return numericRating === 0 ? 0 : (numericRating / 25) + 1;
+}
+
+export function convertStarsToRating(stars: number): number {
+  return (stars - 1) * 25;
+}
