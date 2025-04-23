@@ -12,6 +12,7 @@ import { formatEther } from "ethers";
 import { useWalletClient } from "wagmi";
 import { config } from "@/components/onchainconfig/config";
 import Link from "next/link";
+import { convertRatingToStars } from "@/utils";
 
 interface ConfirmAgentProps {
   selectedAgent: number;
@@ -83,10 +84,6 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
 
   const { data, loading } = useQuery(GET_PROPOSAL);
 
-  const ratingsArray = new Array(
-    data && data?.proposal ? data?.proposal.issuer.reputation : 0
-  );
-
   const proposal = data && data.proposal ? data?.proposal : undefined;
 
   const filteredTweetStyles = useMemo(() => {
@@ -127,6 +124,42 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
       setLoadingCreate(false);
     }
   }, [state.taskPrompt, sdk]);
+
+  const renderStar = (index: number) => {
+    const starRating = convertRatingToStars(data?.proposal?.issuer?.reputation || 0);
+    const isFilled = index < Math.floor(starRating);
+    const isPartial = !isFilled && index < starRating;
+    const partialFill = isPartial ? ((starRating - Math.floor(starRating)) * 100) : 0;
+
+    return (
+      <div key={index} className="relative w-5 h-5">
+        <img
+          src="/assets/empty-star-icon.svg"
+          alt="star"
+          className="w-5 h-5"
+        />
+        {isFilled && (
+          <img
+            src="/assets/star-icon.svg"
+            alt="star"
+            className="absolute top-0 left-0 w-5 h-5"
+          />
+        )}
+        {isPartial && (
+          <div 
+            className="absolute top-0 left-0 overflow-hidden"
+            style={{ width: `${partialFill}%` }}
+          >
+            <img
+              src="/assets/star-icon.svg"
+              alt="star"
+              className="w-5 h-5"
+            />
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -336,14 +369,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
                   Average rating
                 </p>
                 <div className="flex items-center gap-1">
-                  {ratingsArray.fill(0).map((star, index) => (
-                    <img
-                      key={`${star}-${index}`}
-                      src="/assets/star-icon.svg"
-                      alt="star"
-                      className="w-5 h-5"
-                    />
-                  ))}
+                  {[0, 1, 2, 3, 4].map(renderStar)}
                 </div>
               </div>
             </div>

@@ -291,7 +291,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       </div>
                     </div>
                   )}
-                  {isConnected && address?.toLowerCase() === task?.task?.issuer?.toLowerCase() ? (
+                  {true ? (
                     <>
                       <div className="space-y-3 mb-4">
                         <p className="text-[18px] leading-[24.3px]">
