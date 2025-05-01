@@ -4,7 +4,7 @@ import { sendGAEvent } from "@next/third-parties/google";
 import { convertRatingToStars } from "@/utils";
 import TWEETSTYLES from "@/dummydata/tweetstyles.json";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AppContext } from "@/context";
+import { AppContext } from "@/context/app";
 import { useSdk } from "@/sdk-config";
 import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";

@@ -1,15 +1,14 @@
 "use client";
 import { createContext, FC, useReducer } from "react";
-import State from "./statemodel";
-import initialState from "./state";
 import { Action } from "./action";
 import reducer from "./reducer";
+import initialState, { AppState } from "./state";
 
 interface ContextProps {
   children: React.ReactNode;
 }
 
-export const AppContext = createContext<[State, React.Dispatch<Action>]>([
+export const AppContext = createContext<[AppState, React.Dispatch<Action>]>([
   initialState,
   () => {},
 ]);

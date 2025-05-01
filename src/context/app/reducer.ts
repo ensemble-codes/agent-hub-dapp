@@ -1,8 +1,8 @@
 import { Action } from "./action";
 import { SET_IS_WHITELISTED, SET_TASK_PROMPT } from "./actions";
-import State from "./statemodel";
+import { AppState } from "./state";
 
-const reducer = (state: State, action: Action): State => {
+const reducer = (state: AppState, action: Action): AppState => {
   switch (action.type) {
     case SET_TASK_PROMPT:
       return {
@@ -18,5 +18,6 @@ const reducer = (state: State, action: Action): State => {
       return state;
   }
 };
+
 export default reducer;
 

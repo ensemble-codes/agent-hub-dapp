@@ -1,6 +1,8 @@
 import { TaskStatus } from "@/enum/taskstatus";
+import { Signer } from "@xmtp/browser-sdk";
 import clsx, { type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { toBytes } from "viem";
 
 export function getTaskStatusText(status: TaskStatus): string {
   switch (status) {
@@ -39,3 +41,20 @@ export function convertRatingToStars(rating: number | string): number {
 export function convertStarsToRating(stars: number): number {
   return (stars - 1) * 25;
 }
+
+export const createEOASigner = (
+  address: `0x${string}`,
+  signMessage: (message: string) => Promise<string> | string,
+): Signer => {
+  return {
+    type: "EOA",
+    getIdentifier: () => ({
+      identifier: address.toLowerCase(),
+      identifierKind: "Ethereum",
+    }),
+    signMessage: async (message: string) => {
+      const signature = await signMessage(message);
+      return toBytes(signature);
+    },
+  };
+};

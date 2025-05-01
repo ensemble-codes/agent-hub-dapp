@@ -6,6 +6,7 @@ import { formatEther } from "ethers";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { useChat } from "@/context/chat";
 
 const services = [
   {
@@ -118,6 +119,11 @@ export default function Home() {
     (a: any, b: any) => b.tasks.length - a.tasks.length
   );
   // agents
+
+  const [chatState] = useChat()
+
+  console.log("chatState", chatState)
+
   return (
     <>
       <div>
