@@ -58,3 +58,18 @@ export const createEOASigner = (
     },
   };
 };
+
+export function getTaskStatusColor(status: TaskStatus): string {
+  switch (status) {
+    case TaskStatus.CREATED:
+      return "#3B82F6"; // blue-500
+    case TaskStatus.ASSIGNED:
+      return "#F59E42"; // yellow-500
+    case TaskStatus.COMPLETED:
+      return "#16A34A"; // green-600
+    case TaskStatus.FAILED:
+      return "#EF4444"; // red-500
+    default:
+      return "#9CA3AF"; // gray-400
+  }
+}

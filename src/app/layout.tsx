@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AppBg, Footer, Wrapper } from "@/components";
+import { Footer, Wrapper } from "@/components";
 import OnchainProvider from "@/components/onchainconfig/provider";
 import { AppContextProvider } from "@/context/app";
 import '@rainbow-me/rainbowkit/styles.css';
@@ -55,7 +55,6 @@ export default function RootLayout({
             <ChatContextProvider>
               <Wrapper>
                 <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">
-                  <AppBg />
                   {children}
                 </main>
                 <Footer />
