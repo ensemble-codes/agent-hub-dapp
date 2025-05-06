@@ -1,12 +1,48 @@
 "use client";
 import { AppHeader, SideMenu } from "@/components";
-import { FC, useState } from "react";
+import { useChat } from "@/context/chat";
+import { useConsersation } from "@/context/chat/hooks";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 
 const Page: FC = () => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(true);
   const [userInput, setUserInput] = useState("");
   const [chatInput, setChatInput] = useState("");
+
+  const { getMessages, streamMessages, messages, send, sync } = useConsersation('0xc1ec8b9ca11ef907b959fed83272266b0e96b58d')
+
+  const stopStreamRef = useRef<() => void | null>(null)
+
+  const startStream = useCallback(async () => {
+    stopStreamRef.current = await streamMessages()
+  }, [streamMessages])
+
+  const stopStream = useCallback(() => {
+    stopStreamRef.current?.()
+    stopStreamRef.current = null
+  }, [])
+
+  const onSendMessage = useCallback(async () => { 
+    if (!chatInput) return
+
+    await send(chatInput)
+    setChatInput("")
+  }, [chatInput, send])
+
+  useEffect(() => {
+    const loadMessages = async () => {
+      stopStream()
+      await getMessages()
+      await startStream()
+    }
+
+    loadMessages()
+
+    return () => {
+      stopStream()
+    }
+  }, [getMessages])
 
   return (
     <>
@@ -195,252 +231,9 @@ const Page: FC = () => {
                 <>
                   <div className="w-full h-full flex flex-col items-start justify-between gap-[20px]">
                     <div className="grow overflow-y-auto w-full h-[80%] mt-[20px]">
-                      <div className="flex justify-end w-full mb-2">
-                        <p className="bg-primary/15 py-2 px-4 rounded-[2000px] w-fit text-[#121212] font-normal text-right max-w-[50%]">
-                          hi
-                        </p>
-                      </div>
-                      <div className="space-y-4 w-[50%] mb-2">
-                        <p className="text-[#121212] font-normal">
-                          Hello, this is the Ensemble Orchestrator, your AI
-                          sidekick on Agent Hub. What would you like to do?
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <div className="border border-[#8F95B2] rounded-[2000px] py-[2px] px-2">
-                            <span className="text-[14px] text-[#8F95B2]">
-                              Find Ai Agents
-                            </span>
-                          </div>
-                          <div className="border border-[#8F95B2] rounded-[2000px] py-[2px] px-2">
-                            <span className="text-[14px] text-[#8F95B2]">
-                              Know more about Agent Hub
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex justify-end w-full mb-2">
-                        <p className="border border-[#8F95B2] py-[2px] px-2 rounded-[2000px] w-fit text-[#121212] font-normal text-right max-w-[50%]">
-                          Find Ai Agents
-                        </p>
-                      </div>
-                      <div className="space-y-4 w-[50%] mb-2">
-                        <p className="text-[#121212] font-normal">
-                          Sure, I'll get to finding top AI Agents for you. What
-                          kind of agent would you like?
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <div className="border border-primary cursor-pointer rounded-[2000px] py-[2px] px-2 flex items-center gap-2">
-                            <img
-                              src="/assets/social-service-primary-icon.svg"
-                              alt="social"
-                              className="w-4 h-4"
-                            />
-                            <span className="text-[14px] text-primary">
-                              Social
-                            </span>
-                          </div>
-                          <div className="border border-primary cursor-pointer rounded-[2000px] py-[2px] px-2 flex items-center gap-2">
-                            <img
-                              src="/assets/active-service-highlighted-icon.svg"
-                              alt="defi"
-                              className="w-4 h-4"
-                            />
-                            <span className="text-[14px] text-primary">
-                              DeFi
-                            </span>
-                          </div>
-                          <div className="border border-primary cursor-pointer rounded-[2000px] py-[2px] px-2 flex items-center gap-2">
-                            <img
-                              src="/assets/security-service-primary-icon.svg"
-                              alt="security"
-                              className="w-4 h-4"
-                            />
-                            <span className="text-[14px] text-primary">
-                              Security
-                            </span>
-                          </div>
-                          <div className="border border-primary cursor-pointer rounded-[2000px] py-[2px] px-2 flex items-center gap-2">
-                            <img
-                              src="/assets/research-service-primary-icon.svg"
-                              alt="research"
-                              className="w-4 h-4"
-                            />
-                            <span className="text-[14px] text-primary">
-                              Research
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex justify-end w-full mb-2">
-                        <div className="border border-[#8F95B2] cursor-pointer rounded-[2000px] py-[2px] px-2 flex items-center gap-2">
-                          <img
-                            src="/assets/social-service-icon.svg"
-                            alt="social"
-                            className="w-4 h-4"
-                          />
-                          <span className="text-[14px] text-[#121212]">
-                            Social
-                          </span>
-                        </div>
-                      </div>
-                      <div className="space-y-4 w-full">
-                        <p className="text-[#121212] font-normal max-w-[60%]">
-                          Here are the top Social Agents on Agent Hub. If you'd
-                          like to do a specific task, let me know and I'll find
-                          the best agent for that particular task!
-                        </p>
-                        <div className="flex items-stretch gap-4 overflow-x-auto">
-                          <div className="border-[0.5px] border-[#8F95B2] p-3 rounded-[8px] w-[300px] flex-shrink-0">
-                            <div className="flex items-center justify-between w-full gap-2">
-                              <div className="w-[70%] flex items-center gap-2">
-                                <img
-                                  src="/assets/dummy-agent-1-icon.svg"
-                                  alt="dummy"
-                                  className="w-10 h-10 rounded-full"
-                                />
-                                <div className="w-full">
-                                  <p className="text-[#121212] font-medium w-full text-ellipsis overflow-hidden whitespace-nowrap">
-                                    Rabbi Moshe Zalman
-                                  </p>
-                                  <p className="text-[14px] text-[#8F95B2] font-normal">
-                                    0x6F...21C0
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="bg-[#F94D27]/10 px-2 py-[2px] rounded-[2000px] flex items-center gap-1">
-                                <img
-                                  src="/assets/star-icon.svg"
-                                  alt="star"
-                                  className="w-3 h-3"
-                                />
-                                <span className="text-[14px] text-[#8F95B2] font-medium">
-                                  4.5
-                                </span>
-                              </div>
-                            </div>
-                            <div className="mt-4 flex items-center justify-between w-full gap-2">
-                              <div className="flex items-center gap-2">
-                                <p className="text-[16px] text-[#121212]">
-                                  Bull Post
-                                </p>
-                                <div className="w-2 h-2 rounded-full bg-[#8F95B2]" />
-                                <p className="text-[16px] text-[#121212]">
-                                  Replies
-                                </p>
-                                <div className="w-2 h-2 rounded-full bg-[#8F95B2]" />
-                                <p className="text-[16px] text-[#121212]">
-                                  Blessings
-                                </p>
-                              </div>
-                              <img
-                                src="/assets/pixelated-arrow-primary-icon.svg"
-                                alt="arrow"
-                                className="w-6 h-6"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="border-[0.5px] border-[#8F95B2] p-3 rounded-[8px] w-[300px] flex-shrink-0">
-                            <div className="flex items-center justify-between w-full gap-2">
-                              <div className="w-[70%] flex items-center gap-2">
-                                <img
-                                  src="/assets/dummy-agent-1-icon.svg"
-                                  alt="dummy"
-                                  className="w-10 h-10 rounded-full"
-                                />
-                                <div className="w-full">
-                                  <p className="text-[#121212] font-medium w-full text-ellipsis overflow-hidden whitespace-nowrap">
-                                    Rabbi Moshe Zalman
-                                  </p>
-                                  <p className="text-[14px] text-[#8F95B2] font-normal">
-                                    0x6F...21C0
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="bg-[#F94D27]/10 px-2 py-[2px] rounded-[2000px] flex items-center gap-1">
-                                <img
-                                  src="/assets/star-icon.svg"
-                                  alt="star"
-                                  className="w-3 h-3"
-                                />
-                                <span className="text-[14px] text-[#8F95B2] font-medium">
-                                  4.5
-                                </span>
-                              </div>
-                            </div>
-                            <div className="mt-4 flex items-center justify-between w-full gap-2">
-                              <div className="flex items-center gap-2">
-                                <p className="text-[16px] text-[#121212]">
-                                  Bull Post
-                                </p>
-                                <div className="w-2 h-2 rounded-full bg-[#8F95B2]" />
-                                <p className="text-[16px] text-[#121212]">
-                                  Replies
-                                </p>
-                                <div className="w-2 h-2 rounded-full bg-[#8F95B2]" />
-                                <p className="text-[16px] text-[#121212]">
-                                  Blessings
-                                </p>
-                              </div>
-                              <img
-                                src="/assets/pixelated-arrow-primary-icon.svg"
-                                alt="arrow"
-                                className="w-6 h-6"
-                              />
-                            </div>
-                          </div>
-                          <div className="border-[0.5px] border-[#8F95B2] p-3 rounded-[8px] w-[300px] flex-shrink-0">
-                            <div className="flex items-center justify-between w-full gap-2">
-                              <div className="w-[70%] flex items-center gap-2">
-                                <img
-                                  src="/assets/dummy-agent-1-icon.svg"
-                                  alt="dummy"
-                                  className="w-10 h-10 rounded-full"
-                                />
-                                <div className="w-full">
-                                  <p className="text-[#121212] font-medium w-full text-ellipsis overflow-hidden whitespace-nowrap">
-                                    Rabbi Moshe Zalman
-                                  </p>
-                                  <p className="text-[14px] text-[#8F95B2] font-normal">
-                                    0x6F...21C0
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="bg-[#F94D27]/10 px-2 py-[2px] rounded-[2000px] flex items-center gap-1">
-                                <img
-                                  src="/assets/star-icon.svg"
-                                  alt="star"
-                                  className="w-3 h-3"
-                                />
-                                <span className="text-[14px] text-[#8F95B2] font-medium">
-                                  4.5
-                                </span>
-                              </div>
-                            </div>
-                            <div className="mt-4 flex items-center justify-between w-full gap-2">
-                              <div className="flex items-center gap-2">
-                                <p className="text-[16px] text-[#121212]">
-                                  Bull Post
-                                </p>
-                                <div className="w-2 h-2 rounded-full bg-[#8F95B2]" />
-                                <p className="text-[16px] text-[#121212]">
-                                  Replies
-                                </p>
-                                <div className="w-2 h-2 rounded-full bg-[#8F95B2]" />
-                                <p className="text-[16px] text-[#121212]">
-                                  Blessings
-                                </p>
-                              </div>
-                              <img
-                                src="/assets/pixelated-arrow-primary-icon.svg"
-                                alt="arrow"
-                                className="w-6 h-6"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-primary">View more</p>
-                      </div>
+                      {messages.map((message, index) => (
+                        <div id={index.toString()}>{message.content}</div>
+                      ))}
                     </div>
                     <div className="h-[40px] flex-shrink-0 flex items-stretch justify-center w-full border border-[#8F95B2] rounded-[8px] bg-white z-[11]">
                       <input
@@ -449,14 +242,13 @@ const Page: FC = () => {
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
                       />
-                      <div className="basis-[10%] border-x-[1px] border-x-[#8F95B2] flex items-center justify-center">
+                      <div className="basis-[10%] border-x-[1px] border-x-[#8F95B2] flex items-center justify-center cursor-pointer" onClick={() => sync()}>
                         <img src="/assets/attach-icon.svg" alt="attach" />
                       </div>
                       <div
-                        className="basis-[10%] flex items-center justify-center"
+                        className="basis-[10%] flex items-center justify-center cursor-pointer"
                         onClick={() => {
-                          setIsChatOpen(true);
-                          setUserInput("");
+                          onSendMessage();
                         }}
                       >
                         <img

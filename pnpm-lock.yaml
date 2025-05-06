@@ -33,8 +33,8 @@ importers:
         specifier: ^15.5.13
         version: 15.5.13
       '@xmtp/browser-sdk':
-        specifier: ^2.0.12
-        version: 2.0.12
+        specifier: 2.0.3
+        version: 2.0.3
       axios:
         specifier: ^1.7.9
         version: 1.7.9
@@ -1245,8 +1245,8 @@ packages:
     resolution: {integrity: sha512-FNoYzHawTMk/6KMQoEG5O4PuioX19UbwdQKF44yw0nLfOypfQdjtfZzo/UIJWAJ23sNIFbD1Ug9lbaDGMwbqQA==}
     engines: {node: '>=8'}
 
-  '@xmtp/browser-sdk@2.0.12':
-    resolution: {integrity: sha512-nhZVHlUTMk5oHGtGJ1jijHGk6F3Ev6PEBdlA1eRXEpPNdO5Y8JQls4TkvyAQSK0XLv13XipAEd7zq9Q7tfthlw==}
+  '@xmtp/browser-sdk@2.0.3':
+    resolution: {integrity: sha512-UaMDRpArFH1s4zuHnQuIC+UsVSm/8iQhORam6XFxiZPWsIM0Py12ZwLnCN59UHPFdQyz6cFbfI6em5xClJxYjg==}
     engines: {node: '>=20'}
 
   '@xmtp/content-type-group-updated@2.0.2':
@@ -1261,8 +1261,8 @@ packages:
   '@xmtp/proto@3.78.0':
     resolution: {integrity: sha512-JHkkvbdyqpWo1YOg88uOrc2GAsPnfXhIWaUKyIjXQdt4LltR4iAMgXcr1CFN+xjUmOBkAwwJ2JywUYv/uA4yZA==}
 
-  '@xmtp/wasm-bindings@1.1.7':
-    resolution: {integrity: sha512-/HkRWHCEhHHuoWnoXFtTzYRSEIPkOvxGJlVvMVMgmdVgd4DTavf3llbVfyC2r1BC7xVfjXSpJzNLnKVExIGIKA==}
+  '@xmtp/wasm-bindings@1.2.0-dev.878fd38':
+    resolution: {integrity: sha512-G72RniMu1kcx6/hsJ6s8qPkHYLILx2Wj99VnQePxsS6Q0njaOcThIPmCcc7YnoaICsNDv8XKcns2PLmwB38ziQ==}
     engines: {node: '>=20'}
 
   abitype@1.0.8:
@@ -5594,13 +5594,13 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@xmtp/browser-sdk@2.0.12':
+  '@xmtp/browser-sdk@2.0.3':
     dependencies:
       '@xmtp/content-type-group-updated': 2.0.2
       '@xmtp/content-type-primitives': 2.0.2
       '@xmtp/content-type-text': 2.0.2
       '@xmtp/proto': 3.78.0
-      '@xmtp/wasm-bindings': 1.1.7
+      '@xmtp/wasm-bindings': 1.2.0-dev.878fd38
       uuid: 11.1.0
 
   '@xmtp/content-type-group-updated@2.0.2':
@@ -5623,7 +5623,7 @@ snapshots:
       rxjs: 7.8.2
       undici: 5.29.0
 
-  '@xmtp/wasm-bindings@1.1.7': {}
+  '@xmtp/wasm-bindings@1.2.0-dev.878fd38': {}
 
   abitype@1.0.8(typescript@5.7.3):
     optionalDependencies:

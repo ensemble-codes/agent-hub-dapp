@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useChat } from ".";
 import { Conversation, DecodedMessage } from "@xmtp/browser-sdk";
 
@@ -8,13 +8,15 @@ export function useConsersation(address?: string) {
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [sending, setSending] = useState(false);
-  const [messages, setMessages] = useState<DecodedMessage[]>([]);
+  const [messages, setMessages] = useState<{ content: string; isReceived: boolean }[]>([]);
 
   const { client } = chatState;
 
   useEffect(() => {
     const getConversation = async () => {
       if (!client || !address) return;
+
+      await client.conversations.syncAll()
 
       const dmConversation = await client.conversations.newDmWithIdentifier({
         identifierKind: "Ethereum",
@@ -27,12 +29,30 @@ export function useConsersation(address?: string) {
     getConversation();
   }, [client, address]);
 
+  const indexId = useMemo(() =>  {
+    if (!client) return null;
+
+    return client.inboxId
+  }, [client])
+
+  const formatMessage = useCallback((message: DecodedMessage) => {
+    if (typeof message.content !== 'string') {
+      return null
+    }
+
+    return {
+      content: message.content,
+      isReceived: message.senderInboxId !== indexId
+    }
+  }, [indexId])
+
   const getMessages = useCallback(async () => {
     if (!converstion) return;
 
     try {
       const msgs = (await converstion.messages()) ?? [];
-      setMessages(msgs);
+      const formattedMessages = msgs.map(formatMessage).filter((msg) => msg !== null);
+      setMessages(formattedMessages);
     } finally {
       setLoading(false);
     }
@@ -77,8 +97,12 @@ export function useConsersation(address?: string) {
           return;
         }
 
+        
         if (message) {
-          setMessages((prev) => [...prev, message]);
+          const formattedMessage = formatMessage(message);
+          if (!formattedMessage) return;
+          
+          setMessages((prev) => [...prev, formattedMessage]);
         }
       }
     );

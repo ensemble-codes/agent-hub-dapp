@@ -122,8 +122,6 @@ export default function Home() {
 
   const [chatState] = useChat()
 
-  console.log("chatState", chatState)
-
   return (
     <>
       <div>

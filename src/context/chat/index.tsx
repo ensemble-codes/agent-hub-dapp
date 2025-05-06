@@ -35,7 +35,7 @@ export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
                 
                 try {
                     let xmtpClient = await Client.create(signer, {
-                        env: 'production'
+                        env: 'production',
                     })
     
                     dispatch({
