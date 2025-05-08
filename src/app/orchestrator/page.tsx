@@ -1,6 +1,5 @@
 "use client";
 import { AppHeader, SideMenu } from "@/components";
-import { useChat } from "@/context/chat";
 import { useConsersation } from "@/context/chat/hooks";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 
@@ -9,40 +8,78 @@ const Page: FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [userInput, setUserInput] = useState("");
   const [chatInput, setChatInput] = useState("");
+  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+  const [lastMessageTime, setLastMessageTime] = useState<number>(0);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const { getMessages, streamMessages, messages, send, sync } = useConsersation('0xc1ec8b9ca11ef907b959fed83272266b0e96b58d')
+  const { getMessages, streamMessages, messages, send, sync, loading, sending } = useConsersation('0xc1ec8b9ca11ef907b959fed83272266b0e96b58d');
 
-  const stopStreamRef = useRef<() => void | null>(null)
+  const stopStreamRef = useRef<() => void | null>(null);
 
   const startStream = useCallback(async () => {
-    stopStreamRef.current = await streamMessages()
-  }, [streamMessages])
+    stopStreamRef.current = await streamMessages();
+  }, [streamMessages]);
 
   const stopStream = useCallback(() => {
-    stopStreamRef.current?.()
-    stopStreamRef.current = null
-  }, [])
+    stopStreamRef.current?.();
+    stopStreamRef.current = null;
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, []);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   const onSendMessage = useCallback(async () => { 
-    if (!chatInput) return
+    if (!chatInput) return;
+    setIsWaitingForResponse(true);
+    setLastMessageTime(Date.now());
+    await send(chatInput);
+    setChatInput("");
+  }, [chatInput, send]);
 
-    await send(chatInput)
-    setChatInput("")
-  }, [chatInput, send])
+  // Listen for new messages to hide the typing indicator
+  useEffect(() => {
+    if (messages.length > 0 && isWaitingForResponse) {
+      const lastMessage = messages[messages.length - 1];
+      // Only hide the indicator if we receive a message after our last sent message
+      if (lastMessage.isReceived && Date.now() - lastMessageTime > 1000) {
+        setIsWaitingForResponse(false);
+      }
+    }
+  }, [messages, isWaitingForResponse, lastMessageTime]);
+
+  // Reset waiting state if no response after timeout
+  useEffect(() => {
+    if (isWaitingForResponse) {
+      const timeout = setTimeout(() => {
+        console.log("Timeout reached, resetting waiting state");
+        setIsWaitingForResponse(false);
+      }, 10000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isWaitingForResponse]);
 
   useEffect(() => {
     const loadMessages = async () => {
-      stopStream()
-      await getMessages()
-      await startStream()
-    }
+      stopStream();
+      await getMessages();
+      await startStream();
+    };
 
-    loadMessages()
+    loadMessages();
 
     return () => {
-      stopStream()
-    }
-  }, [getMessages])
+      stopStream();
+    };
+  }, [getMessages, startStream, stopStream]);
 
   return (
     <>
@@ -84,12 +121,12 @@ const Page: FC = () => {
                     </>
                   ) : null}
                 </div>
-                <img
+                {/* <img
                   src="/assets/orchestrator-sidemenu-icon.svg"
                   alt="side"
                   className="w-6 h-6 cursor-pointer"
                   onClick={() => setIsSideMenuOpen(true)}
-                />
+                /> */}
               </div>
               {isSideMenuOpen && (
                 <div
@@ -97,7 +134,7 @@ const Page: FC = () => {
                   onClick={() => setIsSideMenuOpen(false)}
                 ></div>
               )}
-              <div
+              {/* <div
                 className="bg-white absolute right-0 top-0 h-full border-l border-[#8F95B2] transition-[width] duration-300 ease-in-out z-20"
                 style={{ width: isSideMenuOpen ? "50%" : "0" }}
               >
@@ -226,14 +263,56 @@ const Page: FC = () => {
                     </p>
                   </div>
                 </div>
-              </div>
+              </div> */}
               {isChatOpen ? (
                 <>
-                  <div className="w-full h-full flex flex-col items-start justify-between gap-[20px]">
-                    <div className="grow overflow-y-auto w-full h-[80%] mt-[20px]">
-                      {messages.map((message, index) => (
-                        <div id={index.toString()}>{message.content}</div>
-                      ))}
+                  <div className="w-full h-[94%] flex flex-col items-start justify-between gap-[20px]">
+                    <div 
+                      ref={messagesContainerRef}
+                      className="grow overflow-y-auto w-full h-[80%] mt-[20px]" 
+                      style={{ scrollbarWidth: 'none' }}
+                    >
+                      {loading ? (
+                        <div className="flex items-center justify-center h-full">
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                            <p className="text-[#8F95B2] text-sm">Loading messages...</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {messages.map((message, index) => {
+                            const isPreviousFromSameSender = index > 0 && messages[index - 1].isReceived === message.isReceived;
+                            return (
+                              <div 
+                                key={index} 
+                                className={`flex ${!message.isReceived ? 'justify-end' : 'justify-start'} ${
+                                  isPreviousFromSameSender ? 'mb-1' : 'mb-4'
+                                }`}
+                              >
+                                <div 
+                                  className={`max-w-[70%] text-[#121212] rounded-[2000px] ${
+                                    !message.isReceived 
+                                      ? 'py-[2px] px-3 bg-primary/15' 
+                                      : ''
+                                  }`}
+                                >
+                                  {message.content}
+                                </div>
+                              </div>
+                            );
+                          })}
+                          {isWaitingForResponse ? (
+                            <div className="flex justify-start mb-4">
+                              <div className="flex items-center gap-1 px-3 py-2 bg-gray-100 rounded-[2000px]">
+                                <div className="w-2 h-2 bg-[#8F95B2] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                <div className="w-2 h-2 bg-[#8F95B2] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                <div className="w-2 h-2 bg-[#8F95B2] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                              </div>
+                            </div>
+                          ) : null}
+                        </>
+                      )}
                     </div>
                     <div className="h-[40px] flex-shrink-0 flex items-stretch justify-center w-full border border-[#8F95B2] rounded-[8px] bg-white z-[11]">
                       <input
