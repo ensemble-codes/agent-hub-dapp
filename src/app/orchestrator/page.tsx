@@ -5,14 +5,13 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 
 const Page: FC = () => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(true);
-  const [userInput, setUserInput] = useState("");
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const { getMessages, streamMessages, messages, send, sync, loading, sending } = useConsersation('0xc1ec8b9ca11ef907b959fed83272266b0e96b58d');
+  const { getMessages, streamMessages, messages, send, loading } = useConsersation('0xc1ec8b9ca11ef907b959fed83272266b0e96b58d');
 
   const stopStreamRef = useRef<() => void | null>(null);
 
@@ -320,14 +319,22 @@ const Page: FC = () => {
                         className="basis-[80%] grow p-4 text-[16px] placeholder:text-[#8F95B2] outline-none border-none rounded-[8px]"
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey && chatInput.trim()) {
+                            e.preventDefault();
+                            onSendMessage();
+                          }
+                        }}
                       />
-                      <div className="basis-[10%] border-x-[1px] border-x-[#8F95B2] flex items-center justify-center cursor-pointer" onClick={() => sync()}>
+                      {/* <div className="basis-[10%] border-x-[1px] border-x-[#8F95B2] flex items-center justify-center cursor-pointer" onClick={() => sync()}>
                         <img src="/assets/attach-icon.svg" alt="attach" />
-                      </div>
+                      </div> */}
                       <div
-                        className="basis-[10%] flex items-center justify-center cursor-pointer"
+                        className="basis-[10%] border-l-[1px] border-l-[#8F95B2] flex items-center justify-center cursor-pointer"
                         onClick={() => {
-                          onSendMessage();
+                          if (chatInput.trim()) {
+                            onSendMessage();
+                          }
                         }}
                       >
                         <img
@@ -356,15 +363,27 @@ const Page: FC = () => {
                     <input
                       placeholder="Let's explore..."
                       className="basis-[80%] grow p-4 text-[16px] placeholder:text-[#8F95B2] outline-none border-none rounded-[8px]"
-                      value={userInput}
-                      onChange={(e) => setUserInput(e.target.value)}
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey && chatInput.trim()) {
+                          e.preventDefault();
+                          setIsChatOpen(true);
+                          onSendMessage();
+                        }
+                      }}
                     />
-                    <div className="basis-[10%] border-x-[1px] border-x-[#8F95B2] flex items-center justify-center">
+                    {/* <div className="basis-[10%] border-x-[1px] border-x-[#8F95B2] flex items-center justify-center">
                       <img src="/assets/attach-icon.svg" alt="attach" />
-                    </div>
+                    </div> */}
                     <div
-                      className="basis-[10%] flex items-center justify-center"
-                      onClick={() => setIsChatOpen(true)}
+                      className="basis-[10%] border-l-[1px] border-l-[#8F95B2] flex items-center justify-center"
+                      onClick={() => {
+                        if (chatInput.trim()) {
+                          setIsChatOpen(true);
+                          onSendMessage();
+                        }
+                      }}
                     >
                       <img
                         src="/assets/pixelated-arrow-primary-icon.svg"
