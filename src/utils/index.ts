@@ -1,6 +1,8 @@
 import { TaskStatus } from "@/enum/taskstatus";
+import { Signer } from "@xmtp/browser-sdk";
 import clsx, { type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { toBytes } from "viem";
 
 export function getTaskStatusText(status: TaskStatus): string {
   switch (status) {
@@ -38,4 +40,36 @@ export function convertRatingToStars(rating: number | string): number {
 
 export function convertStarsToRating(stars: number): number {
   return (stars - 1) * 25;
+}
+
+export const createEOASigner = (
+  address: `0x${string}`,
+  signMessage: (message: string) => Promise<string> | string,
+): Signer => {
+  return {
+    type: "EOA",
+    getIdentifier: () => ({
+      identifier: address.toLowerCase(),
+      identifierKind: "Ethereum",
+    }),
+    signMessage: async (message: string) => {
+      const signature = await signMessage(message);
+      return toBytes(signature);
+    },
+  };
+};
+
+export function getTaskStatusColor(status: TaskStatus): string {
+  switch (status) {
+    case TaskStatus.CREATED:
+      return "#3B82F6"; // blue-500
+    case TaskStatus.ASSIGNED:
+      return "#F59E42"; // yellow-500
+    case TaskStatus.COMPLETED:
+      return "#16A34A"; // green-600
+    case TaskStatus.FAILED:
+      return "#EF4444"; // red-500
+    default:
+      return "#9CA3AF"; // gray-400
+  }
 }

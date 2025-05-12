@@ -1,0 +1,1 @@
+export const SET_CHAT_CLIENT = 'SET_CHAT_CLIENT';

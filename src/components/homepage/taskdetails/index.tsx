@@ -3,8 +3,8 @@ import { FC, useCallback, useState, useEffect, useContext } from "react";
 import DetailStep from "./detail-step";
 import SelectAgentStep from "./select-step";
 import ConfirmAgent from "./confirm-agent";
-import { AppContext } from "@/context";
-import { SET_TASK_PROMPT } from "@/context/actions";
+import { AppContext } from "@/context/app";
+import { SET_TASK_PROMPT } from "@/context/app/actions";
 import { useSearchParams } from "next/navigation";
 
 interface TaskDetailsProps {
