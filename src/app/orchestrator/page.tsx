@@ -84,7 +84,7 @@ const Page: FC = () => {
     <>
       <div>
         <AppHeader />
-        <div className="flex items-start gap-16 pt-16">
+        <div className="flex items-start gap-4 pt-8">
           <SideMenu />
           <div className="grow w-full !h-[800px] bg-white rounded-[16px] p-4 border-[0.5px] border-[#8F95B2] relative overflow-hidden">
             <img

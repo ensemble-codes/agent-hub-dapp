@@ -110,7 +110,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     <>
       <div>
         <AppHeader />
-        <div className="flex items-start gap-16 pt-16">
+        <div className="flex items-start gap-4 pt-8">
           <SideMenu />
           <div
             className="min-h-[575px] w-full flex flex-col gap-6 rounded-[20px] pt-12 pb-6 px-8 bg-white border-[1px] shadow-[inset_5px_5px_10px_0px_#D9D9D9,inset_-5px_-5px_10px_0px_#E7EBF0]"

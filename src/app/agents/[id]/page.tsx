@@ -80,7 +80,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   return (
     <div>
       <AppHeader />
-      <div className="flex items-start gap-16 pt-16">
+      <div className="flex items-start gap-4 pt-8">
         <SideMenu />
         <div className="grow w-full">
           <p className="font-bold text-primary leading-[24px]">Agent Details</p>

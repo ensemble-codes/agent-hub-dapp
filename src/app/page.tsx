@@ -139,7 +139,7 @@ export default function Home() {
     <>
       <div>
         <AppHeader />
-        <div className="flex items-start gap-16 pt-16">
+        <div className="flex items-start gap-4 pt-8">
           <SideMenu />
           <div className="grow w-full ">
             <div className="flex items-stretch gap-6 mb-6 w-full">
