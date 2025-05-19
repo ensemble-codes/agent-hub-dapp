@@ -11,7 +11,7 @@ const Page: FC = () => {
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const { getMessages, streamMessages, messages, send, loading } = useConsersation('0x74bf71e6efdbe2d02b8388535498eb4624b82813');
+  const { getMessages, streamMessages, messages, send, loading } = useConsersation('0x5C02b4685492D36a40107B6eC48A91ab3f8875cb');
 
   const stopStreamRef = useRef<() => void | null>(null);
 
