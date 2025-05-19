@@ -11,7 +11,7 @@ const Page: FC = () => {
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const { getMessages, streamMessages, messages, send, loading } = useConsersation('0xc1ec8b9ca11ef907b959fed83272266b0e96b58d');
+  const { getMessages, streamMessages, messages, send, loading } = useConsersation('0x74bf71e6efdbe2d02b8388535498eb4624b82813');
 
   const stopStreamRef = useRef<() => void | null>(null);
 
@@ -332,7 +332,7 @@ const Page: FC = () => {
                       <div
                         className="basis-[10%] border-l-[1px] border-l-[#8F95B2] flex items-center justify-center cursor-pointer"
                         onClick={() => {
-                          if (chatInput.trim()) {
+                          if (chatInput.trim() && !isWaitingForResponse) {
                             onSendMessage();
                           }
                         }}
@@ -448,15 +448,29 @@ const Page: FC = () => {
                       Starter Prompts
                     </p>
                     <div className="flex items-stretch justify-center gap-4 max-w-[755px] w-full">
-                      <div className="p-4 rounded-[16px] border-[#8F95B2] border">
-                        <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
+                      <div 
+                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors"
+                        onClick={() => {
+                          setChatInput("Help me to hire an AI KoL for my project. The perfect Hype-man!");
+                          setIsChatOpen(true);
+                          onSendMessage();
+                        }}
+                      >
+                        <p className="cursor-pointer text-[16px] text-primary font-medium leading-[100%] mb-2">
                           Social
                         </p>
-                        <p className="text-[16px] text-[#121212] font-normal leading-[100%]">
+                        <p className="cursor-pointer text-[16px] text-[#121212] font-normal leading-[100%]">
                           Hire an AI KoL for your project. The perfect Hype-man!
                         </p>
                       </div>
-                      <div className="p-4 rounded-[16px] border-[#8F95B2] border">
+                      <div 
+                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors"
+                        onClick={() => {
+                          setChatInput("Help me find an expert security researcher to audit my smart contracts");
+                          setIsChatOpen(true);
+                          onSendMessage();
+                        }}
+                      >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
                           Security
                         </p>
@@ -465,7 +479,14 @@ const Page: FC = () => {
                           contracts
                         </p>
                       </div>
-                      <div className="p-4 rounded-[16px] border-[#8F95B2] border">
+                      <div 
+                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors"
+                        onClick={() => {
+                          setChatInput("Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents");
+                          setIsChatOpen(true);
+                          onSendMessage();
+                        }}
+                      >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
                           DeFi
                         </p>
