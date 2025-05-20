@@ -1,82 +1,143 @@
+'use client';
 import Link from "next/link";
 
 const Footer = () => {
   return (
     <>
-      <footer className="py-[64px] container mx-auto max-md:px-[20px]">
-        <div className="flex items-start justify-between flex-wrap max-md:gap-8">
-          <div className="md:basis-1/3 basis-full space-y-4">
-            <p className="text-[28px] leading-[32px] font-bold text-light-text-color">
-              Subscribe to our newsletter
-            </p>
-            <img
-              src="/assets/logo-icon.svg"
-              alt="logo"
-              className="w-[224px] h-[224px]"
-            />
-            <div className="border-b-[1px] border-b-[#4C4B47] px-0 py-2 flex items-center gap-2 max-w-[350px]">
+      <footer className="max-lg:mb-[40px] lg:container lg:mx-auto flex lg:flex-row flex-col items-start justify-start lg:gap-[156px] gap-[64px] lg:mb-[120px] max-lg:px-[16px]">
+        <div>
+          <h6 className="font-medium text-[18px] text-[#121212] mb-[40px]">
+            Join a Newsletter
+          </h6>
+          <div className="flex flex-col gap-6 mb-[40px]">
+            <label
+              htmlFor="newsletter"
+              className="text-[16px] font-light text-[#000]"
+            >
+              Email
+            </label>
+            <div className="flex items-center gap-5">
               <input
-                className="border-none outline-none text-[14px] text-light-text-color placeholder:text-placeholder-text w-full"
-                placeholder="you@email.com"
-                style={{ background: "none" }}
+                name="newsletter"
+                id="newsletter"
+                placeholder="Enter your email"
+                className="border-none bg-black/5 lg:p-6 p-3 rounded-[30px] placeholder:text-black/75 text-[16px] font-light text-[#000] outline-none"
               />
+              <button className="bg-gradient-to-r from-[#fff]/40 to-[#fff]/14 rounded-[40px] border-none outline-none font-medium text-[16px] text-primary py-4 px-8 cursor-pointer">
+                Subscribe
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link
+              href={`https://t.me/+V2yQK15ZYLw3YWU0`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="w-7 h-7 flex items-center justify-center rounded-full border border-black"
+            >
               <img
-                src="/assets/primary-arrow-icon.svg"
-                alt="primary"
-                className="w-3 h-[10px] flex-shrink-0"
+                src={"/assets/telegram-footer-icon.svg"}
+                alt="telegram"
+                className="w-5 h-5"
               />
-            </div>
+            </Link>
+            <Link
+              href={`https://x.com/EnsembleCodes`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="w-7 h-7 flex items-center justify-center rounded-full border border-black"
+            >
+              <img src={"/assets/x-footer-icon.svg"} alt="x" className="w-5 h-5" />
+            </Link>
+            <Link
+              href={`https://linktr.ee/ensemble.codes`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="w-7 h-7 flex items-center justify-center rounded-full border border-black"
+            >
+              <img
+                src={"/assets/linktree-footer-icon.svg"}
+                alt="linktree"
+                className="w-5 h-5"
+              />
+            </Link>
+            <Link
+              href={`https://www.linkedin.com/company/ensemble-codes`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="w-7 h-7 flex items-center justify-center rounded-full border border-black"
+            >
+              <img
+                src={"/assets/linkedin-footer-icon.svg"}
+                alt="linkedin"
+                className="w-5 h-5"
+              />
+            </Link>
+            <Link
+              href={`https://github.com/ensemble-codes`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="w-7 h-7 flex items-center justify-center rounded-full border border-black"
+            >
+              <img
+                src={"/assets/github-footer-icon.svg"}
+                alt="github"
+                className="w-5 h-5"
+              />
+            </Link>
           </div>
-          <div className="md:basis-1/3 basis-full flex items-start justify-between">
-            <div className="basis-1/2 flex flex-col items-baseline gap-3">
-              {[
-                {name: "GitHub", link: "https://github.com/ensemble-codes/ensemble-framework"},
-                {name: "SDK", link: "https://www.npmjs.com/package/@ensemble-ai/sdk"},
-                {name: "Python SDK", link: "https://github.com/ensemble-codes/ensemble-framework/tree/main/packages/python-sdk"},
-                {name: "Automation Docs", link: "https://docs.ensemble.codes/"},
-                {name: "Privacy Policy"},
-                {name: "Terms of Use"},
-              ].map(({name, link}, index) => (
-                <div key={`${name}-${index}`}>
-                  <Link
-                    href={link ?? "/"}
-                    rel="noreferrer noopener"
-                    target="_blank"
-                    className="text-light-text-color text-[18px] leading-[25.2px]"
-                  >
-                    {name}
-                  </Link>
-                </div>
-              ))}
-            </div>
-            <div className="basis-1/2 flex flex-col items-baseline gap-3">
-              {[{link: "https://x.com/EnsembleCodes", name: "X"}, {link: "https://t.me/+3AsQlbcpR-NkNGVk", name: "Telegram"}].map(({name, link}, index) => (
-                <div key={`${name}-${index}`}>
-                  <Link
-                    key={`${name}-${index}`}
-                    href={link ?? "/"}
-                    rel="noreferrer noopener"
-                    target="_blank"
-                    className="text-light-text-color text-[18px] leading-[25.2px]"
-                  >
-                    {name}
-                  </Link>
-                </div>
-              ))}
-            </div>
+        </div>
+        <div className="flex items-start lg:justify-start justify-between lg:gap-[156px] max-lg:w-full">
+          <div className="max-lg:basis-1/2">
+            <h6 className="font-medium text-[18px] text-[#121212] mb-[40px]">
+              Company
+            </h6>
+            <span className="text-[16px] block font-light leading-[100%] text-black/50 hover:text-black transition-colors duration-300 ease-in-out mb-5">
+              For any inquiries -
+            </span>
+            <Link
+              href={`mailto:hello@ensemble.codes`}
+              className="text-[16px] block font-light leading-[100%] text-black/50 hover:text-black transition-colors duration-300 ease-in-out mb-5"
+            >
+              hello@ensemble.codes
+            </Link>
           </div>
-          <div className="md:basis-1/4 basis-full space-y-4 text-left">
-            <div className="space-y-2">
-              <p className="text-placeholder-text text-[14px] leading-[19.2px]">
-                EMAIL US
-              </p>
-              <p className="text-alternate-black-text-color text-[14px] leading-[19.2px]">
-                hello@ensemble.codes
-              </p>
-            </div>
+          <div className="max-lg:basis-1/2 max-lg:text-end">
+            <h6 className="font-medium text-[18px] text-[#121212] mb-[40px]">
+              Support
+            </h6>
+            <Link
+              href={`https://t.me/+V2yQK15ZYLw3YWU0`}
+              target="_blank"
+              rel="noreferrer noopener nofollower"
+              className="text-[16px] block font-light leading-[100%] text-black/50 hover:text-black transition-colors duration-300 ease-in-out mb-5"
+            >
+              Help Center
+            </Link>
+            <span
+              onClick={() => {
+                document
+                  .getElementById("faq")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-[16px] block font-light leading-[100%] text-black/50 hover:text-black transition-colors duration-300 ease-in-out mb-5 cursor-pointer"
+            >
+              FAQs
+            </span>
           </div>
         </div>
       </footer>
+      <div className="container mx-auto mb-[120px] max-lg:px-[16px]">
+        <h6 className="text-[20px] text-primary font-medium">Agent Hub</h6>
+        <p className="font-normal text-[#8F95B2] text-[16px]">
+          © 2025 All rights reserved
+        </p>
+      </div>
+      <style jsx global>{`
+        .team-shadow {
+          box-shadow: 0px 1.67px 16.67px 0px rgba(143, 149, 178, 0.68);
+        }
+      `}</style>
     </>
   );
 };

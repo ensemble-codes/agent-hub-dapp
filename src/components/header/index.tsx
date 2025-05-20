@@ -1,5 +1,5 @@
 "use client";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useConnectModal, ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAccount, useDisconnect } from "wagmi";
@@ -49,23 +49,10 @@ const AppHeader = () => {
             DOCS
           </Link>
           {isConnected ? (
-            pathname.includes("register-agent") ? null : (
-              <button
-                className="w-fit space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                onClick={() => push(`/register-agent`)}
-              >
-                <span className="text-white text-[16px] font-[700] leading-[24px]">
-                  Register Agent
-                </span>
-                <img
-                  src="/assets/pixelated-arrow-icon.svg"
-                  alt="pixelated-arrow"
-                />
-              </button>
-            )
+              <ConnectButton showBalance={false} />
           ) : (
             <button
-              className="w-auto mt-6 space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+              className="w-auto space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
               onClick={openConnectModal}
             >
               <img src="/assets/connect-wallet-icon.svg" alt="connect-wallet" />

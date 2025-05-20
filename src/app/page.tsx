@@ -10,6 +10,13 @@ import { useChat } from "@/context/chat";
 export default function Home() {
   const { push } = useRouter();
   const [selectedProposal, setSelectedProposal] = useState<string | null>(null);
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedAddress(text);
+    setTimeout(() => setCopiedAddress(null), 1000);
+  };
 
   const GET_ALL_PROPOSALS = gql`
     query MyQuery {
@@ -63,6 +70,17 @@ export default function Home() {
     []
   );
 
+  const GET_ALL_AGENTS = gql`
+    query MyQuery {
+      agents {
+        id
+        tasks {
+          id
+        }
+      }
+    }
+  `;
+
   const GET_AGENTS = useMemo(
     () =>
       gql`
@@ -114,6 +132,7 @@ export default function Home() {
   const { data, loading } = useQuery(GET_AGENTS);
   const { data: proposalsData } = useQuery(GET_ALL_PROPOSALS);
   const { data: topAgentData } = useQuery(GET_TOP_AGENT);
+  const { data: allAgentsData } = useQuery(GET_ALL_AGENTS);
 
   const agents = [...(data?.agents || [])]?.sort(
     (a: any, b: any) => b.tasks.length - a.tasks.length
@@ -128,10 +147,15 @@ export default function Home() {
     return Array.from(proposals);
   }, [proposalsData]);
 
-  // Calculate total tasks across all agents
+  // Calculate total tasks across all agents, regardless of filter
   const totalTasks = useMemo(() => {
-    return agents.reduce((total, agent) => total + agent.tasks.length, 0);
-  }, [agents]);
+    return (
+      allAgentsData?.agents?.reduce(
+        (total: number, agent: any) => total + agent.tasks.length,
+        0
+      ) || 0
+    );
+  }, [allAgentsData?.agents]);
 
   const [chatState] = useChat();
 
@@ -162,13 +186,13 @@ export default function Home() {
                       className="w-8 h-8"
                     />
                   </div>
-                  <div className="relative">
+                  <div className="relative h-[180px]">
                     <img
                       src="/assets/featured-agent-bg.png"
                       alt="featured-bg"
-                      className="w-full object-cover rounded-[16px]"
+                      className="w-full object-cover rounded-[16px] h-full"
                     />
-                    <div className="absolute inset-0 p-4 flex flex-col justify-between">
+                    <div className="absolute inset-0 p-4 flex flex-col justify-between h-full">
                       <div className="flex items-start justify-between mb-1">
                         <div className="flex items-start gap-2 w-[70%] grow">
                           <img
@@ -186,7 +210,16 @@ export default function Home() {
                             <p className="text-white text-[24px] font-medium leading-[28px]">
                               {topAgentData.agent.name}
                             </p>
-                            <p className="font-normal text-[16px] leading-[19px] text-white">
+                            <p
+                              className={`font-normal text-[16px] leading-[19px] text-white cursor-pointer transition-opacity duration-100 ${
+                                copiedAddress === topAgentData.agent.id
+                                  ? "opacity-50"
+                                  : "opacity-100"
+                              }`}
+                              onClick={() =>
+                                copyToClipboard(topAgentData.agent.id)
+                              }
+                            >
                               {topAgentData.agent.id.slice(0, 4)}...
                               {topAgentData.agent.id.slice(-4)}
                             </p>
@@ -197,7 +230,7 @@ export default function Home() {
                             src="/assets/featured-agent-graph-icon.svg"
                             alt="graph"
                           />
-                          <p className="absolute right-0 bottom-0 font-semibold text-[12px] text-white">
+                          <p className="absolute right-[10px] bottom-0 font-semibold text-[12px] text-white">
                             {topAgentData.agent.tasks.length} tasks
                           </p>
                         </div>
@@ -246,20 +279,24 @@ export default function Home() {
                   <img src="/assets/ornament-pattern-icon.svg" alt="ornament" />
                   <img src="/assets/ornament-pattern-icon.svg" alt="ornament" />
                 </div>
-                <div className="relative rounded-[16px] shadow-[0px_4px_8px_0px_#12121266]">
+                <div className="relative rounded-[16px] shadow-[0px_4px_8px_0px_#12121266] h-[180px]">
                   <img
                     src="/assets/tasks-done-bg.png"
                     alt="tasks-done"
-                    className="w-full object-cover rounded-[16px]"
+                    className="w-full object-cover rounded-[16px] h-full"
                   />
-                  <div className="absolute left-0 bottom-0 p-4">
+                  <div className="absolute left-0 bottom-0 p-4 h-full">
                     <p className="text-[40px] font-medium text-primary">
                       {totalTasks.toLocaleString()}
                     </p>
                     <p className="text-[18px] font-normal text-white leading-[22px] mb-4">
                       tasks done
                     </p>
-                    <img src="/assets/tasks-done-icon.svg" alt="done" className="w-10 h-10" />
+                    <img
+                      src="/assets/tasks-done-icon.svg"
+                      alt="done"
+                      className="w-10 h-10"
+                    />
                   </div>
                 </div>
               </div>
@@ -312,6 +349,14 @@ export default function Home() {
                   ))}
                 </div>
               </div>
+              <hr
+                className="mb-6 border-[0.5px] border-[#8F95B2] w-[70%]"
+                style={{
+                  borderImageSource:
+                    "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                  borderImageSlice: "1",
+                }}
+              />
               {loading ? (
                 <Loader size="xl" />
               ) : (
@@ -358,7 +403,14 @@ export default function Home() {
                                   <p className="font-bold text-[16px] leading-[19px] text-text-color mb-2">
                                     {a.metadata.name}
                                   </p>
-                                  <p className="font-bold text-[14px] leading-[19px] text-light-text-color">
+                                  <p
+                                    className={`font-bold text-[14px] leading-[19px] text-light-text-color cursor-pointer transition-opacity duration-100 ${
+                                      copiedAddress === a.id
+                                        ? "opacity-50"
+                                        : "opacity-100"
+                                    }`}
+                                    onClick={() => copyToClipboard(a.id)}
+                                  >
                                     {a.id.slice(0, 4)}...
                                     {a.id.slice(-4)}
                                   </p>
@@ -380,6 +432,31 @@ export default function Home() {
                                   : "bg-[#C8E6FF]"
                               }`}
                             >
+                              {a.proposals[0].service === "Swap" ? (
+                                <img
+                                  src="/assets/defi-service-black-icon.svg"
+                                  alt={a.proposals[0].service}
+                                />
+                              ) : ["Bull-Post", "Bless Me"].includes(
+                                  a.proposals[0].service
+                                ) ? (
+                                <img
+                                  src="/assets/social-service-black-icon.svg"
+                                  alt={a.proposals[0].service}
+                                />
+                              ) : ["Trends", "Markets"].includes(
+                                  a.proposals[0].service
+                                ) ? (
+                                <img
+                                  src="/assets/research-service-black-icon.svg"
+                                  alt={a.proposals[0].service}
+                                />
+                              ) : (
+                                <img
+                                  src="/assets/security-service-black-icon.svg"
+                                  alt={a.proposals[0].service}
+                                />
+                              )}
                               <p className="font-bold text-[14px] leading-[19px] text-[#3D3D3D] truncate">
                                 {a.proposals[0].service}
                               </p>

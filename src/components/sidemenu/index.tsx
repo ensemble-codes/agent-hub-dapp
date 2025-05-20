@@ -30,23 +30,6 @@ const SideMenu = () => {
         </div>
         <div
           className={`p-4 rounded-[16px] ${
-            pathname === "/task-center" ? "bg-[#F5F5F5]" : ""
-          }`}
-        >
-          <Link href={"/task-center"}>
-            <img
-              src={
-                pathname === "/task-center"
-                  ? "/assets/task-center-highlighted-icon.svg"
-                  : "/assets/task-center-icon.svg"
-              }
-              alt="task-center"
-              className="w-6 h-6"
-            />
-          </Link>
-        </div>
-        <div
-          className={`p-4 rounded-[16px] ${
             pathname === "/" ? "bg-[#F5F5F5]" : ""
           }`}
         >
@@ -79,12 +62,29 @@ const SideMenu = () => {
             />
           </Link>
         </div>
+        <div
+          className={`p-4 rounded-[16px] ${
+            pathname === "/task-center" ? "bg-[#F5F5F5]" : ""
+          }`}
+        >
+          <Link href={"/task-center"}>
+            <img
+              src={
+                pathname === "/task-center"
+                  ? "/assets/task-center-highlighted-icon.svg"
+                  : "/assets/task-center-icon.svg"
+              }
+              alt="task-center"
+              className="w-6 h-6"
+            />
+          </Link>
+        </div>
         {isConnected ? (
           <div className={`p-4 rounded-[16px] mt-[48px]`}>
             <img
               src={"/assets/disconnect-icon.svg"}
               alt="disconnect"
-              className="w-6 h-6"
+              className="cursor-pointer w-6 h-6"
               onClick={() => disconnect()}
             />
           </div>

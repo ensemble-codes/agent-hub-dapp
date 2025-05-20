@@ -1,6 +1,7 @@
 "use client";
 import { AppHeader, SideMenu } from "@/components";
 import { useConsersation } from "@/context/chat/hooks";
+import { useChat } from "@/context/chat";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 
 const Page: FC = () => {
@@ -12,6 +13,7 @@ const Page: FC = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { getMessages, streamMessages, messages, send, loading } = useConsersation('0x5C02b4685492D36a40107B6eC48A91ab3f8875cb');
+  const [chatState, chatDispatch, initClient] = useChat();
 
   const stopStreamRef = useRef<() => void | null>(null);
 
@@ -39,9 +41,17 @@ const Page: FC = () => {
     if (!chatInput) return;
     setIsWaitingForResponse(true);
     setLastMessageTime(Date.now());
-    await send(chatInput);
-    setChatInput("");
-  }, [chatInput, send]);
+    try {
+      if (!chatState.client) {
+        await initClient();
+      }
+      await send(chatInput);
+      setChatInput("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setIsWaitingForResponse(false);
+    }
+  }, [chatInput, send, chatState.client, initClient]);
 
   // Listen for new messages to hide the typing indicator
   useEffect(() => {
@@ -449,22 +459,22 @@ const Page: FC = () => {
                     </p>
                     <div className="flex items-stretch justify-center gap-4 max-w-[755px] w-full">
                       <div 
-                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors"
+                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
                         onClick={() => {
                           setChatInput("Help me to hire an AI KoL for my project. The perfect Hype-man!");
                           setIsChatOpen(true);
                           onSendMessage();
                         }}
                       >
-                        <p className="cursor-pointer text-[16px] text-primary font-medium leading-[100%] mb-2">
+                        <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
                           Social
                         </p>
-                        <p className="cursor-pointer text-[16px] text-[#121212] font-normal leading-[100%]">
+                        <p className="text-[16px] text-[#121212] font-normal leading-[100%]">
                           Hire an AI KoL for your project. The perfect Hype-man!
                         </p>
                       </div>
                       <div 
-                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors"
+                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
                         onClick={() => {
                           setChatInput("Help me find an expert security researcher to audit my smart contracts");
                           setIsChatOpen(true);
@@ -480,7 +490,7 @@ const Page: FC = () => {
                         </p>
                       </div>
                       <div 
-                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors"
+                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
                         onClick={() => {
                           setChatInput("Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents");
                           setIsChatOpen(true);
