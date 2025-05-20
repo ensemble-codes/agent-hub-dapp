@@ -459,22 +459,22 @@ const Page: FC = () => {
                     </p>
                     <div className="flex items-stretch justify-center gap-4 max-w-[755px] w-full">
                       <div 
-                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors"
+                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
                         onClick={() => {
                           setChatInput("Help me to hire an AI KoL for my project. The perfect Hype-man!");
                           setIsChatOpen(true);
                           onSendMessage();
                         }}
                       >
-                        <p className="cursor-pointer text-[16px] text-primary font-medium leading-[100%] mb-2">
+                        <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
                           Social
                         </p>
-                        <p className="cursor-pointer text-[16px] text-[#121212] font-normal leading-[100%]">
+                        <p className="text-[16px] text-[#121212] font-normal leading-[100%]">
                           Hire an AI KoL for your project. The perfect Hype-man!
                         </p>
                       </div>
                       <div 
-                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors"
+                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
                         onClick={() => {
                           setChatInput("Help me find an expert security researcher to audit my smart contracts");
                           setIsChatOpen(true);
@@ -490,7 +490,7 @@ const Page: FC = () => {
                         </p>
                       </div>
                       <div 
-                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors"
+                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
                         onClick={() => {
                           setChatInput("Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents");
                           setIsChatOpen(true);
