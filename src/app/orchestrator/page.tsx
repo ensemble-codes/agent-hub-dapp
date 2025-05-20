@@ -1,6 +1,7 @@
 "use client";
 import { AppHeader, SideMenu } from "@/components";
 import { useConsersation } from "@/context/chat/hooks";
+import { useChat } from "@/context/chat";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 
 const Page: FC = () => {
@@ -12,6 +13,7 @@ const Page: FC = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { getMessages, streamMessages, messages, send, loading } = useConsersation('0x5C02b4685492D36a40107B6eC48A91ab3f8875cb');
+  const [chatState, chatDispatch, initClient] = useChat();
 
   const stopStreamRef = useRef<() => void | null>(null);
 
@@ -39,9 +41,17 @@ const Page: FC = () => {
     if (!chatInput) return;
     setIsWaitingForResponse(true);
     setLastMessageTime(Date.now());
-    await send(chatInput);
-    setChatInput("");
-  }, [chatInput, send]);
+    try {
+      if (!chatState.client) {
+        await initClient();
+      }
+      await send(chatInput);
+      setChatInput("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setIsWaitingForResponse(false);
+    }
+  }, [chatInput, send, chatState.client, initClient]);
 
   // Listen for new messages to hide the typing indicator
   useEffect(() => {
