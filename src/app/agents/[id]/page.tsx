@@ -83,44 +83,16 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
       <div className="flex items-start gap-4 pt-8">
         <SideMenu />
         <div className="grow w-full">
-          <p className="font-bold text-primary leading-[24px]">Agent Details</p>
-          <p className="text-light-text-color font-medium leading-[21px] mb-4">
-            View or assign agent!
-          </p>
           {loading ? (
             <Loader size="xl" />
           ) : agent && agent.agent ? (
-            <div className="flex items-start gap-4 w-full">
-              <div className="max-w-[720px] grow rounded-[10px] bg-gradient-to-r from-[rgba(255,255,255,0.4)] to-[rgba(255,255,255,0)] p-[1px]">
-                <div className="py-8 px-5 rounded-[10px] w-full shadow-[inset_5px_5px_10px_0px_#D8D8D8,inset_-5px_-5px_10px_0px_#FAFBFF] bg-[#FAFAFA]">
-                  <div className="flex w-full items-start justify-between mb-6">
-                    <div className="flex flex-start gap-4">
-                      <img
-                        className="w-[120px] h-[120px] rounded-full object-cover"
-                        src={
-                          agent.agent.metadata?.imageUri.startsWith("https://")
-                            ? agent.agent.metadata?.imageUri
-                            : `https://${agent.agent.metadata?.imageUri}`
-                        }
-                        alt={agent.agent.metadata?.name}
-                      />
-                      <div className="flex flex-col items-start gap-2">
-                        <p className="font-bold text-[#3d3d3d] text-[20px] leading-[auto]">
-                          {agent.agent.metadata?.name}
-                        </p>
-                        <p
-                          className="font-bold text-light-text-color text-[16px] leading-[auto] cursor-pointer flex items-center gap-1"
-                          onClick={() => copyToClipboard(agent.agent.id)}
-                          style={{
-                            transition: "all 0.3s ease",
-                            opacity: copied ? 0.6 : 1,
-                          }}
-                        >
-                          {agent.agent.id?.slice(0, 4)}...
-                          {agent.agent.id?.slice(-4)}
-                        </p>
-                      </div>
-                    </div>
+            <div className="flex items-stretch gap-4 w-full">
+              <div className="grow rounded-[10px]">
+                <div className="py-8 px-5 rounded-[10px] w-full bg-white">
+                  <div className="flex w-full items-start justify-between">
+                    <p className="text-primary text-[20px] leading-[24px] font-semibold">
+                      AGENT PROFILE
+                    </p>
                     <div className="flex items-center gap-1">
                       {agent.agent.metadata?.telegram ? (
                         <Link
@@ -163,122 +135,197 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       ) : null}
                     </div>
                   </div>
-                  <div className="mb-6">
-                    <p className="text-light-text-color font-medium leading-[100%] mb-3">
-                      About Agent
-                    </p>
-                    <p className="text-[14px] font-medium text-text-color">
-                      {agent.agent.metadata?.description}
-                    </p>
-                  </div>
                   <hr
-                    className="mb-6 border-[1px] border-[#8F95B2]"
+                    className="my-5 border-[1px] border-[#8F95B2]"
                     style={{
                       borderImageSource:
                         "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
                       borderImageSlice: "1",
                     }}
                   />
-                  <div className="mb-6">
-                    <p className="text-light-text-color font-medium leading-[100%] mb-3">
+                  <div className="flex w-full items-start justify-between mb-6 relative">
+                    <div className="flex flex-start gap-4">
+                      <img
+                        className="w-[120px] h-[120px] rounded-full object-cover"
+                        src={
+                          agent.agent.metadata?.imageUri.startsWith("https://")
+                            ? agent.agent.metadata?.imageUri
+                            : `https://${agent.agent.metadata?.imageUri}`
+                        }
+                        alt={agent.agent.metadata?.name}
+                      />
+                      <div className="flex flex-col items-start gap-2">
+                        <p className="font-bold text-[#3d3d3d] text-[20px] leading-[auto]">
+                          {agent.agent.metadata?.name}
+                        </p>
+                        <p
+                          className="font-bold text-light-text-color text-[16px] leading-[auto] cursor-pointer flex items-center gap-1"
+                          onClick={() => copyToClipboard(agent.agent.id)}
+                          style={{
+                            transition: "all 0.3s ease",
+                            opacity: copied ? 0.6 : 1,
+                          }}
+                        >
+                          {agent.agent.id?.slice(0, 4)}...
+                          {agent.agent.id?.slice(-4)}
+                        </p>
+                      </div>
+                    </div>
+                    <img
+                      src="/assets/profile-ornament.svg"
+                      alt="ornament"
+                      className="absolute w-[214px] h-[158px] right-[0px]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-primary font-medium leading-[100%]">
+                      About
+                    </p>
+                    <p className="text-[14px] font-medium text-[#121212]">
+                      {agent.agent.metadata?.description}
+                    </p>
+                  </div>
+                  <hr
+                    className="my-5 border-[1px] border-[#8F95B2]"
+                    style={{
+                      borderImageSource:
+                        "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                      borderImageSlice: "1",
+                    }}
+                  />
+                  <div className="space-y-2">
+                    <p className="text-primary font-medium leading-[100%]">
                       Capabilities
                     </p>
-                    <p className="text-[14px] font-medium text-text-color">
-                      {service?.service?.description}
-                    </p>
-                  </div>
-                  <div className="p-3 border border-light-text-color bg-white w-full rounded-[4px] flex items-start justify-between mb-6">
-                    <div className="flex flex-col items-center justify-center gap-1">
-                      <p className="flex items-center gap-1">
-                        <img
-                          src="/assets/agent-list-card-dollar-icon.svg"
-                          alt="dollar"
-                          className="w-4 h-4"
-                        />
-                        <span className="text-[14px] text-light-text-color font-bold">
-                          Price
-                        </span>
-                      </p>
-                      {agent.agent?.proposals?.length ? (
-                        <p className="font-bold leading-[19px] text-primary">
-                          {formatEther(agent.agent?.proposals[0].price)} ETH
-                        </p>
-                      ) : null}
-                    </div>
-                    <div className="flex flex-col items-center justify-center gap-1">
-                      <p className="flex items-center gap-1">
-                        <img
-                          src="/assets/agent-list-card-wrench-icon.svg"
-                          alt="wrench"
-                          className="w-4 h-4"
-                        />
-                        <span className="text-[14px] text-light-text-color font-bold">
-                          Tasks
-                        </span>
-                      </p>
-                      <p className="font-bold leading-[19px] text-text-color">
-                        {agent.agent.tasks.length}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-center justify-center gap-1">
-                      <p className="flex items-center gap-1">
-                        <img
-                          src="/assets/star-dull-icon.svg"
-                          alt="star"
-                          className="w-3 h-3"
-                        />
-                        <span className="text-[14px] text-light-text-color font-bold">
-                          Rating
-                        </span>
-                      </p>
-                      <p className="font-bold leading-[19px] text-text-color">
-                        {convertRatingToStars(agent.agent.reputation)}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-center justify-center gap-1">
-                      <p className="flex items-center gap-1">
-                        <img
-                          src="/assets/agent-list-card-pulse-icon.svg"
-                          alt="pulse"
-                          className="w-4 h-4"
-                        />
-                        <span className="text-[14px] text-light-text-color font-bold">
-                          Skills
-                        </span>
-                      </p>
-                      <p className="font-bold leading-[19px] text-text-color">
-                        {agent.agent.proposals &&
-                          agent.agent.proposals.length &&
-                          agent.agent.proposals[0].service}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    className="w-full space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                    onClick={() =>
-                      push(
-                        `/task-center?service=${agent.agent.proposals[0]?.service}&proposal=${agent.agent.proposals[0]?.id}`
-                      )
-                    }
-                  >
-                    <img
-                      src="/assets/bolt-icon.svg"
-                      alt="bolt"
-                      className="w-4 h-4"
-                    />
-                    <span className="text-white text-[18px] font-[700] leading-[24px]">
+                    <p className="text-[14px] font-medium text-text-color flex items-center gap-1">
+                      <img
+                        src="/assets/check-icon.svg"
+                        alt="check"
+                        className="w-4 h-4"
+                      />
                       {agent.agent.proposals &&
                         agent.agent.proposals.length &&
                         agent.agent.proposals[0].service}
-                    </span>
-                  </button>
+                    </p>
+                  </div>
+                  <hr
+                    className="my-5 border-[1px] border-[#8F95B2]"
+                    style={{
+                      borderImageSource:
+                        "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                      borderImageSlice: "1",
+                    }}
+                  />
+                  <div className="space-y-2">
+                    <p className="text-primary font-medium leading-[100%]">
+                      Stats
+                    </p>
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-start justify-center gap-1">
+                        <img
+                          src="/assets/price-tag-icon.svg"
+                          alt="price-tag"
+                          className="w-4 h-4 mt-[2px]"
+                        />
+                        <p className="flex flex-col items-start gap-1">
+                          <span className="text-[14px] text-light-text-color font-bold">
+                            Price
+                          </span>
+                          {agent.agent?.proposals?.length ? (
+                            <p className="font-bold leading-[19px] text-primary">
+                              {formatEther(agent.agent?.proposals[0].price)} ETH
+                            </p>
+                          ) : null}
+                        </p>
+                      </div>
+                      <div className="flex items-start justify-center gap-1">
+                        <img
+                          src="/assets/agent-list-card-wrench-icon.svg"
+                          alt="wrench"
+                          className="w-4 h-4 mt-[2px]"
+                        />{" "}
+                        <p className="flex flex-col items-start gap-1">
+                          <span className="text-[14px] text-light-text-color font-bold">
+                            Tasks
+                          </span>
+                          <p className="font-bold leading-[19px] text-text-color">
+                            {agent.agent.tasks.length}
+                          </p>
+                        </p>
+                      </div>
+                      <div className="flex items-start justify-center gap-1">
+                        <img
+                          src="/assets/star-dull-icon.svg"
+                          alt="star"
+                          className="w-4 h-4 mt-[2px]"
+                        />
+                        <p className="flex flex-col items-start gap-1">
+                          <span className="text-[14px] text-light-text-color font-bold">
+                            Rating
+                          </span>
+                          <p className="font-bold leading-[19px] text-text-color">
+                            {convertRatingToStars(agent.agent.reputation)}
+                          </p>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <hr
+                    className="my-5 border-[1px] border-[#8F95B2]"
+                    style={{
+                      borderImageSource:
+                        "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                      borderImageSlice: "1",
+                    }}
+                  />
+                  <div className="w-full flex items-center gap-4">
+                    <button
+                      className="w-full space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                      onClick={() =>
+                        push(
+                          `/task-center?service=${agent.agent.proposals[0]?.service}&proposal=${agent.agent.proposals[0]?.id}`
+                        )
+                      }
+                    >
+                      <img
+                        src="/assets/bolt-icon.svg"
+                        alt="bolt"
+                        className="w-4 h-4"
+                      />
+                      <span className="text-white text-[18px] font-[700] leading-[24px]">
+                        {agent.agent.proposals &&
+                          agent.agent.proposals.length &&
+                          agent.agent.proposals[0].service}
+                      </span>
+                    </button>
+                    <button
+                      className="w-full space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#121212]"
+                      onClick={() =>
+                        push(`/orchestrator?agent=${agent.agent.id}`)
+                      }
+                    >
+                      <img
+                        src="/assets/chat-icon.svg"
+                        alt="chat"
+                        className="w-4 h-4"
+                      />
+                      <span className="text-[#121212] text-[18px] font-[700] leading-[24px]">
+                        {"Chat with Agent"}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="flex-shrink-0 w-[275px] rounded-[10px] bg-gradient-to-r from-[rgba(255,255,255,0.4)] to-[rgba(255,255,255,0)] p-[1px]">
+              <div className="flex-shrink-0 w-[368px] rounded-[10px]">
                 <div
-                  className="h-[500px] overflow-auto p-4 rounded-[10px] w-full shadow-[inset_5px_5px_10px_0px_#D8D8D8,inset_-5px_-5px_10px_0px_#FAFBFF] bg-[#FAFAFA]"
+                  className="relative h-[545px] overflow-auto p-4 rounded-[10px] w-full bg-white z-[1]"
                   style={{ scrollbarWidth: "none" }}
                 >
+                  {/* <img
+                    src="/assets/past-works-icon.svg"
+                    alt="past-work"
+                    className="absolute z-[-1]"
+                  /> */}
                   <div className="flex items-center gap-2">
                     <img
                       src="/assets/task-history-icon.svg"
@@ -304,7 +351,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                     )
                     .map((td: any, index: number) => (
                       <>
-                        <div key={`${td.id}-${td.prompt}`}>
+                        <div key={`${td.id}-${td.prompt}`} className="z-[1]">
                           <Link
                             href={`/tasks/${td.id}`}
                             className="flex items-center justify-between"

@@ -42,22 +42,30 @@ export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
         (message: string) => signMessageAsync({ message })
       );
 
-      try {
-        let xmtpClient = await Client.create(signer, {
-          env: "production",
-        });
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          let xmtpClient = await Client.create(signer, {
+            env: "production",
+          });
 
-        dispatch({
-          type: SET_CHAT_CLIENT,
-          payload: xmtpClient,
-        });
-      } catch (e) {
-        dispatch({
-          type: SET_CHAT_CLIENT,
-          payload: undefined,
-        });
-
-        console.error("Error creating XMTP client", e);
+          dispatch({
+            type: SET_CHAT_CLIENT,
+            payload: xmtpClient,
+          });
+          break;
+        } catch (e) {
+          console.error(`Error creating XMTP client (attempts left: ${retries})`, e);
+          retries--;
+          if (retries === 0) {
+            dispatch({
+              type: SET_CHAT_CLIENT,
+              payload: undefined,
+            });
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+          }
+        }
       }
     }
   }, [account.address, data?.account]);

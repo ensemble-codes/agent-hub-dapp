@@ -1,0 +1,23 @@
+import { openai } from "@ai-sdk/openai";
+import { frontendTools } from "@assistant-ui/react-ai-sdk";
+import { streamText } from "ai";
+
+export const runtime = "edge";
+export const maxDuration = 30;
+
+export async function POST(req: Request) {
+  const { messages, system, tools } = await req.json();
+
+  // Stream the AI response directly
+  const result = streamText({
+    model: openai("gpt-4"),
+    messages,
+    toolCallStreaming: true,
+    system,
+    tools: {
+      ...frontendTools(tools),
+    },
+  });
+
+  return result.toDataStreamResponse();
+}
