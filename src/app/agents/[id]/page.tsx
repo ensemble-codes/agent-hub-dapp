@@ -80,20 +80,20 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   return (
     <div>
       <AppHeader />
-      <div className="flex items-start gap-4 pt-8">
+      <div className="flex items-start gap-4 lg:pt-8">
         <SideMenu />
         <div className="grow w-full">
           {loading ? (
             <Loader size="xl" />
           ) : agent && agent.agent ? (
-            <div className="flex items-stretch gap-4 w-full">
+            <div className="flex lg:flex-row flex-col items-stretch gap-4 w-full">
               <div className="grow rounded-[10px]">
-                <div className="py-8 px-5 rounded-[10px] w-full bg-white">
-                  <div className="flex w-full items-start justify-between">
+                <div className="lg:py-8 lg:px-5 rounded-[10px] w-full lg:bg-white">
+                  <div className="flex w-full items-start justify-between mb-4 lg:mb-0">
                     <p className="text-primary text-[20px] leading-[24px] font-semibold">
                       AGENT PROFILE
                     </p>
-                    <div className="flex items-center gap-1">
+                    <div className="lg:flex items-center gap-1 hidden">
                       {agent.agent.metadata?.telegram ? (
                         <Link
                           href={agent.agent.metadata?.telegram}
@@ -136,7 +136,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                     </div>
                   </div>
                   <hr
-                    className="my-5 border-[1px] border-[#8F95B2]"
+                    className="lg:block hidden my-5 border-[1px] border-[#8F95B2]"
                     style={{
                       borderImageSource:
                         "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
@@ -278,7 +278,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       borderImageSlice: "1",
                     }}
                   />
-                  <div className="w-full flex items-center gap-4">
+                  <div className="w-full flex lg:flex-row flex-col items-center gap-4">
                     <button
                       className="w-full space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                       onClick={() =>
@@ -316,9 +316,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                   </div>
                 </div>
               </div>
-              <div className="flex-shrink-0 w-[368px] rounded-[10px]">
+              <div className="flex-shrink-0 lg:w-[368px] w-full rounded-[10px]">
                 <div
-                  className="relative h-[545px] overflow-auto p-4 rounded-[10px] w-full bg-white z-[1]"
+                  className="relative lg:h-[545px] overflow-auto lg:p-4 rounded-[10px] w-full lg:bg-white z-[1]"
                   style={{ scrollbarWidth: "none" }}
                 >
                   {/* <img
@@ -332,7 +332,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       alt="task-history"
                       className="w-6 h-6"
                     />
-                    <p className="text-light-text-color font-medium">
+                    <p className="text-light-text-color font-bold">
                       Task History
                     </p>
                   </div>
@@ -356,7 +356,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             href={`/tasks/${td.id}`}
                             className="flex items-center justify-between"
                           >
-                            <p className="text-light-text-color font-[500] max-w-[12ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                            <p className="text-light-text-color font-[500] lg:max-w-[12ch] max-w-[20ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
                               {td.prompt}
                             </p>
                             <p

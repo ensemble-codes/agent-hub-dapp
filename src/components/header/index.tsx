@@ -1,19 +1,15 @@
 "use client";
 import { useConnectModal, ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useAccount, useDisconnect } from "wagmi";
+import { useAccount } from "wagmi";
 
 const AppHeader = () => {
   const { openConnectModal } = useConnectModal();
-  const { address, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
-  const { push } = useRouter();
-  const pathname = usePathname();
+  const { isConnected } = useAccount();
 
   return (
     <>
-      <div className="w-full flex items-center justify-between py-2 px-4 bg-white rounded-[16px]">
+      <div className="hidden w-full lg:flex items-center justify-between py-2 px-4 bg-white rounded-[16px]">
         <Link
           href={"/"}
         >

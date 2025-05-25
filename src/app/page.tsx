@@ -163,12 +163,13 @@ export default function Home() {
     <>
       <div>
         <AppHeader />
-        <div className="flex items-start gap-4 pt-8">
+        <div className="flex items-start gap-4 lg:pt-8">
           <SideMenu />
           <div className="grow w-full ">
-            <div className="flex items-stretch gap-6 mb-6 w-full">
+            <h1 className="lg:hidden text-[24px] font-semibold text-primary mb-4" style={{ textShadow: '0px 4px 12px #F94D2733' }}>MarketPlace</h1>
+            <div className="flex items-stretch gap-6 mb-6 w-full overflow-x-auto">
               {topAgentData ? (
-                <div className="basis-[calc(50%-12px)] flex flex-col justify-between bg-white rounded-[16px] border-[0.5px] border-[#CADFF4]">
+                <div className="basis-[calc(50%-12px)] min-w-[318px] flex flex-col justify-between bg-white rounded-[16px] border-[0.5px] border-[#CADFF4]">
                   <div className="flex items-center justify-between py-2 px-4">
                     <div className="flex items-center gap-2">
                       <img
@@ -272,7 +273,7 @@ export default function Home() {
                   </div>
                 </div>
               ) : null}
-              <div className="basis-[calc(50%-12px)]">
+              <div className="basis-[calc(50%-12px)] min-w-[318px]">
                 <div className="mb-2 flex items-center">
                   <img src="/assets/ornament-pattern-icon.svg" alt="ornament" />
                   <img src="/assets/ornament-pattern-icon.svg" alt="ornament" />
@@ -301,12 +302,12 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="p-6 rounded-[16px] bg-white">
-              <div className="w-full flex items-center justify-between mb-6">
-                <div className="flex items-center justify-start gap-3 flex-wrap">
+            <div className="lg:p-6 rounded-[16px] lg:bg-white">
+              <div className="w-full flex items-center justify-between lg:mb-6 mb-4 overflow-x-auto">
+                <div className="flex items-center justify-start gap-3">
                   <div
                     onClick={() => setSelectedProposal(null)}
-                    className={`px-4 py-2 rounded-[200px] cursor-pointer ${
+                    className={`px-4 py-2 rounded-[200px] flex-shrink-0 cursor-pointer ${
                       selectedProposal === null
                         ? "border-primary border"
                         : "border-[#8F95B2] border-[0.5px]"
@@ -330,7 +331,7 @@ export default function Home() {
                           proposal === selectedProposal ? null : proposal
                         )
                       }
-                      className={`px-4 py-2 rounded-[200px] cursor-pointer ${
+                      className={`px-4 py-2 rounded-[200px] flex-shrink-0 cursor-pointer ${
                         proposal === selectedProposal
                           ? "border-primary border"
                           : "border-[#8F95B2] border-[0.5px]"
@@ -350,7 +351,7 @@ export default function Home() {
                 </div>
               </div>
               <hr
-                className="mb-6 border-[0.5px] border-[#8F95B2] w-[70%]"
+                className="lg:mb-6 mb-4 border-[0.5px] border-[#8F95B2] w-[70%]"
                 style={{
                   borderImageSource:
                     "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",

@@ -8,4 +8,6 @@ export { default as GoogleTagManager } from "./googletagmanager";
 export { default as Wrapper } from "./wrapper";
 export { default as Modal } from "./modal";
 export { Switch } from "./switch";
+export { default as MobileHeader } from "./mobile-header";
+export { default as MobileFooter } from "./mobile-footer";
 export * from "./homepage";

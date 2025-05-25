@@ -156,20 +156,24 @@ const PageContent: FC = () => {
     <>
       <div>
         <AppHeader />
-        <div className="flex items-start gap-4 pt-8">
+        <div className="flex items-start gap-4 lg:pt-8">
           <SideMenu />
-          <div className="grow w-full !h-[800px] bg-white rounded-[16px] p-4 border-[0.5px] border-[#8F95B2] relative overflow-hidden">
+          <div className="grow w-full lg:!h-[800px] lg:bg-white rounded-[16px] p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
             <img
               src="/assets/orchestrator-pattern-bg.svg"
               alt="pattern"
-              className="absolute left-0 bottom-0 w-full"
+              className="lg:block hidden absolute left-0 bottom-0 w-full"
             />
             <div className="flex flex-col w-full h-full">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {isChatOpen ? (
                     <>
-                      <Link href={`/agents/${agentData && agentData.agent && agentData.agent.id}`}>
+                      <Link
+                        href={`/agents/${
+                          agentData && agentData.agent && agentData.agent.id
+                        }`}
+                      >
                         <div className="relative">
                           <img
                             src={
@@ -317,7 +321,7 @@ const PageContent: FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center mt-[128px]">
+                <div className="flex flex-col items-center justify-center lg:mt-[128px] mt-[72px]">
                   <div className="flex flex-col gap-2 items-center justify-center mb-8">
                     <img
                       src={
@@ -332,7 +336,7 @@ const PageContent: FC = () => {
                       alt="mascot"
                       className="w-[120px] h-[120px] rounded-full object-cover"
                     />
-                    <p className="text-[18px] text-primary font-medium leading-[100%]">
+                    <p className="text-[18px] text-primary text-center font-medium leading-[100%]">
                       Hi, I'm{" "}
                       {agentData && agentData.agent
                         ? agentData.agent?.metadata?.name
@@ -376,7 +380,7 @@ const PageContent: FC = () => {
                       />
                     </div>
                   </div>
-                  <div className="flex items-center gap-6 mb-8">
+                  <div className="flex items-center gap-6 mb-8 lg:flex-nowrap flex-wrap">
                     <button className="p-2 flex items-center gap-2 border border-[#8F95B2] rounded-[20000px]">
                       <img
                         src="/assets/agenthub-gray-icon.svg"
@@ -432,47 +436,24 @@ const PageContent: FC = () => {
                     <p className="text-[16px] font-normal text-[#8F95B2] leading-[100%]">
                       Starter Prompts
                     </p>
-                    <div className="flex items-stretch justify-center gap-4 max-w-[755px] w-full">
-                      <HoverCard>
-                        <HoverCardTrigger asChild>
-                          <div
-                            className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
-                            onClick={() => {
-                              setChatInput(
-                                "Help me to hire an AI KoL for my project. The perfect Hype-man!"
-                              );
-                              setIsChatOpen(true);
-                              onSendMessage();
-                            }}
-                          >
-                            <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
-                              Social
-                            </p>
-                            <p className="text-[16px] text-[#121212] font-normal leading-[100%]">
-                              Hire an AI KoL for your project. The perfect
-                              Hype-man!
-                            </p>
-                          </div>
-                        </HoverCardTrigger>
-                        <HoverCardContent className="w-80">
-                          <div className="flex justify-between space-x-4">
-                            <div className="space-y-1">
-                              <h4 className="text-sm font-semibold">
-                                AI KoL Hiring
-                              </h4>
-                              <p className="text-sm text-muted-foreground">
-                                Find the perfect AI influencer to promote your
-                                project. Get help with:
-                              </p>
-                              <ul className="text-sm text-muted-foreground list-disc list-inside">
-                                <li>Content strategy</li>
-                                <li>Audience targeting</li>
-                                <li>Engagement metrics</li>
-                              </ul>
-                            </div>
-                          </div>
-                        </HoverCardContent>
-                      </HoverCard>
+                    <div className="flex lg:flex-row flex-col items-stretch justify-center gap-4 max-w-[755px] w-full">
+                      <div
+                        className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
+                        onClick={() => {
+                          setChatInput(
+                            "Help me to hire an AI KoL for my project. The perfect Hype-man!"
+                          );
+                          setIsChatOpen(true);
+                          onSendMessage();
+                        }}
+                      >
+                        <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
+                          Social
+                        </p>
+                        <p className="text-[16px] text-[#121212] font-normal leading-[100%]">
+                          Hire an AI KoL for your project. The perfect Hype-man!
+                        </p>
+                      </div>
                       <div
                         className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
                         onClick={() => {

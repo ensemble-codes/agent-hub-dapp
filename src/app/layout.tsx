@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { GoogleAnalytics } from '@next/third-parties/google'
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Footer, Wrapper } from "@/components";
+import { Footer, MobileFooter, MobileHeader, Wrapper } from "@/components";
 import OnchainProvider from "@/components/onchainconfig/provider";
 import { AppContextProvider } from "@/context/app";
-import '@rainbow-me/rainbowkit/styles.css';
+import "@rainbow-me/rainbowkit/styles.css";
 import { ChatContextProvider } from "@/context/chat";
 
 const geistSans = Geist({
@@ -54,10 +54,12 @@ export default function RootLayout({
           <AppContextProvider>
             <ChatContextProvider>
               <Wrapper>
-                <main className="py-[124px] container mx-auto flex-1 max-md:px-[20px]">
+                <MobileHeader />
+                <main className="lg:py-[124px] py-[36px] container mx-auto flex-1 max-md:px-[20px]">
                   {children}
                 </main>
                 <Footer />
+                <MobileFooter />
               </Wrapper>
             </ChatContextProvider>
           </AppContextProvider>

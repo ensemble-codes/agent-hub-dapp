@@ -9,7 +9,7 @@ const SideMenu = () => {
   const { disconnect } = useDisconnect();
 
   return (
-    <div className="sticky top-[124px] flex-shrink-0">
+    <div className="hidden lg:block sticky top-[124px] flex-shrink-0">
       <div className="p-4 bg-white rounded-[16px] w-full flex flex-col items-start justify-between">
         <div
           className={`p-4 rounded-[16px] ${
