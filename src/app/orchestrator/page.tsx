@@ -36,7 +36,7 @@ const PageContent: FC = () => {
     () => gql`
       query MyQuery {
         agent(id: "${
-          agentAddress || "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184"
+          agentAddress || "0x5C02b4685492D36a40107B6eC48A91ab3f8875cb"
         }") {
           id
           metadata {
