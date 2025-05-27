@@ -97,16 +97,19 @@ const PageContent: FC = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const onSendMessage = useCallback(async () => {
-    if (!chatInput || isWaitingForResponse) return;
+  const onSendMessage = useCallback(async (input?: string) => {
+    if (isWaitingForResponse) return;
+    const sendInput = input || chatInput;
+    if (!sendInput) return;
+    
     setIsWaitingForResponse(true);
     setLastMessageTime(Date.now());
     try {
       if (!chatState.client) {
         await initClient();
-        await send(chatInput);
+        await send(sendInput);
       } else {
-        await send(chatInput);
+        await send(sendInput);
       }
       setChatInput("");
     } catch (error) {
@@ -152,6 +155,8 @@ const PageContent: FC = () => {
     };
   }, [getMessages, startStream, stopStream]);
 
+  console.log(agentData);
+
   return (
     <>
       <div>
@@ -171,7 +176,7 @@ const PageContent: FC = () => {
                     <>
                       <Link
                         href={`/agents/${
-                          agentData && agentData.agent && agentData.agent.id
+                          agentData && agentData.agent && agentData.agent.id || '0x5C02b4685492D36a40107B6eC48A91ab3f8875cb'
                         }`}
                       >
                         <div className="relative">
@@ -209,7 +214,7 @@ const PageContent: FC = () => {
                   ) : null}
                 </div>
               </div>
-              {isChatOpen ? (
+              {isChatOpen || agentAddress ? (
                 <>
                   <div className="w-full h-[94%] flex flex-col items-start justify-between gap-[20px]">
                     <div
@@ -444,7 +449,7 @@ const PageContent: FC = () => {
                             "Help me to hire an AI KoL for my project. The perfect Hype-man!"
                           );
                           setIsChatOpen(true);
-                          onSendMessage();
+                          onSendMessage("Help me to hire an AI KoL for my project. The perfect Hype-man!");
                         }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
@@ -461,7 +466,7 @@ const PageContent: FC = () => {
                             "Help me find an expert security researcher to audit my smart contracts"
                           );
                           setIsChatOpen(true);
-                          onSendMessage();
+                          onSendMessage("Help me find an expert security researcher to audit my smart contracts");
                         }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
@@ -479,7 +484,7 @@ const PageContent: FC = () => {
                             "Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents"
                           );
                           setIsChatOpen(true);
-                          onSendMessage();
+                          onSendMessage("Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents");
                         }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
