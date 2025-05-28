@@ -90,29 +90,37 @@ export function useConsersation(address?: string) {
 
     if (!converstion) return noop;
 
-    const stream = await converstion.stream(
-      (error: Error | null, message: DecodedMessage | undefined) => {
-        if (error) {
-          console.error("Error streaming messages", error);
-          return;
-        }
+    try {
+      const stream = await converstion.stream(
+        (error: Error | null, message: DecodedMessage | undefined) => {
+          if (error) {
+            console.error("Error streaming messages", error);
+            return;
+          }
 
-        
-        if (message) {
-          const formattedMessage = formatMessage(message);
-          if (!formattedMessage) return;
-          
-          setMessages((prev) => [...prev, formattedMessage]);
+          if (message) {
+            const formattedMessage = formatMessage(message);
+            if (!formattedMessage) return;
+            
+            setMessages((prev) => [...prev, formattedMessage]);
+          }
         }
-      }
-    );
+      );
 
-    return stream
-      ? () => {
-          stream.return(undefined);
-        }
-      : noop;
-  }, [converstion]);
+      return stream
+        ? () => {
+            try {
+              stream.return(undefined);
+            } catch (e) {
+              console.error("Error closing stream", e);
+            }
+          }
+        : noop;
+    } catch (e) {
+      console.error("Error setting up stream", e);
+      return noop;
+    }
+  }, [converstion, formatMessage]);
 
   return {
     getMessages,
