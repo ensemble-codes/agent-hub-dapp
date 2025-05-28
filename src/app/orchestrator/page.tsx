@@ -19,11 +19,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import { useSearchParams } from "next/navigation";
 import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
@@ -61,7 +56,6 @@ const PageContent: FC = () => {
 
   const { data: agentData } = useQuery(GET_AGENT);
 
-  // const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
@@ -96,6 +90,27 @@ const PageContent: FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  // Initialize client and load messages
+  useEffect(() => {
+    const initializeChat = async () => {
+      try {
+        if (!chatState.client) {
+          await initClient();
+        }
+        await getMessages();
+        await startStream();
+      } catch (error) {
+        console.error('Error initializing chat:', error);
+      }
+    };
+
+    initializeChat();
+
+    return () => {
+      stopStream();
+    };
+  }, [chatState.client, initClient, getMessages, startStream, stopStream]);
 
   const onSendMessage = useCallback(async (input?: string) => {
     if (isWaitingForResponse) return;
@@ -140,22 +155,6 @@ const PageContent: FC = () => {
       return () => clearTimeout(timeout);
     }
   }, [isWaitingForResponse]);
-
-  useEffect(() => {
-    const loadMessages = async () => {
-      stopStream();
-      await getMessages();
-      await startStream();
-    };
-
-    loadMessages();
-
-    return () => {
-      stopStream();
-    };
-  }, [getMessages, startStream, stopStream]);
-
-  console.log(agentData);
 
   return (
     <>
@@ -288,7 +287,8 @@ const PageContent: FC = () => {
                             e.key === "Enter" &&
                             !e.shiftKey &&
                             chatInput.trim() &&
-                            !isWaitingForResponse
+                            !isWaitingForResponse &&
+                            chatState.client
                           ) {
                             e.preventDefault();
                             onSendMessage();
@@ -305,7 +305,7 @@ const PageContent: FC = () => {
                                   ? "opacity-50 cursor-not-allowed"
                                   : "cursor-pointer"
                               }`}
-                              onClick={() => {
+                              onClick={!chatState.client ? undefined : () => {
                                 if (chatInput.trim() && !isWaitingForResponse) {
                                   onSendMessage();
                                 }
@@ -362,7 +362,8 @@ const PageContent: FC = () => {
                         if (
                           e.key === "Enter" &&
                           !e.shiftKey &&
-                          chatInput.trim()
+                          chatInput.trim() &&
+                          chatState.client
                         ) {
                           e.preventDefault();
                           setIsChatOpen(true);
@@ -372,7 +373,7 @@ const PageContent: FC = () => {
                     />
                     <div
                       className="basis-[10%] border-l-[1px] border-l-[#8F95B2] flex items-center justify-center"
-                      onClick={() => {
+                      onClick={!chatState.client ? undefined : () => {
                         if (chatInput.trim()) {
                           setIsChatOpen(true);
                           onSendMessage();
@@ -444,13 +445,11 @@ const PageContent: FC = () => {
                     <div className="flex lg:flex-row flex-col items-stretch justify-center gap-4 max-w-[755px] w-full">
                       <div
                         className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
-                        onClick={() => {
-                          setChatInput(
-                            "Help me to hire an AI KoL for my project. The perfect Hype-man!"
-                          );
+                        onClick={!chatState.client ? undefined : async () => {
                           setIsChatOpen(true);
                           onSendMessage("Help me to hire an AI KoL for my project. The perfect Hype-man!");
                         }}
+                        style={{ opacity: !chatState.client ? 0.7 : 1 }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
                           Social
@@ -461,13 +460,11 @@ const PageContent: FC = () => {
                       </div>
                       <div
                         className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
-                        onClick={() => {
-                          setChatInput(
-                            "Help me find an expert security researcher to audit my smart contracts"
-                          );
+                        onClick={!chatState.client ? undefined : async () => {
                           setIsChatOpen(true);
                           onSendMessage("Help me find an expert security researcher to audit my smart contracts");
                         }}
+                        style={{ opacity: !chatState.client ? 0.7 : 1 }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
                           Security
@@ -479,13 +476,11 @@ const PageContent: FC = () => {
                       </div>
                       <div
                         className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
-                        onClick={() => {
-                          setChatInput(
-                            "Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents"
-                          );
+                        onClick={!chatState.client ? undefined : async () => {
                           setIsChatOpen(true);
                           onSendMessage("Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents");
                         }}
+                        style={{ opacity: !chatState.client ? 0.7 : 1 }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
                           DeFi
