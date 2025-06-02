@@ -4,7 +4,7 @@ import { Conversation, DecodedMessage } from "@xmtp/browser-sdk";
 
 export function useConsersation(address?: string) {
   const [chatState] = useChat();
-  const [converstion, setConverstion] = useState<Conversation | null>(null);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [sending, setSending] = useState(false);
@@ -23,7 +23,7 @@ export function useConsersation(address?: string) {
         identifier: address.toLowerCase(),
       });
 
-      setConverstion(dmConversation);
+      setConversation(dmConversation);
     };
 
     getConversation();
@@ -47,51 +47,51 @@ export function useConsersation(address?: string) {
   }, [indexId])
 
   const getMessages = useCallback(async () => {
-    if (!converstion) return;
+    if (!conversation) return;
 
     try {
-      const msgs = (await converstion.messages()) ?? [];
+      const msgs = (await conversation.messages()) ?? [];
       const formattedMessages = msgs.map(formatMessage).filter((msg) => msg !== null);
       setMessages(formattedMessages);
     } finally {
       setLoading(false);
     }
-  }, [converstion]);
+  }, [conversation]);
 
   const sync = useCallback(async () => {
-    if (!converstion) return;
+    if (!conversation) return;
 
     setSyncing(true);
 
     try {
-      await converstion.sync();
+      await conversation.sync();
     } finally {
       setSyncing(false);
     }
-  }, [converstion]);
+  }, [conversation]);
 
   const send = useCallback(
     async (message: string) => {
-      if (!converstion) return;
+      if (!conversation) return;
 
       setSending(true);
 
       try {
-        await converstion.send(message);
+        await conversation.send(message);
       } finally {
         setSending(false);
       }
     },
-    [converstion]
+    [conversation]
   );
 
   const streamMessages = useCallback(async () => {
     const noop = () => {};
 
-    if (!converstion) return noop;
+    if (!conversation) return noop;
 
     try {
-      const stream = await converstion.stream(
+      const stream = await conversation.stream(
         (error: Error | null, message: DecodedMessage | undefined) => {
           if (error) {
             console.error("Error streaming messages", error);
@@ -120,11 +120,11 @@ export function useConsersation(address?: string) {
       console.error("Error setting up stream", e);
       return noop;
     }
-  }, [converstion, formatMessage]);
+  }, [conversation, formatMessage]);
 
   return {
     getMessages,
-    converstion,
+    conversation,
     loading,
     syncing,
     sending,

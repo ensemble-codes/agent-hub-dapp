@@ -6,25 +6,32 @@ import {
   Dispatch,
   useContext,
   useCallback,
+  useEffect,
 } from "react";
 import { Action } from "../app/action";
 import { useAccount, useSignMessage, useWalletClient } from "wagmi";
-import { Client } from "@xmtp/browser-sdk";
+import { ReactionCodec } from "@xmtp/content-type-reaction";
+import { RemoteAttachmentCodec } from "@xmtp/content-type-remote-attachment";
+import { ReplyCodec } from "@xmtp/content-type-reply";
+import { TransactionReferenceCodec } from "@xmtp/content-type-transaction-reference";
+import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import { useLocalStorage } from "@mantine/hooks";
+import { Client, ClientOptions } from "@xmtp/browser-sdk";
 import initialState, { ChatState } from "./state";
 import { SET_CHAT_CLIENT } from "./actions";
 import { createEOASigner } from "@/utils";
 import reducer from "./reducer";
+import { hexToUint8Array } from "uint8array-extras";
 
 interface ContextProps {
   children: React.ReactNode;
 }
 
-type ChatContextType = [ChatState, Dispatch<Action>, () => Promise<void>];
+type ChatContextType = [ChatState, Dispatch<Action>];
 
 export const ChatContext = createContext<ChatContextType>([
   initialState,
-  () => {},
-  async () => {}
+  () => {}
 ]);
 
 export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
@@ -32,6 +39,23 @@ export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
   const account = useAccount();
   const { data } = useWalletClient();
   const { signMessageAsync } = useSignMessage();
+  const [encryptionKey, setEncryptionKey] = useLocalStorage({
+    key: "XMTP_ENCRYPTION_KEY",
+    defaultValue: "",
+    getInitialValueInEffect: false,
+  });
+  const [loggingLevel, setLoggingLevel] = useLocalStorage<
+    ClientOptions["loggingLevel"]
+  >({
+    key: "XMTP_LOGGING_LEVEL",
+    defaultValue: "off",
+    getInitialValueInEffect: false,
+  });
+  const [dbPath, setDbPath] = useLocalStorage({
+    key: "XMTP_DB_PATH",
+    defaultValue: `xmtp-${account.address}.db3`,
+    getInitialValueInEffect: false
+  })
 
   const initClient = useCallback(async () => {
     const connector = account.connector;
@@ -47,7 +71,19 @@ export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
         try {
           let xmtpClient = await Client.create(signer, {
             env: "production",
+            loggingLevel,
+            dbEncryptionKey: hexToUint8Array(encryptionKey),
+            dbPath,
+            codecs: [
+              new ReactionCodec(),
+              new ReplyCodec(),
+              new RemoteAttachmentCodec(),
+              new TransactionReferenceCodec(),
+              new WalletSendCallsCodec(),
+            ],
           });
+
+          console.log({ xmtpClient });
 
           dispatch({
             type: SET_CHAT_CLIENT,
@@ -70,8 +106,16 @@ export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
     }
   }, [account.address, data?.account]);
 
+  // Initialize XMTP client when wallet connects
+  useEffect(() => {
+    if (account.isConnected && !state.client) {
+      console.log(account);
+      initClient();
+    }
+  }, [account.isConnected, state.client, initClient]);
+
   return (
-    <ChatContext.Provider value={[state, dispatch, initClient]}>
+    <ChatContext.Provider value={[state, dispatch]}>
       {children}
     </ChatContext.Provider>
   );

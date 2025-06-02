@@ -3,17 +3,13 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: "SpaceRanger";
-  src: url("/fonts/spaceranger.ttf") format("truetype");
-}
-@font-face {
-  font-family: "Satoshi";
-  src: url("/fonts/Satoshi-Variable.ttf") format("truetype");
+  font-family: "Graphik";
+  src: url("/fonts/GraphikRegular.otf") format("opentype");
 }
 
 body {
   background: #F9F9F9;
-  font-family: "Satoshi";
+  font-family: "Graphik";
 }
 
 * {
