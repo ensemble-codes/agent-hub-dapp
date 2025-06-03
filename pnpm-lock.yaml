@@ -26,6 +26,9 @@ importers:
       '@ensemble-ai/sdk':
         specifier: ^0.3.2
         version: 0.3.2(@types/node@20.17.17)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@mantine/hooks':
+        specifier: ^8.0.2
+        version: 8.0.2(react@19.0.0)
       '@next/third-parties':
         specifier: ^15.2.4
         version: 15.2.4(next@15.2.4(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
@@ -57,8 +60,32 @@ importers:
         specifier: ^15.5.13
         version: 15.5.13
       '@xmtp/browser-sdk':
-        specifier: 2.0.3
+        specifier: ^2.0.3
         version: 2.0.3
+      '@xmtp/content-type-group-updated':
+        specifier: ^2.0.2
+        version: 2.0.2
+      '@xmtp/content-type-primitives':
+        specifier: ^2.0.2
+        version: 2.0.2
+      '@xmtp/content-type-reaction':
+        specifier: ^2.0.2
+        version: 2.0.2
+      '@xmtp/content-type-remote-attachment':
+        specifier: ^2.0.2
+        version: 2.0.2
+      '@xmtp/content-type-reply':
+        specifier: ^2.0.2
+        version: 2.0.2
+      '@xmtp/content-type-text':
+        specifier: ^2.0.2
+        version: 2.0.2
+      '@xmtp/content-type-transaction-reference':
+        specifier: ^2.0.2
+        version: 2.0.2
+      '@xmtp/content-type-wallet-send-calls':
+        specifier: ^1.0.1
+        version: 1.0.1
       ai:
         specifier: ^4.3.16
         version: 4.3.16(react@19.0.0)(zod@3.25.13)
@@ -116,6 +143,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
+      uint8array-extras:
+        specifier: ^1.4.0
+        version: 1.4.0
       viem:
         specifier: ^2.22.22
         version: 2.22.22(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.25.13)
@@ -697,6 +727,11 @@ packages:
   '@lit/reactive-element@1.6.3':
     resolution: {integrity: sha512-QuTgnG52Poic7uM1AN5yJ09QMe0O28e10XzSvWDz02TJiiKee4stsiownEIadWm8nYzyDAyT+gKzUoZmiWQtsQ==}
 
+  '@mantine/hooks@8.0.2':
+    resolution: {integrity: sha512-0jpEdC0KIAZ54D5kd9rJudrEm6vkvnrL9yYHnkuNbxokXSzDdYA/wpHnKR5WW+u6fW4JF6A6A7gN1vXKeC9MSw==}
+    peerDependencies:
+      react: ^18.x || ^19.x
+
   '@metamask/eth-json-rpc-provider@1.0.1':
     resolution: {integrity: sha512-whiUMPlAOrVGmX8aKYVPvlKyG4CpQXiNNyt74vE1xb5sPvmx5oA7B/kOi/JdBvhGQq97U1/AVdXEdk2zkP8qyA==}
     engines: {node: '>=14.0.0'}
@@ -882,6 +917,9 @@ packages:
   '@noble/hashes@1.7.1':
     resolution: {integrity: sha512-B8XBPsn4vT/KJAGqDzbwztd+6Yte3P4V7iafm24bxgDe/mlRuK6xmWPuCNrKt2vDafZ8MfJLlchDG/vYafQEjQ==}
     engines: {node: ^14.21.3 || >=16}
+
+  '@noble/secp256k1@2.2.3':
+    resolution: {integrity: sha512-l7r5oEQym9Us7EAigzg30/PQAvynhMt2uoYtT3t26eGDVm9Yii5mZ5jWSWmZ/oSIR2Et0xfc6DXrG0bZ787V3w==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1660,8 +1698,23 @@ packages:
   '@xmtp/content-type-primitives@2.0.2':
     resolution: {integrity: sha512-OTUsCD48sO2Eg69dfre32OSnXSkmefbSZA4L0S58LqYK6+hMymFRRjEH4fvPzXc9WCw5FmCYEG7DFAaB680HiQ==}
 
+  '@xmtp/content-type-reaction@2.0.2':
+    resolution: {integrity: sha512-v7wGMycSsUi8NyLR+ytjDhNY4Nr4p8qNwKx8LZPlA8IwLacq2Bp2vKxlOAnGX7m5XP9ivpBNNZvkpR5Limvz1g==}
+
+  '@xmtp/content-type-remote-attachment@2.0.2':
+    resolution: {integrity: sha512-gV2yU6UWsLQcJ228B7jOvtzUyK/+TfG0EUevxbz3OUuWpVpoo110qAa3HWUlahL1fWuaoFSX9GmESyw2UJWAQw==}
+
+  '@xmtp/content-type-reply@2.0.2':
+    resolution: {integrity: sha512-tks5WEevzOzUTmpvpJjxLH5jil3cHSddWgS5MPfm8bGU5hCUfy8uojlVaFEUbBBjpDVwU1o++SW5h5HggHKsgg==}
+
   '@xmtp/content-type-text@2.0.2':
     resolution: {integrity: sha512-nlRufOYPrG5sNbruNPCsb6Qk9/jmJ5lMooPsZEo4Dbwda/2S4bSvrrIncT6if7M2SCha3hxtlgJlFGeTtHy4gQ==}
+
+  '@xmtp/content-type-transaction-reference@2.0.2':
+    resolution: {integrity: sha512-7JwqZ3phX/XIZByY4XnteW/0c/XtPOeuEG3GayLOMELyEBJxoVog4evxFidoWb/vtEm9JuqqKqh8VtUaekhXYA==}
+
+  '@xmtp/content-type-wallet-send-calls@1.0.1':
+    resolution: {integrity: sha512-PVpp0WDMzcKBAO4dFWa2jXTtuLzwimdp+aucpBFlfEv4dJBi2QFaXHinJc79FXdz+UZx70ed1RkAqLmEHN8y8g==}
 
   '@xmtp/proto@3.78.0':
     resolution: {integrity: sha512-JHkkvbdyqpWo1YOg88uOrc2GAsPnfXhIWaUKyIjXQdt4LltR4iAMgXcr1CFN+xjUmOBkAwwJ2JywUYv/uA4yZA==}
@@ -4033,6 +4086,10 @@ packages:
   uint8-varint@2.0.4:
     resolution: {integrity: sha512-FwpTa7ZGA/f/EssWAb5/YV6pHgVF1fViKdW8cWaEarjB8t7NyofSWBdOTyFPaGuUG4gx3v1O3PQ8etsiOs3lcw==}
 
+  uint8array-extras@1.4.0:
+    resolution: {integrity: sha512-ZPtzy0hu4cZjv3z5NW9gfKnNLjoz4y6uv4HlelAjDK7sY/xOkKZv9xK/WQpcsBB3jEybChz9DPC2U/+cusjJVQ==}
+    engines: {node: '>=18'}
+
   uint8arraylist@2.4.8:
     resolution: {integrity: sha512-vc1PlGOzglLF0eae1M8mLRTBivsvrGsdmJ5RbK3e+QRvRLOZfZhQROTwH/OfyF3+ZVUg9/8hE8bmKP2CvP9quQ==}
 
@@ -5163,6 +5220,10 @@ snapshots:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.3.0
 
+  '@mantine/hooks@8.0.2(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@metamask/eth-json-rpc-provider@1.0.1':
     dependencies:
       '@metamask/json-rpc-engine': 7.3.3
@@ -5438,6 +5499,8 @@ snapshots:
   '@noble/hashes@1.4.0': {}
 
   '@noble/hashes@1.7.1': {}
+
+  '@noble/secp256k1@2.2.3': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -6539,7 +6602,30 @@ snapshots:
     dependencies:
       '@xmtp/proto': 3.78.0
 
+  '@xmtp/content-type-reaction@2.0.2':
+    dependencies:
+      '@xmtp/content-type-primitives': 2.0.2
+
+  '@xmtp/content-type-remote-attachment@2.0.2':
+    dependencies:
+      '@noble/secp256k1': 2.2.3
+      '@xmtp/content-type-primitives': 2.0.2
+      '@xmtp/proto': 3.78.0
+
+  '@xmtp/content-type-reply@2.0.2':
+    dependencies:
+      '@xmtp/content-type-primitives': 2.0.2
+      '@xmtp/proto': 3.78.0
+
   '@xmtp/content-type-text@2.0.2':
+    dependencies:
+      '@xmtp/content-type-primitives': 2.0.2
+
+  '@xmtp/content-type-transaction-reference@2.0.2':
+    dependencies:
+      '@xmtp/content-type-primitives': 2.0.2
+
+  '@xmtp/content-type-wallet-send-calls@1.0.1':
     dependencies:
       '@xmtp/content-type-primitives': 2.0.2
 
@@ -9423,6 +9509,8 @@ snapshots:
     dependencies:
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
+
+  uint8array-extras@1.4.0: {}
 
   uint8arraylist@2.4.8:
     dependencies:
