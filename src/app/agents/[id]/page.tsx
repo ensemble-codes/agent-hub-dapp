@@ -156,6 +156,19 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             {agent.agent.id?.slice(0, 4)}...
                             {agent.agent.id?.slice(-4)}
                           </p>
+                          {id ===
+                          "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
+                            <p className="py-1 px-4 bg-[#C8F3FF] rounded-[2000px] flex items-center gap-2">
+                              <img
+                                src="/assets/vibes-dark-icon.svg"
+                                alt="vibes"
+                                className="w-[18px] h-[18px]"
+                              />
+                              <p className="text-[#3d3d3d] text-[14px] font-medium leading-[18px]">
+                                Vibes
+                              </p>
+                            </p>
+                          ) : null}
                         </div>
                       </div>
                       <img
@@ -509,14 +522,16 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           </p>
                         </div>
 
-                      <button
-                        className="w-full mt-2 space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#8F95B2]"
-                      >
-                        <img src="/assets/cross-gray-icon.svg" alt="cross" className="w-[18px] h-[18px]" />
-                        <span className="text-[#8F95B2] text-[14px] font-[700] leading-[18px]">
-                          Agent does not have a token
-                        </span>
-                      </button>
+                        <button className="w-full mt-2 space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#8F95B2]">
+                          <img
+                            src="/assets/cross-gray-icon.svg"
+                            alt="cross"
+                            className="w-[18px] h-[18px]"
+                          />
+                          <span className="text-[#8F95B2] text-[14px] font-[700] leading-[18px]">
+                            Agent does not have a token
+                          </span>
+                        </button>
                       </div>
                     </div>
                     <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">

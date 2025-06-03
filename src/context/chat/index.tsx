@@ -72,8 +72,8 @@ export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
           let xmtpClient = await Client.create(signer, {
             env: "production",
             loggingLevel,
-            dbEncryptionKey: hexToUint8Array(encryptionKey),
-            dbPath,
+            ...(encryptionKey ? { dbEncryptionKey: hexToUint8Array(encryptionKey) } : {}),
+            ...(dbPath ? { dbPath } : {}),
             codecs: [
               new ReactionCodec(),
               new ReplyCodec(),
@@ -104,7 +104,7 @@ export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
         }
       }
     }
-  }, [account.address, data?.account]);
+  }, [account.address, data?.account, encryptionKey, dbPath]);
 
   // Initialize XMTP client when wallet connects
   useEffect(() => {
