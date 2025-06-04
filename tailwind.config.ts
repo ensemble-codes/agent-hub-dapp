@@ -10,8 +10,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        spaceranger: ["SpaceRanger", ...fontFamily.sans],
-        satoshi: ["Satoshi", ...fontFamily.sans],
+        graphik: ["Graphik", ...fontFamily.sans],
       },
       colors: {
         primary: "#FE4600",

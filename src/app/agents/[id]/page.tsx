@@ -149,12 +149,26 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             onClick={() => copyToClipboard(agent.agent.id)}
                             style={{
                               transition: "all 0.3s ease",
-                              opacity: copiedPrompt === agent.agent.id ? 0.6 : 1,
+                              opacity:
+                                copiedPrompt === agent.agent.id ? 0.6 : 1,
                             }}
                           >
                             {agent.agent.id?.slice(0, 4)}...
                             {agent.agent.id?.slice(-4)}
                           </p>
+                          {id ===
+                          "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
+                            <p className="py-1 px-4 bg-[#C8F3FF] rounded-[2000px] flex items-center gap-2">
+                              <img
+                                src="/assets/vibes-dark-icon.svg"
+                                alt="vibes"
+                                className="w-[18px] h-[18px]"
+                              />
+                              <p className="text-[#3d3d3d] text-[14px] font-medium leading-[18px]">
+                                Vibes
+                              </p>
+                            </p>
+                          ) : null}
                         </div>
                       </div>
                       <img
@@ -167,7 +181,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       <p className="text-primary font-medium leading-[100%]">
                         About
                       </p>
-                      <p className="text-[14px] font-medium text-[#121212]">
+                      <p className="text-[16px] font-medium text-[#121212]">
                         {agent.agent.metadata?.description}
                       </p>
                     </div>
@@ -461,6 +475,77 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           borderImageSlice: "1",
                         }}
                       />
+                      <div className="p-4">
+                        <img
+                          src="/assets/featured-agent-graph-icon.svg"
+                          alt="graph"
+                          className="w-full"
+                        />
+                        <div className="flex items-center justify-between">
+                          <p className="text-[#8F95B2] text-[14px] font-normal">
+                            Mcap
+                          </p>
+                          <p className="text-[#121212] text-[14px] font-normal">
+                            -
+                          </p>
+                        </div>
+                        <hr
+                          className="my-2 lg:block hidden border-[1px] border-[#8F95B2]"
+                          style={{
+                            borderImageSource:
+                              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                            borderImageSlice: "1",
+                          }}
+                        />
+                        <div className="flex items-center justify-between">
+                          <p className="text-[#8F95B2] text-[14px] font-normal">
+                            Liquidity
+                          </p>
+                          <p className="text-[#121212] text-[14px] font-normal">
+                            -
+                          </p>
+                        </div>
+                        <hr
+                          className="my-2 lg:block hidden border-[1px] border-[#8F95B2]"
+                          style={{
+                            borderImageSource:
+                              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                            borderImageSlice: "1",
+                          }}
+                        />
+                        <div className="flex items-center justify-between">
+                          <p className="text-[#8F95B2] text-[14px] font-normal">
+                            Holders
+                          </p>
+                          <p className="text-[#121212] text-[14px] font-normal">
+                            -
+                          </p>
+                        </div>
+
+                        <button className="w-full mt-2 space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#8F95B2]">
+                          <img
+                            src="/assets/cross-gray-icon.svg"
+                            alt="cross"
+                            className="w-[18px] h-[18px]"
+                          />
+                          <span className="text-[#8F95B2] text-[14px] font-[700] leading-[18px]">
+                            Agent does not have a token
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
+                      <p className="p-4 text-primary text-[16px] font-medium">
+                        How agent works
+                      </p>
+                      <hr
+                        className="lg:block hidden border-[1px] border-[#8F95B2]"
+                        style={{
+                          borderImageSource:
+                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                          borderImageSlice: "1",
+                        }}
+                      />
                       <div className="p-4 flex items-center justify-start gap-2 border-b-[1px] border-b-[#8F95B2]">
                         <img
                           src="/assets/check-squared-icon.svg"
@@ -517,64 +602,113 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           borderImageSlice: "1",
                         }}
                       />
-                      <div className="p-4 flex items-center justify-between gap-2 border-b-[1px] border-b-[#8F95B2]">
-                        <p className="text-[#121212] text-[14px] font-normal w-[80%]">
+                      <div className="p-4 flex items-center justify-between gap-2 border-b-[1px] border-b-[#8F95B2] group relative">
+                        <p
+                          className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
+                          onClick={() =>
+                            copyToClipboard(
+                              "I want you to make a blessing or a greeting"
+                            )
+                          }
+                        >
                           "I want you to make a blessing or a greeting"
                         </p>
                         <img
                           src="/assets/copy-icon.svg"
                           alt="copy"
-                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 ${
-                            copiedPrompt === "I want you to make a blessing or a greeting"
+                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
+                            copiedPrompt ===
+                            "I want you to make a blessing or a greeting"
                               ? "opacity-50"
-                              : "opacity-100"
+                              : ""
                           }`}
-                          onClick={() => copyToClipboard("I want you to make a blessing or a greeting")}
+                          onClick={() =>
+                            copyToClipboard(
+                              "I want you to make a blessing or a greeting"
+                            )
+                          }
                         />
                       </div>
-                      <div className="p-4 flex items-center justify-between gap-2 border-b-[1px] border-b-[#8F95B2]">
-                        <p className="text-[#121212] text-[14px] font-normal w-[80%]">
+                      <div className="p-4 flex items-center justify-between gap-2 border-b-[1px] border-b-[#8F95B2] group relative">
+                        <p
+                          className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
+                          onClick={() =>
+                            copyToClipboard(
+                              "I want you to reply to an account on Twitter"
+                            )
+                          }
+                        >
                           "I want you to reply to an account on Twitter"
                         </p>
                         <img
                           src="/assets/copy-icon.svg"
                           alt="copy"
-                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 ${
-                            copiedPrompt === "I want you to reply to an account on Twitter"
+                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
+                            copiedPrompt ===
+                            "I want you to reply to an account on Twitter"
                               ? "opacity-50"
-                              : "opacity-100"
+                              : ""
                           }`}
-                          onClick={() => copyToClipboard("I want you to reply to an account on Twitter")}
+                          onClick={() =>
+                            copyToClipboard(
+                              "I want you to reply to an account on Twitter"
+                            )
+                          }
                         />
                       </div>
-                      <div className="p-4 flex items-center justify-between gap-2 border-b-[1px] border-b-[#8F95B2]">
-                        <p className="text-[#121212] text-[14px] font-normal w-[80%]">
-                          "I want you to shill a project on Twitter for maximum reach"
+                      <div className="p-4 flex items-center justify-between gap-2 border-b-[1px] border-b-[#8F95B2] group relative">
+                        <p
+                          className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
+                          onClick={() =>
+                            copyToClipboard(
+                              "I want you to shill a project on Twitter for maximum reach"
+                            )
+                          }
+                        >
+                          "I want you to shill a project on Twitter for maximum
+                          reach"
                         </p>
                         <img
                           src="/assets/copy-icon.svg"
                           alt="copy"
-                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 ${
-                            copiedPrompt === "I want you to shill a project on Twitter for maximum reach"
+                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
+                            copiedPrompt ===
+                            "I want you to shill a project on Twitter for maximum reach"
                               ? "opacity-50"
-                              : "opacity-100"
+                              : ""
                           }`}
-                          onClick={() => copyToClipboard("I want you to shill a project on Twitter for maximum reach")}
+                          onClick={() =>
+                            copyToClipboard(
+                              "I want you to shill a project on Twitter for maximum reach"
+                            )
+                          }
                         />
                       </div>
-                      <div className="p-4 flex items-center justify-between gap-2">
-                        <p className="text-[#121212] text-[14px] font-normal w-[80%]">
+                      <div className="p-4 flex items-center justify-between gap-2 group relative">
+                        <p
+                          className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
+                          onClick={() =>
+                            copyToClipboard(
+                              "Show me some samples of your best work so far"
+                            )
+                          }
+                        >
                           "Show me some samples of your best work so far"
                         </p>
                         <img
                           src="/assets/copy-icon.svg"
                           alt="copy"
-                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 ${
-                            copiedPrompt === "Show me some samples of your best work so far"
+                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
+                            copiedPrompt ===
+                            "Show me some samples of your best work so far"
                               ? "opacity-50"
-                              : "opacity-100"
+                              : ""
                           }`}
-                          onClick={() => copyToClipboard("Show me some samples of your best work so far")}
+                          onClick={() =>
+                            copyToClipboard(
+                              "Show me some samples of your best work so far"
+                            )
+                          }
                         />
                       </div>
                     </div>
