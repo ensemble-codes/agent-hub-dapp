@@ -1,5 +1,5 @@
 "use client";
-import { AppHeader, SideMenu } from "@/components";
+import { AppHeader, Loader, SideMenu } from "@/components";
 import { useConsersation } from "@/context/chat/hooks";
 import { useChat } from "@/context/chat";
 import {
@@ -22,10 +22,13 @@ import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
+import { useAccount } from "wagmi";
 
 const PageContent: FC = () => {
   const searchParams = useSearchParams();
   const agentAddress = searchParams.get("agent");
+  const account = useAccount();
+  const [isInitializing, setIsInitializing] = useState(false);
 
   const GET_AGENT = useMemo(
     () => gql`
@@ -66,7 +69,23 @@ const PageContent: FC = () => {
     useConsersation(
       agentAddress || "0x5C02b4685492D36a40107B6eC48A91ab3f8875cb"
     );
-  const [chatState] = useChat();
+  const [chatState, dispatch, { initClient }] = useChat();
+
+  // Initialize XMTP client when the page loads
+  useEffect(() => {
+    const initializeClient = async () => {
+      if (!chatState.client && account.isConnected && !isInitializing) {
+        console.log("Initializing XMTP client...");
+        setIsInitializing(true);
+        try {
+          await initClient();
+        } finally {
+          setIsInitializing(false);
+        }
+      }
+    };
+    initializeClient();
+  }, [chatState.client, account.isConnected, initClient, isInitializing]);
 
   const stopStreamRef = useRef<() => void | null>(null);
 
@@ -98,7 +117,7 @@ const PageContent: FC = () => {
         await getMessages();
         await startStream();
       } catch (error) {
-        console.error('Error initializing chat:', error);
+        console.error("Error initializing chat:", error);
       }
     };
 
@@ -111,21 +130,24 @@ const PageContent: FC = () => {
     };
   }, [chatState.client, getMessages, startStream, stopStream]);
 
-  const onSendMessage = useCallback(async (input?: string) => {
-    if (isWaitingForResponse) return;
-    const sendInput = input || chatInput;
-    if (!sendInput) return;
-    
-    setIsWaitingForResponse(true);
-    setLastMessageTime(Date.now());
-    try {
-      await send(sendInput);
-      setChatInput("");
-    } catch (error) {
-      console.error("Error sending message:", error);
-      setIsWaitingForResponse(false);
-    }
-  }, [chatInput, send, isWaitingForResponse]);
+  const onSendMessage = useCallback(
+    async (input?: string) => {
+      if (isWaitingForResponse) return;
+      const sendInput = input || chatInput;
+      if (!sendInput) return;
+
+      setIsWaitingForResponse(true);
+      setLastMessageTime(Date.now());
+      try {
+        await send(sendInput);
+        setChatInput("");
+      } catch (error) {
+        console.error("Error sending message:", error);
+        setIsWaitingForResponse(false);
+      }
+    },
+    [chatInput, send, isWaitingForResponse]
+  );
 
   // Listen for new messages to hide the typing indicator
   useEffect(() => {
@@ -169,7 +191,10 @@ const PageContent: FC = () => {
                     <>
                       <Link
                         href={`/agents/${
-                          agentData && agentData.agent && agentData.agent.id || '0x5C02b4685492D36a40107B6eC48A91ab3f8875cb'
+                          (agentData &&
+                            agentData.agent &&
+                            agentData.agent.id) ||
+                          "0x5C02b4685492D36a40107B6eC48A91ab3f8875cb"
                         }`}
                       >
                         <div className="relative">
@@ -282,7 +307,8 @@ const PageContent: FC = () => {
                             !e.shiftKey &&
                             chatInput.trim() &&
                             !isWaitingForResponse &&
-                            chatState.client && conversation
+                            chatState.client &&
+                            conversation
                           ) {
                             e.preventDefault();
                             onSendMessage();
@@ -299,16 +325,27 @@ const PageContent: FC = () => {
                                   ? "opacity-50 cursor-not-allowed"
                                   : "cursor-pointer"
                               }`}
-                              onClick={!chatState.client || !conversation ? undefined : () => {
-                                if (chatInput.trim() && !isWaitingForResponse) {
-                                  onSendMessage();
-                                }
-                              }}
+                              onClick={
+                                !chatState.client || !conversation
+                                  ? undefined
+                                  : () => {
+                                      if (
+                                        chatInput.trim() &&
+                                        !isWaitingForResponse
+                                      ) {
+                                        onSendMessage();
+                                      }
+                                    }
+                              }
                             >
-                              <img
-                                src="/assets/pixelated-arrow-primary-icon.svg"
-                                alt="arrow"
-                              />
+                              {conversation ? (
+                                <img
+                                  src="/assets/pixelated-arrow-primary-icon.svg"
+                                  alt="arrow"
+                                />
+                              ) : (
+                                <Loader />
+                              )}
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -357,7 +394,8 @@ const PageContent: FC = () => {
                           e.key === "Enter" &&
                           !e.shiftKey &&
                           chatInput.trim() &&
-                          chatState.client && conversation
+                          chatState.client &&
+                          conversation
                         ) {
                           e.preventDefault();
                           setIsChatOpen(true);
@@ -367,17 +405,25 @@ const PageContent: FC = () => {
                     />
                     <div
                       className="basis-[10%] border-l-[1px] border-l-[#8F95B2] flex items-center justify-center"
-                      onClick={!chatState.client || !conversation ? undefined : () => {
-                        if (chatInput.trim()) {
-                          setIsChatOpen(true);
-                          onSendMessage();
-                        }
-                      }}
+                      onClick={
+                        !chatState.client || !conversation
+                          ? undefined
+                          : () => {
+                              if (chatInput.trim()) {
+                                setIsChatOpen(true);
+                                onSendMessage();
+                              }
+                            }
+                      }
                     >
-                      <img
-                        src="/assets/pixelated-arrow-primary-icon.svg"
-                        alt="arrow"
-                      />
+                      {conversation ? (
+                        <img
+                          src="/assets/pixelated-arrow-primary-icon.svg"
+                          alt="arrow"
+                        />
+                      ) : (
+                        <Loader />
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-6 mb-8 lg:flex-nowrap flex-wrap">
@@ -439,11 +485,19 @@ const PageContent: FC = () => {
                     <div className="flex lg:flex-row flex-col items-stretch justify-center gap-4 max-w-[755px] w-full">
                       <div
                         className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
-                        onClick={!chatState.client || !conversation ? undefined : async () => {
-                          setIsChatOpen(true);
-                          onSendMessage("Help me to hire an AI KoL for my project. The perfect Hype-man!");
+                        onClick={
+                          !chatState.client || !conversation
+                            ? undefined
+                            : async () => {
+                                setIsChatOpen(true);
+                                onSendMessage(
+                                  "Help me to hire an AI KoL for my project. The perfect Hype-man!"
+                                );
+                              }
+                        }
+                        style={{
+                          opacity: !chatState.client || !conversation ? 0.7 : 1,
                         }}
-                        style={{ opacity: !chatState.client || !conversation ? 0.7 : 1 }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
                           Social
@@ -454,11 +508,19 @@ const PageContent: FC = () => {
                       </div>
                       <div
                         className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
-                        onClick={!chatState.client || !conversation ? undefined : async () => {
-                          setIsChatOpen(true);
-                          onSendMessage("Help me find an expert security researcher to audit my smart contracts");
+                        onClick={
+                          !chatState.client || !conversation
+                            ? undefined
+                            : async () => {
+                                setIsChatOpen(true);
+                                onSendMessage(
+                                  "Help me find an expert security researcher to audit my smart contracts"
+                                );
+                              }
+                        }
+                        style={{
+                          opacity: !chatState.client || !conversation ? 0.7 : 1,
                         }}
-                        style={{ opacity: !chatState.client || !conversation ? 0.7 : 1 }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
                           Security
@@ -470,11 +532,19 @@ const PageContent: FC = () => {
                       </div>
                       <div
                         className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
-                        onClick={!chatState.client || !conversation ? undefined : async () => {
-                          setIsChatOpen(true);
-                          onSendMessage("Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents");
+                        onClick={
+                          !chatState.client || !conversation
+                            ? undefined
+                            : async () => {
+                                setIsChatOpen(true);
+                                onSendMessage(
+                                  "Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents"
+                                );
+                              }
+                        }
+                        style={{
+                          opacity: !chatState.client || !conversation ? 0.7 : 1,
                         }}
-                        style={{ opacity: !chatState.client || !conversation ? 0.7 : 1 }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
                           DeFi

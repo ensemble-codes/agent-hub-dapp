@@ -27,11 +27,12 @@ interface ContextProps {
   children: React.ReactNode;
 }
 
-type ChatContextType = [ChatState, Dispatch<Action>];
+type ChatContextType = [ChatState, Dispatch<Action>, { initClient: () => Promise<void> }];
 
 export const ChatContext = createContext<ChatContextType>([
   initialState,
-  () => {}
+  () => {},
+  { initClient: async () => {} }
 ]);
 
 export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
@@ -53,11 +54,37 @@ export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
   });
   const [dbPath, setDbPath] = useLocalStorage({
     key: "XMTP_DB_PATH",
-    defaultValue: `xmtp-${account.address}.db3`,
+    defaultValue: "",
     getInitialValueInEffect: false
-  })
+  });
 
   const initClient = useCallback(async () => {
+    if (!account.address) {
+      console.error("No account address available");
+      return;
+    }
+
+    // If client already exists, don't reinitialize
+    if (state.client) {
+      console.log("Client already exists, skipping initialization");
+      return;
+    }
+
+    // Set the database path if not already set
+    if (!dbPath) {
+      const newDbPath = `xmtp-${account.address}.db3`;
+      setDbPath(newDbPath);
+    }
+
+    // Generate and set encryption key if not already set
+    if (!encryptionKey) {
+      const newEncryptionKey = crypto.getRandomValues(new Uint8Array(32));
+      const hexKey = Array.from(newEncryptionKey)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      setEncryptionKey(hexKey);
+    }
+
     const connector = account.connector;
 
     if (data?.account && connector) {
@@ -66,61 +93,44 @@ export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
         (message: string) => signMessageAsync({ message })
       );
 
-      let retries = 3;
-      while (retries > 0) {
-        try {
-          let xmtpClient = await Client.create(signer, {
-            env: "production",
-            loggingLevel,
-            ...(encryptionKey ? { dbEncryptionKey: hexToUint8Array(encryptionKey) } : {}),
-            ...(dbPath ? { dbPath } : {}),
-            codecs: [
-              new ReactionCodec(),
-              new ReplyCodec(),
-              new RemoteAttachmentCodec(),
-              new TransactionReferenceCodec(),
-              new WalletSendCallsCodec(),
-            ],
-          });
+      try {
+        let xmtpClient = await Client.create(signer, {
+          env: "production",
+          loggingLevel,
+          ...(encryptionKey ? { dbEncryptionKey: hexToUint8Array(encryptionKey) } : {}),
+          ...(dbPath ? { dbPath } : {}),
+          codecs: [
+            new ReactionCodec(),
+            new ReplyCodec(),
+            new RemoteAttachmentCodec(),
+            new TransactionReferenceCodec(),
+            new WalletSendCallsCodec(),
+          ],
+        });
 
-          console.log({ xmtpClient });
+        console.log("XMTP client created successfully");
 
-          dispatch({
-            type: SET_CHAT_CLIENT,
-            payload: xmtpClient,
-          });
-          break;
-        } catch (e) {
-          console.error(`Error creating XMTP client (attempts left: ${retries})`, e);
-          retries--;
-          if (retries === 0) {
-            dispatch({
-              type: SET_CHAT_CLIENT,
-              payload: undefined,
-            });
-          } else {
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
-          }
-        }
+        dispatch({
+          type: SET_CHAT_CLIENT,
+          payload: xmtpClient,
+        });
+      } catch (e) {
+        console.error("Error creating XMTP client:", e);
+        dispatch({
+          type: SET_CHAT_CLIENT,
+          payload: undefined,
+        });
       }
     }
-  }, [account.address, data?.account, encryptionKey, dbPath]);
-
-  // Initialize XMTP client when wallet connects
-  useEffect(() => {
-    if (account.isConnected && !state.client) {
-      console.log(account);
-      initClient();
-    }
-  }, [account.isConnected, state.client, initClient]);
+  }, [account.address, data?.account, encryptionKey, dbPath, setDbPath, setEncryptionKey, state.client]);
 
   return (
-    <ChatContext.Provider value={[state, dispatch]}>
+    <ChatContext.Provider value={[state, dispatch, { initClient }]}>
       {children}
     </ChatContext.Provider>
   );
 };
 
-export function useChat(): ChatContextType {
+export function useChat(): [ChatState, Dispatch<Action>, { initClient: () => Promise<void> }] {
   return useContext(ChatContext);
 }
