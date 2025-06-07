@@ -98,7 +98,6 @@ export const ChatContextProvider: FC<ContextProps> = ({ children }) => {
           env: "production",
           loggingLevel,
           ...(encryptionKey ? { dbEncryptionKey: hexToUint8Array(encryptionKey) } : {}),
-          ...(dbPath ? { dbPath } : {}),
           codecs: [
             new ReactionCodec(),
             new ReplyCodec(),
