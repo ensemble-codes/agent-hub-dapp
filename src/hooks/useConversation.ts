@@ -2,13 +2,20 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useXMTP } from "@/context/XMTPContext";
 import { Conversation, DecodedMessage } from "@xmtp/browser-sdk";
 
+type FormattedMessage = {
+  id: string;
+  content: string;
+  isReceived: boolean;
+  timestamp: number;
+};
+
 export function useConversation(address?: string) {
   const { client } = useXMTP();
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [sending, setSending] = useState(false);
-  const [messages, setMessages] = useState<{ content: string; isReceived: boolean }[]>([]);
+  const [messages, setMessages] = useState<FormattedMessage[]>([]);
 
   useEffect(() => {
     const getConversation = async () => {
@@ -33,28 +40,48 @@ export function useConversation(address?: string) {
     return client.inboxId
   }, [client])
 
-  const formatMessage = useCallback((message: DecodedMessage) => {
+  const formatMessage = useCallback((message: DecodedMessage): FormattedMessage | null => {
     if (typeof message.content !== 'string') {
       return null
     }
 
     return {
+      id: message.id,
       content: message.content,
-      isReceived: message.senderInboxId !== indexId
+      isReceived: message.senderInboxId !== indexId,
+      timestamp: message.sentAtNs ? Number(message.sentAtNs) / 1_000_000 : Date.now()
     }
   }, [indexId])
+
+  const addMessageToState = useCallback((newMessage: FormattedMessage) => {
+    setMessages((prevMessages) => {
+      // Check if message already exists
+      const messageExists = prevMessages.some(msg => msg.id === newMessage.id);
+      if (messageExists) {
+        return prevMessages;
+      }
+      
+      // Add new message and sort by timestamp
+      const updatedMessages = [...prevMessages, newMessage];
+      return updatedMessages.sort((a, b) => a.timestamp - b.timestamp);
+    });
+  }, []);
 
   const getMessages = useCallback(async () => {
     if (!conversation) return;
 
     try {
       const msgs = (await conversation.messages()) ?? [];
-      const formattedMessages = msgs.map(formatMessage).filter((msg) => msg !== null);
+      const formattedMessages = msgs
+        .map(formatMessage)
+        .filter((msg): msg is FormattedMessage => msg !== null)
+        .sort((a, b) => a.timestamp - b.timestamp);
+      
       setMessages(formattedMessages);
     } finally {
       setLoading(false);
     }
-  }, [conversation]);
+  }, [conversation, formatMessage]);
 
   const sync = useCallback(async () => {
     if (!conversation) return;
@@ -100,7 +127,7 @@ export function useConversation(address?: string) {
             const formattedMessage = formatMessage(message);
             if (!formattedMessage) return;
             
-            setMessages((prev) => [...prev, formattedMessage]);
+            addMessageToState(formattedMessage);
           }
         }
       );
@@ -118,7 +145,7 @@ export function useConversation(address?: string) {
       console.error("Error setting up stream", e);
       return noop;
     }
-  }, [conversation, formatMessage]);
+  }, [conversation, formatMessage, addMessageToState]);
 
   return {
     getMessages,

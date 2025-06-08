@@ -268,7 +268,7 @@ const PageContent: FC = () => {
                                 message.isReceived;
                             return (
                               <div
-                                key={index}
+                                key={message.id}
                                 className={`flex ${
                                   !message.isReceived
                                     ? "justify-end"
