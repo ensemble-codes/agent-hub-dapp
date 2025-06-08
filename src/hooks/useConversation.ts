@@ -1,16 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useChat } from ".";
+import { useXMTP } from "@/context/XMTPContext";
 import { Conversation, DecodedMessage } from "@xmtp/browser-sdk";
 
-export function useConsersation(address?: string) {
-  const [chatState] = useChat();
+export function useConversation(address?: string) {
+  const { client } = useXMTP();
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [sending, setSending] = useState(false);
   const [messages, setMessages] = useState<{ content: string; isReceived: boolean }[]>([]);
-
-  const { client } = chatState;
 
   useEffect(() => {
     const getConversation = async () => {
@@ -133,4 +131,4 @@ export function useConsersation(address?: string) {
     send,
     streamMessages
   };
-}
+} 

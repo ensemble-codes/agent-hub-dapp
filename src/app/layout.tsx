@@ -6,7 +6,7 @@ import { Footer, MobileFooter, MobileHeader, Wrapper } from "@/components";
 import OnchainProvider from "@/components/onchainconfig/provider";
 import { AppContextProvider } from "@/context/app";
 import "@rainbow-me/rainbowkit/styles.css";
-import { ChatContextProvider } from "@/context/chat";
+import { XMTPProvider } from "@/context/XMTPContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,7 +52,7 @@ export default function RootLayout({
         )}
         <OnchainProvider>
           <AppContextProvider>
-            <ChatContextProvider>
+            <XMTPProvider>
               <Wrapper>
                 <MobileHeader />
                 <main className="lg:py-[124px] py-[36px] container mx-auto flex-1 max-md:px-[20px]">
@@ -61,7 +61,7 @@ export default function RootLayout({
                 <Footer />
                 <MobileFooter />
               </Wrapper>
-            </ChatContextProvider>
+            </XMTPProvider>
           </AppContextProvider>
         </OnchainProvider>
       </body>
