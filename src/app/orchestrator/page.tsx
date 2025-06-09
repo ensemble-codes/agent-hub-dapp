@@ -80,7 +80,6 @@ const PageContent: FC = () => {
         console.log("Initializing XMTP client...");
         setIsInitializing(true);
         try {
-          debugger
           await initialize({
             signer: createEOASigner(
               account.address!,
