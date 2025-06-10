@@ -6,6 +6,7 @@ import {
   rabbyWallet,
   injectedWallet,
   metaMaskWallet,
+  coinbaseWallet
 } from "@rainbow-me/rainbowkit/wallets";
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID!;
@@ -18,6 +19,7 @@ const connectors = connectorsForWallets(
         rabbyWallet,
         metaMaskWallet,
         injectedWallet,
+        coinbaseWallet
       ],
     },
   ],
