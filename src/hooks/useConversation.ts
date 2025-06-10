@@ -4,7 +4,8 @@ import { Conversation, DecodedMessage } from "@xmtp/browser-sdk";
 
 type FormattedMessage = {
   id: string;
-  content: string;
+  content: any;
+  contentType: 'json' | 'string';
   isReceived: boolean;
   timestamp: number;
 };
@@ -41,17 +42,42 @@ export function useConversation(address?: string) {
   }, [client])
 
   const formatMessage = useCallback((message: DecodedMessage): FormattedMessage | null => {
+    console.log(message.content, typeof message.content);
+
     if (typeof message.content !== 'string') {
-      return null
+      return null;
     }
 
+    // Only try to parse as JSON if it looks like a JSON code block
+    if (message.content.includes('service_details') || message.content.includes('agent_services')) {
+      try {
+        const cleanContent = message.content.replace(/```json\n|\n```/g, '');
+        const content = JSON.parse(cleanContent);
+        console.log({ content });
+        if (content.type === 'agent_services' || content.type === 'service_details') {
+          return {
+            id: message.id,
+            content: content,
+            contentType: 'json' as const,
+            isReceived: message.senderInboxId !== indexId,
+            timestamp: message.sentAtNs ? Number(message.sentAtNs) / 1_000_000 : Date.now()
+          };
+        }
+      } catch (e) {
+        console.log(e);
+        // Not a JSON message or parsing failed
+      }
+    }
+
+    // Fallback: treat as plain string message
     return {
       id: message.id,
       content: message.content,
+      contentType: 'string' as const,
       isReceived: message.senderInboxId !== indexId,
       timestamp: message.sentAtNs ? Number(message.sentAtNs) / 1_000_000 : Date.now()
-    }
-  }, [indexId])
+    };
+  }, [indexId]);
 
   const addMessageToState = useCallback((newMessage: FormattedMessage) => {
     setMessages((prevMessages) => {
