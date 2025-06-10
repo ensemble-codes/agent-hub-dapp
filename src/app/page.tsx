@@ -5,7 +5,7 @@ import { convertRatingToStars } from "@/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { useChat } from "@/context/chat";
+import { useXMTP } from "@/context/XMTPContext";
 
 export default function Home() {
   const { push } = useRouter();
@@ -132,6 +132,7 @@ export default function Home() {
   const { data, loading } = useQuery(GET_AGENTS);
   const { data: proposalsData } = useQuery(GET_ALL_PROPOSALS);
   const { data: topAgentData } = useQuery(GET_TOP_AGENT);
+
   const { data: allAgentsData } = useQuery(GET_ALL_AGENTS);
 
   const agents = [...(data?.agents || [])]?.sort(
@@ -157,7 +158,7 @@ export default function Home() {
     );
   }, [allAgentsData?.agents]);
 
-  const [chatState] = useChat();
+  const { client } = useXMTP();
 
   return (
     <>

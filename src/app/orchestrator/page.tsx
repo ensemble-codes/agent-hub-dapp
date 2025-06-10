@@ -1,7 +1,7 @@
 "use client";
 import { AppHeader, Loader, SideMenu } from "@/components";
-import { useConsersation } from "@/context/chat/hooks";
-import { useChat } from "@/context/chat";
+import { useConversation } from "@/hooks/useConversation";
+import { useXMTP } from "@/context/XMTPContext";
 import {
   FC,
   useCallback,
@@ -22,12 +22,14 @@ import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
+import { createEOASigner } from "@/utils";
 
 const PageContent: FC = () => {
   const searchParams = useSearchParams();
   const agentAddress = searchParams.get("agent");
   const account = useAccount();
+  const { signMessageAsync } = useSignMessage();
   const [isInitializing, setIsInitializing] = useState(false);
 
   const GET_AGENT = useMemo(
@@ -66,26 +68,33 @@ const PageContent: FC = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { getMessages, streamMessages, messages, send, loading, conversation } =
-    useConsersation(
+    useConversation(
       agentAddress || "0x5C02b4685492D36a40107B6eC48A91ab3f8875cb"
     );
-  const [chatState, dispatch, { initClient }] = useChat();
+  const { client, initialize, initializing } = useXMTP();
 
   // Initialize XMTP client when the page loads
   useEffect(() => {
     const initializeClient = async () => {
-      if (!chatState.client && account.isConnected && !isInitializing) {
+      if (!client && account.isConnected && !isInitializing && !initializing) {
         console.log("Initializing XMTP client...");
         setIsInitializing(true);
         try {
-          await initClient();
+          await initialize({
+            signer: createEOASigner(
+              account.address!,
+              (message: string) => signMessageAsync({ message })
+            ),
+            env: "production",
+            loggingLevel: "off"
+          });
         } finally {
           setIsInitializing(false);
         }
       }
     };
     initializeClient();
-  }, [chatState.client, account.isConnected, initClient, isInitializing]);
+  }, [client, account.isConnected, initialize, initializing, isInitializing]);
 
   const stopStreamRef = useRef<() => void | null>(null);
 
@@ -132,14 +141,14 @@ const PageContent: FC = () => {
       }
     };
 
-    if (chatState.client && conversation) {
+    if (client && conversation) {
       initializeChat();
     }
 
     return () => {
       stopStream();
     };
-  }, [chatState.client, getMessages, startStream, stopStream]);
+  }, [client, getMessages, startStream, stopStream]);
 
   const onSendMessage = useCallback(
     async (input?: string) => {
@@ -269,7 +278,7 @@ const PageContent: FC = () => {
                                 message.isReceived;
                             return (
                               <div
-                                key={index}
+                                key={message.id}
                                 className={`flex ${
                                   !message.isReceived
                                     ? "justify-end"
@@ -318,7 +327,7 @@ const PageContent: FC = () => {
                             !e.shiftKey &&
                             chatInput.trim() &&
                             !isWaitingForResponse &&
-                            chatState.client &&
+                            client &&
                             conversation
                           ) {
                             e.preventDefault();
@@ -337,7 +346,7 @@ const PageContent: FC = () => {
                                   : "cursor-pointer"
                               }`}
                               onClick={
-                                !chatState.client || !conversation
+                                !client || !conversation
                                   ? undefined
                                   : () => {
                                       if (
@@ -384,10 +393,7 @@ const PageContent: FC = () => {
                       className="w-[120px] h-[120px] rounded-full object-cover"
                     />
                     <p className="text-[18px] text-primary text-center font-medium leading-[100%]">
-                      Hi, I'm{" "}
-                      {agentData && agentData.agent
-                        ? agentData.agent?.metadata?.name
-                        : "Orchestrator"}
+                      Hi, I'm Orchestrator
                       , your ai assistant on agent hub
                     </p>
                     <p className="text-[#121212] text-[14px] font-normal leading-[100%]">
@@ -405,7 +411,7 @@ const PageContent: FC = () => {
                           e.key === "Enter" &&
                           !e.shiftKey &&
                           chatInput.trim() &&
-                          chatState.client &&
+                          client &&
                           conversation
                         ) {
                           e.preventDefault();
@@ -417,7 +423,7 @@ const PageContent: FC = () => {
                     <div
                       className="basis-[10%] border-l-[1px] border-l-[#8F95B2] flex items-center justify-center"
                       onClick={
-                        !chatState.client || !conversation
+                        !client || !conversation
                           ? undefined
                           : () => {
                               if (chatInput.trim()) {
@@ -497,7 +503,7 @@ const PageContent: FC = () => {
                       <div
                         className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
                         onClick={
-                          !chatState.client || !conversation
+                          !client || !conversation
                             ? undefined
                             : async () => {
                                 setIsChatOpen(true);
@@ -507,7 +513,7 @@ const PageContent: FC = () => {
                               }
                         }
                         style={{
-                          opacity: !chatState.client || !conversation ? 0.7 : 1,
+                          opacity: !client || !conversation ? 0.7 : 1,
                         }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
@@ -520,7 +526,7 @@ const PageContent: FC = () => {
                       <div
                         className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
                         onClick={
-                          !chatState.client || !conversation
+                          !client || !conversation
                             ? undefined
                             : async () => {
                                 setIsChatOpen(true);
@@ -530,7 +536,7 @@ const PageContent: FC = () => {
                               }
                         }
                         style={{
-                          opacity: !chatState.client || !conversation ? 0.7 : 1,
+                          opacity: !client || !conversation ? 0.7 : 1,
                         }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
@@ -544,7 +550,7 @@ const PageContent: FC = () => {
                       <div
                         className="p-4 rounded-[16px] border-[#8F95B2] border cursor-pointer hover:border-primary transition-colors w-full h-full z-[2]"
                         onClick={
-                          !chatState.client || !conversation
+                          !client || !conversation
                             ? undefined
                             : async () => {
                                 setIsChatOpen(true);
@@ -554,7 +560,7 @@ const PageContent: FC = () => {
                               }
                         }
                         style={{
-                          opacity: !chatState.client || !conversation ? 0.7 : 1,
+                          opacity: !client || !conversation ? 0.7 : 1,
                         }}
                       >
                         <p className="text-[16px] text-primary font-medium leading-[100%] mb-2">
