@@ -1,5 +1,9 @@
 "use client";
 import { FC, useState } from "react";
+import { useWalletClient } from "wagmi";
+import { config } from "../onchainconfig/config";
+import { useSdk } from "@/sdk-config";
+import { sendGAEvent } from "@next/third-parties/google";
 
 interface Parameter {
   name: string;
@@ -19,14 +23,21 @@ interface Service {
 interface ServiceDetailsCardProps {
   service: Service;
   userAddress: string;
+  agentAddress: string;
   onCreateTask: (jsonString: string) => void;
 }
 
 export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
   service,
   userAddress,
+  agentAddress,
   onCreateTask,
 }) => {
+  const { data: walletClient } = useWalletClient({
+    config: config,
+  });
+  const sdk = useSdk(walletClient);
+
   const [inputs, setInputs] = useState<Record<string, string>>(
     Object.fromEntries(service.parameters.map((p) => [p.name, ""]))
   );
@@ -36,23 +47,35 @@ export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
     setInputs((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCreateTask = () => {
-    const json = {
-      type: "create_task",
-      from: userAddress,
-      to: "onii.ensemble",
-      content: {
-        data: {
-          task_id: "task_001",
-          service_id: service.id,
-          parameters: inputs,
-          price: service.price,
-          notes,
-        },
-      },
-    };
-    onCreateTask(JSON.stringify(json, null, 2));
+  const handleCreateTask = async () => {
+    // Generate a human-readable prompt from the details
+    const paramString = Object.entries(inputs)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join(", ");
+    
+    // Only include targetAudience if it's provided by the user
+    const targetAudience = inputs.targetAudience ? `\nTarget Audience: ${inputs.targetAudience}` : '';
+    
+    const prompt = `Create a task for service '${service.name}' (ID: ${service.id}) with parameters: { ${paramString} } for ${service.price} ${service.currency}. Notes: ${notes || "None"}${targetAudience}`;
+    
+    console.log("Attempting to create task with SDK...");
+    const task = await sdk?.createTask({
+      prompt,
+      proposalId: '1'
+    });
+    console.log("SDK task creation response:", task);
+    
+    onCreateTask(prompt);
+    sendGAEvent("create_task", {
+      agentId: agentAddress,
+      taskId: task?.id,
+      proposalId: '1',
+      service: service.name,
+    });
   };
+
+  // Check if required fields are filled
+  const isFormValid = inputs.project_name?.trim() && inputs.key_features?.trim();
 
   return (
     <div className="z-[1] border border-[#E5E7EB] rounded-xl bg-white flex flex-col md:flex-row p-4 gap-4 max-w-[676px] w-full">
@@ -110,8 +133,11 @@ export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
           </div>
         </div>
         <button
-          className="mt-2 rounded-full px-6 py-2 bg-primary transition flex items-center justify-center gap-2 text-white"
+          className={`mt-2 rounded-full px-6 py-2 transition flex items-center justify-center gap-2 text-white ${
+            isFormValid ? 'bg-primary' : 'bg-gray-400 cursor-not-allowed'
+          }`}
           onClick={handleCreateTask}
+          disabled={!isFormValid}
         >
           <span className="font-semibold text-white">Start Task</span>
           <img src="/assets/ensemble-white-icon.svg" alt="ensemble" className="w-5 h-5" />

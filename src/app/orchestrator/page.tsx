@@ -304,6 +304,7 @@ const PageContent: FC = () => {
                                       "service_details" ? (
                                     <ServiceDetailsCard
                                       service={message.content.data.service}
+                                      agentAddress={agentAddress || ''}
                                       userAddress={account.address!}
                                       onCreateTask={(jsonString) =>
                                         onSendMessage(jsonString)
