@@ -24,7 +24,7 @@ export const AgentServicesTable: FC<AgentServicesTableProps> = ({ services, onCr
           </tr>
         </thead>
         <tbody>
-          {services.map((service, idx) => (
+          {services?.map((service, idx) => (
             <tr key={service.id} className={idx !== services.length - 1 ? "border-b border-[#E5E7EB]" : ""}>
               <td className="pl-6 pr-2 py-4 font-bold text-[#FF4D29] align-middle whitespace-nowrap">{service.name}</td>
               <td className="px-2 py-4 align-middle whitespace-nowrap">

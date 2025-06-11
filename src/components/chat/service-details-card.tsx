@@ -65,7 +65,15 @@ export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
     });
     console.log("SDK task creation response:", task);
     
-    onCreateTask(prompt);
+    const message = {
+      task: {
+        service_id: service.id,
+        task_id: task?.id?.toString(),
+        price: service.price,
+        parameters: inputs,
+      }
+    }
+    onCreateTask(JSON.stringify(message));
     sendGAEvent("create_task", {
       agentId: agentAddress,
       taskId: task?.id,

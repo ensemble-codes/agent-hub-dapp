@@ -22,7 +22,6 @@ const AppHeader = () => {
         <div className="flex items-center gap-6">
         <Link
             href={"/register-agent"}
-            target="_blank"
             rel="noreferrer noopener"
             className="text-[14px] font-normal leading-[100%] text-[#121212]"
           >

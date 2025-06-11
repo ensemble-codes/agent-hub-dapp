@@ -953,6 +953,23 @@ const Page = () => {
                   </button>
                 ) : null}
               </div>
+              {registerSuccess && (
+                <div className="p-4 pt-0">
+                  <button
+                    className="w-full space-x-2 flex items-center justify-center gap-1 rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                    onClick={() => push(`/agents/${agentAddress}`)}
+                  >
+                    <img
+                      src="/assets/bolt-icon.svg"
+                      alt="bolt"
+                      className="w-4 h-4"
+                    />
+                    <span className="text-white text-[16px] font-[700] leading-[24px]">
+                      View Agent Profile
+                    </span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

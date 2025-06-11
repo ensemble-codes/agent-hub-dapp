@@ -272,7 +272,7 @@ const PageContent: FC = () => {
                         </div>
                       ) : (
                         <>
-                          {messages.map((message, index) => {
+                          {messages?.map((message, index) => {
                             const isPreviousFromSameSender =
                               index > 0 &&
                               messages[index - 1].isReceived ===
@@ -292,7 +292,7 @@ const PageContent: FC = () => {
                                   message.contentType === "json" &&
                                   message.content.type === "agent_services" ? (
                                     <AgentServicesTable
-                                      services={message.content.data.services}
+                                      services={message.content?.data?.services}
                                       onCreateTask={(service) =>
                                         onSendMessage(
                                           `I want to enable ${service.name} service`
