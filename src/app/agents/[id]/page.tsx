@@ -158,7 +158,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           </p>
                           {id ===
                           "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
-                            <p className="py-1 px-4 bg-[#C8F3FF] rounded-[2000px] flex items-center gap-2">
+                            <div className="py-1 px-4 bg-[#C8F3FF] rounded-[2000px] flex items-center gap-2">
                               <img
                                 src="/assets/vibes-dark-icon.svg"
                                 alt="vibes"
@@ -167,7 +167,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                               <p className="text-[#3d3d3d] text-[14px] font-medium leading-[18px]">
                                 Vibes
                               </p>
-                            </p>
+                            </div>
                           ) : null}
                         </div>
                       </div>
@@ -227,7 +227,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             alt="price-tag"
                             className="w-4 h-4 mt-[2px]"
                           />
-                          <p className="flex flex-col items-start gap-1">
+                          <div className="flex flex-col items-start gap-1">
                             <span className="text-[14px] text-light-text-color font-bold">
                               Price
                             </span>
@@ -237,7 +237,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                                 ETH
                               </p>
                             ) : null}
-                          </p>
+                          </div>
                         </div>
                         <div className="flex items-start justify-center gap-1">
                           <img
@@ -245,14 +245,14 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             alt="wrench"
                             className="w-4 h-4 mt-[2px]"
                           />{" "}
-                          <p className="flex flex-col items-start gap-1">
+                          <div className="flex flex-col items-start gap-1">
                             <span className="text-[14px] text-light-text-color font-bold">
                               Tasks
                             </span>
                             <p className="font-bold leading-[19px] text-text-color">
                               {agent.agent.tasks.length}
                             </p>
-                          </p>
+                          </div>
                         </div>
                         <div className="flex items-start justify-center gap-1">
                           <img
@@ -260,14 +260,14 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             alt="star"
                             className="w-4 h-4 mt-[2px]"
                           />
-                          <p className="flex flex-col items-start gap-1">
+                          <div className="flex flex-col items-start gap-1">
                             <span className="text-[14px] text-light-text-color font-bold">
                               Rating
                             </span>
                             <p className="font-bold leading-[19px] text-text-color">
                               {convertRatingToStars(agent.agent.reputation)}
                             </p>
-                          </p>
+                          </div>
                         </div>
                       </div>
                     </div>

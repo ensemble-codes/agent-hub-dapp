@@ -99,7 +99,7 @@ export const XMTPProvider: React.FC<XMTPProviderProps> = ({
         try {
           // create a new XMTP client
           xmtpClient = await Client.create(signer, {
-            env,
+            env: (process.env.NEXT_PUBLIC_XMTP_ENV as ClientOptions["env"]),
             loggingLevel,
             dbEncryptionKey,
             codecs: [

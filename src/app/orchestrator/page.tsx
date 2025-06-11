@@ -24,6 +24,8 @@ import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
 import { useAccount, useSignMessage } from "wagmi";
 import { createEOASigner } from "@/utils";
+import { AgentServicesTable } from "@/components/chat/agent-services-table";
+import { ServiceDetailsCard } from "@/components/chat/service-details-card";
 
 const PageContent: FC = () => {
   const searchParams = useSearchParams();
@@ -81,12 +83,11 @@ const PageContent: FC = () => {
         setIsInitializing(true);
         try {
           await initialize({
-            signer: createEOASigner(
-              account.address!,
-              (message: string) => signMessageAsync({ message })
+            signer: createEOASigner(account.address!, (message: string) =>
+              signMessageAsync({ message })
             ),
             env: "production",
-            loggingLevel: "off"
+            loggingLevel: "off",
           });
         } finally {
           setIsInitializing(false);
@@ -109,8 +110,19 @@ const PageContent: FC = () => {
 
   const scrollToBottom = useCallback(() => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
+      const scrollOptions = {
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: "smooth" as const,
+      };
+
+      // Try using scrollIntoView first (better for mobile)
+      const lastMessage = messagesContainerRef.current.lastElementChild;
+      if (lastMessage) {
+        lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
+      } else {
+        // Fallback to scrollTo if no messages
+        messagesContainerRef.current.scrollTo(scrollOptions);
+      }
     }
   }, []);
 
@@ -276,10 +288,40 @@ const PageContent: FC = () => {
                                   isPreviousFromSameSender ? "mb-1" : "mb-4"
                                 }`}
                               >
-                                <MessageContent
-                                  content={message.content}
-                                  isReceived={message.isReceived}
-                                />
+                                {message.isReceived ? (
+                                  message.contentType === "json" &&
+                                  message.content.type === "agent_services" ? (
+                                    <AgentServicesTable
+                                      services={message.content.data.services}
+                                      onCreateTask={(service) =>
+                                        onSendMessage(
+                                          `I want to enable ${service.name} service`
+                                        )
+                                      }
+                                    />
+                                  ) : message.contentType === "json" &&
+                                    message.content.type ===
+                                      "service_details" ? (
+                                    <ServiceDetailsCard
+                                      service={message.content.data.service}
+                                      agentAddress={agentAddress || ''}
+                                      userAddress={account.address!}
+                                      onCreateTask={(jsonString) =>
+                                        onSendMessage(jsonString)
+                                      }
+                                    />
+                                  ) : (
+                                    <MessageContent
+                                      content={message.content}
+                                      isReceived={message.isReceived}
+                                    />
+                                  )
+                                ) : (
+                                  <MessageContent
+                                    content={message.content}
+                                    isReceived={message.isReceived}
+                                  />
+                                )}
                               </div>
                             );
                           })}
@@ -382,8 +424,7 @@ const PageContent: FC = () => {
                       className="w-[120px] h-[120px] rounded-full object-cover"
                     />
                     <p className="text-[18px] text-primary text-center font-medium leading-[100%]">
-                      Hi, I'm Orchestrator
-                      , your ai assistant on agent hub
+                      Hi, I'm Orchestrator , your ai assistant on agent hub
                     </p>
                     <p className="text-[#121212] text-[14px] font-normal leading-[100%]">
                       What can I help you with?
