@@ -49,12 +49,12 @@ export function useConversation(address?: string) {
     }
 
     // Only try to parse as JSON if it looks like a JSON code block
-    if (message.content.includes('service_details') || message.content.includes('agent_services')) {
+    if (message.content.includes('service_details') || message.content.includes('agent_services') || message.content.includes('agent_list')) {
       try {
         const cleanContent = message.content.replace(/```json\n|\n```/g, '');
         const content = JSON.parse(cleanContent);
         console.log({ content });
-        if (content.type === 'agent_services' || content.type === 'service_details') {
+        if (content.type === 'agent_services' || content.type === 'service_details' || content.type === 'agent_list') {
           return {
             id: message.id,
             content: content,
