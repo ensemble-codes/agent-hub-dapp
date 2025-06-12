@@ -42,61 +42,85 @@ export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
     Object.fromEntries(service.parameters.map((p) => [p.name, ""]))
   );
   const [notes, setNotes] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
 
   const handleInputChange = (name: string, value: string) => {
     setInputs((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCreateTask = async () => {
-    // Generate a human-readable prompt from the details
-    const paramString = Object.entries(inputs)
-      .map(([key, value]) => `${key}: ${value}`)
-      .join(", ");
-    
-    // Only include targetAudience if it's provided by the user
-    const targetAudience = inputs.targetAudience ? `\nTarget Audience: ${inputs.targetAudience}` : '';
-    
-    const prompt = `Create a task for service '${service.name}' (ID: ${service.id}) with parameters: { ${paramString} } for ${service.price} ${service.currency}. Notes: ${notes || "None"}${targetAudience}`;
-    
-    console.log("Attempting to create task with SDK...");
-    const task = await sdk?.createTask({
-      prompt,
-      proposalId: '1'
-    });
-    console.log("SDK task creation response:", task);
-    
-    const message = {
-      task: {
-        service_id: service.id,
-        task_id: task?.id?.toString(),
-        price: service.price,
-        parameters: inputs,
-      }
+    try {
+      setIsCreating(true);
+      // Generate a human-readable prompt from the details
+      const paramString = Object.entries(inputs)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(", ");
+
+      // Only include targetAudience if it's provided by the user
+      const targetAudience = inputs.targetAudience
+        ? `\nTarget Audience: ${inputs.targetAudience}`
+        : "";
+
+      const prompt = `Create a task for service '${service.name}' (ID: ${
+        service.id
+      }) with parameters: { ${paramString} } for ${service.price} ${
+        service.currency
+      }. Notes: ${notes || "None"}${targetAudience}`;
+
+      console.log("Attempting to create task with SDK...");
+      const task = await sdk?.createTask({
+        prompt,
+        proposalId: "1",
+      });
+      console.log("SDK task creation response:", task);
+
+      const message = {
+        task: {
+          service_id: service.id,
+          task_id: task?.id?.toString(),
+          price: service.price,
+          parameters: inputs,
+        },
+      };
+      onCreateTask(JSON.stringify(message));
+      sendGAEvent("create_task", {
+        agentId: agentAddress,
+        taskId: task?.id,
+        proposalId: "1",
+        service: service.name,
+      });
+    } catch (error) {
+      console.error("Error creating task:", error);
+    } finally {
+      setIsCreating(false);
     }
-    onCreateTask(JSON.stringify(message));
-    sendGAEvent("create_task", {
-      agentId: agentAddress,
-      taskId: task?.id,
-      proposalId: '1',
-      service: service.name,
-    });
   };
 
-  // Check if required fields are filled
-  const isFormValid = inputs.project_name?.trim() && inputs.key_features?.trim();
+  // Check if all required fields are filled
+  const isFormValid = service.parameters
+    .filter((param) => param.required)
+    .every((param) => inputs[param.name]?.trim());
 
   return (
     <div className="z-[1] border border-[#E5E7EB] rounded-xl bg-white flex flex-col md:flex-row p-4 gap-4 max-w-[676px] w-full">
       {/* Left Side */}
       <div className="flex-1 min-w-[220px]">
         <div className="flex items-center gap-2 mb-1">
-          <div className="text-[#FF4D29] font-bold text-lg flex items-center gap-2"><img src="/assets/multi-stars-shape-icon.svg" alt="stars" className="w-5 h-5" /> {service.name}</div>
+          <div className="text-[#FF4D29] font-bold text-lg flex items-center gap-2">
+            <img
+              src="/assets/multi-stars-shape-icon.svg"
+              alt="stars"
+              className="w-5 h-5"
+            />{" "}
+            {service.name}
+          </div>
         </div>
         <div className="text-[#8F95B2] text-sm mb-4">{service.description}</div>
         {service.parameters.map((param) => (
           <div key={param.name} className="mb-4">
             <div className="font-semibold text-[#121212]">
-              {param.name.replace(/_/g, " ")}{param.required && <span className="text-[#FF4D29]">*</span>}
+              {param.name.replace(/_/g, " ")}
+              {param.required && <span className="text-[#FF4D29]">*</span>}
             </div>
             <input
               className="w-full border-b border-[#E5E7EB] bg-transparent outline-none py-1 text-[#FF4D29] text-[15px] placeholder-[#FF4D29]/50"
@@ -135,23 +159,42 @@ export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
           <div className="mb-2">
             <span className="text-[#8F95B2] text-sm">Credits</span>
             <div className="flex items-center gap-1 font-semibold text-[#FF4D29]">
-              <img src="/assets/ensemble-highlighted-icon.svg" alt="credits" className="w-4 h-4 inline-block" />
+              <img
+                src="/assets/ensemble-highlighted-icon.svg"
+                alt="credits"
+                className="w-4 h-4 inline-block"
+              />
               {service.price}
             </div>
           </div>
         </div>
         <button
           className={`mt-2 rounded-full px-6 py-2 transition flex items-center justify-center gap-2 text-white ${
-            isFormValid ? 'bg-primary' : 'bg-gray-400 cursor-not-allowed'
+            isFormValid && !isCreating
+              ? "bg-primary"
+              : "bg-gray-400 cursor-not-allowed"
           }`}
           onClick={handleCreateTask}
-          disabled={!isFormValid}
+          disabled={!isFormValid || isCreating}
         >
-          <span className="font-semibold text-white">Start Task</span>
-          <img src="/assets/ensemble-white-icon.svg" alt="ensemble" className="w-5 h-5" />
-          <span className="font-semibold text-white">{service.price}</span>
+          {isCreating ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span className="font-semibold text-white">Creating...</span>
+            </>
+          ) : (
+            <>
+              <span className="font-semibold text-white">Start Task</span>
+              <img
+                src="/assets/ensemble-white-icon.svg"
+                alt="ensemble"
+                className="w-5 h-5"
+              />
+              <span className="font-semibold text-white">{service.price}</span>
+            </>
+          )}
         </button>
       </div>
     </div>
   );
-}; 
+};

@@ -26,6 +26,7 @@ import { useAccount, useSignMessage } from "wagmi";
 import { createEOASigner } from "@/utils";
 import { AgentServicesTable } from "@/components/chat/agent-services-table";
 import { ServiceDetailsCard } from "@/components/chat/service-details-card";
+import { StructuredMessage } from "@/components/chat/structured-message";
 
 const PageContent: FC = () => {
   const searchParams = useSearchParams();
@@ -304,11 +305,16 @@ const PageContent: FC = () => {
                                       "service_details" ? (
                                     <ServiceDetailsCard
                                       service={message.content.data.service}
-                                      agentAddress={agentAddress || ''}
+                                      agentAddress={agentAddress || ""}
                                       userAddress={account.address!}
                                       onCreateTask={(jsonString) =>
                                         onSendMessage(jsonString)
                                       }
+                                    />
+                                  ) : message.contentType === "json" &&
+                                    message.content.type === "agent_list" ? (
+                                    <StructuredMessage
+                                      content={message.content.content}
                                     />
                                   ) : (
                                     <MessageContent
