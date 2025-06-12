@@ -30,14 +30,12 @@ export type XMTPContextValue = {
   /**
    * The XMTP client instance
    */
-  client?: Client;
+  client?: Client<any>;
   /**
    * Set the XMTP client instance
    */
-  setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
-  initialize: (
-    options: InitializeClientOptions,
-  ) => Promise<Client | undefined>;
+  setClient: React.Dispatch<React.SetStateAction<Client<any> | undefined>>;
+  initialize: (options: InitializeClientOptions) => Promise<Client<any> | undefined>;
   initializing: boolean;
   error: Error | null;
   disconnect: () => void;
@@ -55,14 +53,14 @@ export type XMTPProviderProps = React.PropsWithChildren & {
   /**
    * Initial XMTP client instance
    */
-  client?: Client;
+  client?: Client<any>;
 };
 
 export const XMTPProvider: React.FC<XMTPProviderProps> = ({
   children,
   client: initialClient,
 }) => {
-  const [client, setClient] = useState<Client | undefined>(initialClient);
+  const [client, setClient] = useState<Client<any> | undefined>(initialClient);
 
   const [initializing, setInitializing] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -94,7 +92,7 @@ export const XMTPProvider: React.FC<XMTPProviderProps> = ({
         // reset initializing state
         setInitializing(true);
 
-        let xmtpClient: Client;
+        let xmtpClient: Client<any>;
 
         try {
           // create a new XMTP client
