@@ -280,25 +280,28 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       }}
                     />
                     <div className="w-full flex lg:flex-row flex-col items-center gap-4">
-                      <button
-                        className="lg:w-fit w-full space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                        onClick={() =>
-                          push(
-                            `/task-center?service=${agent.agent.proposals[0]?.service}&proposal=${agent.agent.proposals[0]?.id}`
-                          )
-                        }
-                      >
-                        <img
-                          src="/assets/bolt-icon.svg"
-                          alt="bolt"
-                          className="w-4 h-4"
-                        />
-                        <span className="text-white text-[18px] font-[700] leading-[24px]">
-                          {agent.agent.proposals &&
-                            agent.agent.proposals.length &&
-                            agent.agent.proposals[0].service}
-                        </span>
-                      </button>
+                      {id ===
+                      "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d" ? null : (
+                        <button
+                          className="lg:w-fit w-full space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                          onClick={() =>
+                            push(
+                              `/task-center?service=${agent.agent.proposals[0]?.service}&proposal=${agent.agent.proposals[0]?.id}`
+                            )
+                          }
+                        >
+                          <img
+                            src="/assets/bolt-icon.svg"
+                            alt="bolt"
+                            className="w-4 h-4"
+                          />
+                          <span className="text-white text-[18px] font-[700] leading-[24px]">
+                            {agent.agent.proposals &&
+                              agent.agent.proposals.length &&
+                              agent.agent.proposals[0].service}
+                          </span>
+                        </button>
+                      )}
                       <button
                         className="lg:w-fit w-full space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#121212]"
                         onClick={() =>
@@ -460,7 +463,8 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                   </div>
                 </div>
               </div>
-              {id === "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
+              {id === "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ||
+              id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d" ? (
                 <>
                   <div className="flex lg:flex-row flex-col items-stretch gap-4 w-full mt-4">
                     <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
@@ -607,24 +611,34 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
                           onClick={() =>
                             copyToClipboard(
-                              "I want you to make a blessing or a greeting"
+                              id ===
+                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                                ? "Which services can you provide?"
+                                : "I want you to make a blessing or a greeting"
                             )
                           }
                         >
-                          "I want you to make a blessing or a greeting"
+                          {id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                            ? "Which services can you provide?"
+                            : "I want you to make a blessing or a greeting"}
                         </p>
                         <img
                           src="/assets/copy-icon.svg"
                           alt="copy"
                           className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
                             copiedPrompt ===
-                            "I want you to make a blessing or a greeting"
+                            (id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                              ? "Which services can you provide?"
+                              : "I want you to make a blessing or a greeting")
                               ? "opacity-50"
                               : ""
                           }`}
                           onClick={() =>
                             copyToClipboard(
-                              "I want you to make a blessing or a greeting"
+                              id ===
+                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                                ? "Which services can you provide?"
+                                : "I want you to make a blessing or a greeting"
                             )
                           }
                         />
@@ -634,24 +648,34 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
                           onClick={() =>
                             copyToClipboard(
-                              "I want you to reply to an account on Twitter"
+                              id ===
+                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                                ? "Write a bull post about AI agents and crypto"
+                                : "I want you to reply to an account on Twitter"
                             )
                           }
                         >
-                          "I want you to reply to an account on Twitter"
+                          {id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                            ? "Write a bull post about AI agents and crypto"
+                            : "I want you to reply to an account on Twitter"}
                         </p>
                         <img
                           src="/assets/copy-icon.svg"
                           alt="copy"
                           className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
                             copiedPrompt ===
-                            "I want you to reply to an account on Twitter"
+                            (id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                              ? "Write a bull post about AI agents and crypto"
+                              : "I want you to reply to an account on Twitter")
                               ? "opacity-50"
                               : ""
                           }`}
                           onClick={() =>
                             copyToClipboard(
-                              "I want you to reply to an account on Twitter"
+                              id ===
+                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                                ? "Write a bull post about AI agents and crypto"
+                                : "I want you to reply to an account on Twitter"
                             )
                           }
                         />
@@ -661,25 +685,34 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
                           onClick={() =>
                             copyToClipboard(
-                              "I want you to shill a project on Twitter for maximum reach"
+                              id ===
+                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                                ? "Post a twitter that explains how LLMs work"
+                                : "I want you to shill a project on Twitter for maximum reach"
                             )
                           }
                         >
-                          "I want you to shill a project on Twitter for maximum
-                          reach"
+                          {id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                            ? "Post a twitter that explains how LLMs work"
+                            : "I want you to shill a project on Twitter for maximum reach"}
                         </p>
                         <img
                           src="/assets/copy-icon.svg"
                           alt="copy"
                           className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
                             copiedPrompt ===
-                            "I want you to shill a project on Twitter for maximum reach"
+                            (id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                              ? "Post a twitter that explains how LLMs work"
+                              : "I want you to shill a project on Twitter for maximum reach")
                               ? "opacity-50"
                               : ""
                           }`}
                           onClick={() =>
                             copyToClipboard(
-                              "I want you to shill a project on Twitter for maximum reach"
+                              id ===
+                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                                ? "Post a twitter that explains how LLMs work"
+                                : "I want you to shill a project on Twitter for maximum reach"
                             )
                           }
                         />
@@ -689,24 +722,34 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
                           onClick={() =>
                             copyToClipboard(
-                              "Show me some samples of your best work so far"
+                              id ===
+                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                                ? "Help to market my crypto product"
+                                : "Show me some samples of your best work so far"
                             )
                           }
                         >
-                          "Show me some samples of your best work so far"
+                          {id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                            ? "Help to market my crypto product"
+                            : "Show me some samples of your best work so far"}
                         </p>
                         <img
                           src="/assets/copy-icon.svg"
                           alt="copy"
                           className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
                             copiedPrompt ===
-                            "Show me some samples of your best work so far"
+                            (id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                              ? "Help to market my crypto product"
+                              : "Show me some samples of your best work so far")
                               ? "opacity-50"
                               : ""
                           }`}
                           onClick={() =>
                             copyToClipboard(
-                              "Show me some samples of your best work so far"
+                              id ===
+                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
+                                ? "Help to market my crypto product"
+                                : "Show me some samples of your best work so far"
                             )
                           }
                         />
