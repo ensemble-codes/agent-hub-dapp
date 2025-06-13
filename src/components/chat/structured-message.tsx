@@ -27,7 +27,7 @@ export const StructuredMessage: FC<StructuredMessageProps> = ({ content }) => {
       ) : null}
       <div className="flex items-center gap-4 flex-wrap">
         {content.agents.map((agent) => (
-          <Link key={agent.id} href={`/agent/${agent.id}`}>
+          <Link key={agent.id} href={`/agents/${agent.id}`}>
             <div className="p-3 w-[320px] border border-[#8F95B2] rounded-lg z-[2]">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
