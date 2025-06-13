@@ -13,7 +13,19 @@ export const MessageContent: FC<MessageContentProps> = ({ content, isReceived })
       !isReceived ? 'py-[2px] px-3 bg-primary/15' : ''
     }`}>
       <div className="prose prose-sm max-w-none">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        <ReactMarkdown 
+          remarkPlugins={[remarkGfm]}
+          components={{
+            a: ({ node, ...props }) => (
+              <a 
+                {...props} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              />
+            ),
+          }}
+        >
           {content}
         </ReactMarkdown>
       </div>
