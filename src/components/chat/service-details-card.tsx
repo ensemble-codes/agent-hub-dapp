@@ -102,7 +102,7 @@ export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
     .every((param) => inputs[param.name]?.trim());
 
   return (
-    <div className="z-[1] border border-[#E5E7EB] rounded-xl bg-white flex flex-col md:flex-row p-4 gap-4 max-w-[676px] w-full">
+    <div className="z-[2] border border-[#E5E7EB] rounded-xl bg-white flex flex-col md:flex-row p-4 gap-4 max-w-[676px] w-full">
       {/* Left Side */}
       <div className="flex-1 min-w-[220px]">
         <div className="flex items-center gap-2 mb-1">

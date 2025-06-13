@@ -14,7 +14,7 @@ interface AgentServicesTableProps {
 
 export const AgentServicesTable: FC<AgentServicesTableProps> = ({ services, onCreateTask }) => {
   return (
-    <div className="overflow-x-auto border border-[#E5E7EB] rounded-xl bg-white">
+    <div className="max-w-[70%] z-[2] overflow-x-auto border border-[#E5E7EB] rounded-xl bg-white">
       <table className="min-w-full text-[15px]">
         <thead>
           <tr className="bg-white">

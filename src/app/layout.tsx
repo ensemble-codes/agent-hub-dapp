@@ -55,7 +55,7 @@ export default function RootLayout({
             <XMTPProvider>
               <Wrapper>
                 <MobileHeader />
-                <main className="lg:py-[124px] py-[36px] container mx-auto flex-1 max-md:px-[20px]">
+                <main className="lg:py-[72px] py-[36px] container mx-auto flex-1 max-md:px-[20px]">
                   {children}
                 </main>
                 <Footer />

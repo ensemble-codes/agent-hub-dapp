@@ -188,7 +188,7 @@ const PageContent: FC = () => {
       const timeout = setTimeout(() => {
         console.log("Timeout reached, resetting waiting state");
         setIsWaitingForResponse(false);
-      }, 10000);
+      }, 30000);
 
       return () => clearTimeout(timeout);
     }
@@ -204,7 +204,7 @@ const PageContent: FC = () => {
             <img
               src="/assets/orchestrator-pattern-bg.svg"
               alt="pattern"
-              className="lg:block hidden absolute left-0 bottom-0 w-full"
+              className="lg:block hidden absolute left-0 bottom-0 w-full opacity-40"
             />
             <div className="flex flex-col w-full h-full">
               <div className="flex items-center justify-between">
@@ -332,21 +332,9 @@ const PageContent: FC = () => {
                             );
                           })}
                           {isWaitingForResponse ? (
-                            <div className="flex justify-start mb-4">
-                              <div className="flex items-center gap-1 px-3 py-2 bg-gray-100 rounded-[2000px]">
-                                <div
-                                  className="w-2 h-2 bg-[#8F95B2] rounded-full animate-bounce"
-                                  style={{ animationDelay: "0ms" }}
-                                />
-                                <div
-                                  className="w-2 h-2 bg-[#8F95B2] rounded-full animate-bounce"
-                                  style={{ animationDelay: "150ms" }}
-                                />
-                                <div
-                                  className="w-2 h-2 bg-[#8F95B2] rounded-full animate-bounce"
-                                  style={{ animationDelay: "300ms" }}
-                                />
-                              </div>
+                            <div className="flex items-center justify-start mb-4 gap-2">
+                              <img src="/assets/ensemble-highlighted-icon.svg" alt="loading" className="w-5 h-5 animate-spin-slow ease-in-out" />
+                              <p className="text-[14px] font-medium text-primary">Loading...</p>
                             </div>
                           ) : null}
                         </>
