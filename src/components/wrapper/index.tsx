@@ -14,7 +14,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
   /* const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
-  const [showRegisterModal, setShowRegisterModal] = useState(true);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [checkingEligibility, setCheckingEligibility] = useState(false);
 
   const checkWallet = useCallback(async () => {
@@ -39,9 +39,9 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
     }
   }, [address]);
 
-  useEffect(() => {
-    if (address) checkWallet();
-  }, [address]);
+  // useEffect(() => {
+  //   if (address) checkWallet();
+  // }, [address]);
 
   // Disable body scrolling when modal is open
   useEffect(() => {
