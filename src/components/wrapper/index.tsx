@@ -1,17 +1,17 @@
 "use client";
-import { FC, useCallback, useEffect, useState } from "react";
-import { useAccount, useDisconnect } from "wagmi";
+import { FC/* , useCallback, useEffect, useState */ } from "react";
+/* import { useAccount, useDisconnect } from "wagmi";
 import Modal from "../modal";
 import Loader from "../loader";
 import Link from "next/link";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useConnectModal } from "@rainbow-me/rainbowkit"; */
 
 interface WrapperProps {
   children: React.ReactNode;
 }
 
 const Wrapper: FC<WrapperProps> = ({ children }) => {
-  const { openConnectModal } = useConnectModal();
+  /* const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
   const [showRegisterModal, setShowRegisterModal] = useState(true);
@@ -56,12 +56,12 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
         document.body.style.overflow = originalOverflow;
       };
     }
-  }, [showRegisterModal]);
+  }, [showRegisterModal]); */
 
   return (
     <>
       {children}
-      <Modal isOpen={showRegisterModal} overlayClassName="bg-black/90">
+      {/* <Modal isOpen={showRegisterModal} overlayClassName="bg-black/90">
         <div className="p-12 relative overflow-hidden w-[600px] h-[400px] flex flex-col items-center justify-between">
           <img
             className="absolute top-0 left-0 object-cover w-full h-full z-[-1]"
@@ -148,7 +148,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
             </>
           )}
         </div>
-      </Modal>
+      </Modal> */}
     </>
   );
 };
