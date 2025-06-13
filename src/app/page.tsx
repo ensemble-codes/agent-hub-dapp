@@ -32,7 +32,7 @@ export default function Home() {
   const GET_TOP_AGENT = useMemo(
     () => gql`
       query MyQuery {
-        agent(id: "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184") {
+        agent(id: "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d") {
           agentUri
           id
           metadata {
