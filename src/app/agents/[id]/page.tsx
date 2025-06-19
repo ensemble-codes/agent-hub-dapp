@@ -305,7 +305,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       <button
                         className="lg:w-fit w-full space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#121212]"
                         onClick={() =>
-                          push(`/orchestrator?agent=${agent.agent.id}`)
+                          push(`/chat?agent=${agent.agent.id}`)
                         }
                       >
                         <img
