@@ -10,6 +10,7 @@ import {
   useState,
   Suspense,
   useMemo,
+  memo,
 } from "react";
 import { MessageContent } from "@/components/chat/message-content";
 import {
@@ -34,6 +35,7 @@ const PageContent: FC = () => {
   const account = useAccount();
   const { signMessageAsync } = useSignMessage();
   const [isInitializing, setIsInitializing] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
   const GET_AGENT = useMemo(
     () => gql`
@@ -74,12 +76,14 @@ const PageContent: FC = () => {
     useConversation(
       agentAddress || "0x5C02b4685492D36a40107B6eC48A91ab3f8875cb"
     );
-  const { client, initialize, initializing } = useXMTP();
+  const { client, initialize, initializing, error: xmtpError } = useXMTP();
 
   // Initialize XMTP client when the page loads
   useEffect(() => {
+    const abortController = new AbortController();
+    
     const initializeClient = async () => {
-      if (!client && account.isConnected && !isInitializing && !initializing) {
+      if (!client && account.isConnected && !isInitializing && !initializing && !abortController.signal.aborted) {
         console.log("Initializing XMTP client...");
         setIsInitializing(true);
         try {
@@ -90,13 +94,25 @@ const PageContent: FC = () => {
             env: "production",
             loggingLevel: "off",
           });
+        } catch (error) {
+          if (!abortController.signal.aborted) {
+            console.error("Failed to initialize XMTP client:", error);
+            setConnectionError("Failed to connect to XMTP");
+          }
         } finally {
-          setIsInitializing(false);
+          if (!abortController.signal.aborted) {
+            setIsInitializing(false);
+          }
         }
       }
     };
+    
     initializeClient();
-  }, [client, account.isConnected, initialize, initializing, isInitializing]);
+    
+    return () => {
+      abortController.abort();
+    };
+  }, [client, account.isConnected, initialize, initializing, isInitializing, account.address, signMessageAsync]);
 
   const stopStreamRef = useRef<() => void | null>(null);
 
@@ -111,26 +127,45 @@ const PageContent: FC = () => {
 
   const scrollToBottom = useCallback(() => {
     if (messagesContainerRef.current) {
-      const scrollOptions = {
-        top: messagesContainerRef.current.scrollHeight,
-        behavior: "smooth" as const,
-      };
-
-      // Try using scrollIntoView first (better for mobile)
-      const lastMessage = messagesContainerRef.current.lastElementChild;
-      if (lastMessage) {
-        lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
-      } else {
-        // Fallback to scrollTo if no messages
-        messagesContainerRef.current.scrollTo(scrollOptions);
-      }
+      // Use requestAnimationFrame for better performance
+      requestAnimationFrame(() => {
+        if (messagesContainerRef.current) {
+          const container = messagesContainerRef.current;
+          const lastMessage = container.lastElementChild;
+          
+          if (lastMessage) {
+            // Use scrollIntoView with better options for smoother scrolling
+            lastMessage.scrollIntoView({ 
+              behavior: "smooth", 
+              block: "end",
+              inline: "nearest"
+            });
+          } else {
+            // Fallback to scrollTo if no messages
+            container.scrollTo({
+              top: container.scrollHeight,
+              behavior: "smooth"
+            });
+          }
+        }
+      });
     }
   }, []);
 
+  // Throttled scroll to bottom to prevent excessive calls
+  const throttledScrollToBottom = useCallback(() => {
+    let timeoutId: NodeJS.Timeout;
+    return () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(scrollToBottom, 100);
+    };
+  }, [scrollToBottom]);
+
   // Scroll to bottom when messages change
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+    const scroll = throttledScrollToBottom();
+    scroll();
+  }, [messages, throttledScrollToBottom]);
 
   // Initialize client and load messages
   useEffect(() => {
@@ -156,15 +191,18 @@ const PageContent: FC = () => {
     async (input?: string) => {
       if (isWaitingForResponse) return;
       const sendInput = input || chatInput;
-      if (!sendInput) return;
+      if (!sendInput.trim()) return;
 
       setIsWaitingForResponse(true);
       setLastMessageTime(Date.now());
+      setConnectionError(null); // Clear any previous errors
+      
       try {
         await send(sendInput);
         setChatInput("");
       } catch (error) {
         console.error("Error sending message:", error);
+        setConnectionError("Failed to send message. Please try again.");
         setIsWaitingForResponse(false);
       }
     },
@@ -194,22 +232,105 @@ const PageContent: FC = () => {
     }
   }, [isWaitingForResponse]);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + Enter to send message
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (chatInput.trim() && !isWaitingForResponse && client && conversation) {
+          onSendMessage();
+        }
+      }
+      
+      // Escape to clear input
+      if (e.key === 'Escape') {
+        setChatInput('');
+        setConnectionError(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [chatInput, isWaitingForResponse, client, conversation, onSendMessage]);
+
+  // Memoized message component for better performance
+  const MemoizedMessage = memo(({ message, index, messages, onSendMessage, agentAddress, account }: any) => {
+    const isPreviousFromSameSender =
+      index > 0 &&
+      messages[index - 1].isReceived === message.isReceived;
+      
+    return (
+      <div
+        className={`flex ${
+          !message.isReceived
+            ? "justify-end"
+            : "justify-start"
+        } ${
+          isPreviousFromSameSender ? "mb-1" : "mb-4"
+        }`}
+      >
+        {message.isReceived ? (
+          message.contentType === "json" &&
+          message.content.type === "agent_services" ? (
+            <AgentServicesTable
+              services={message.content?.data?.services}
+              onCreateTask={(service) =>
+                onSendMessage(
+                  `I want to enable ${service.name} service`
+                )
+              }
+            />
+          ) : message.contentType === "json" &&
+            message.content.type ===
+              "service_details" ? (
+            <ServiceDetailsCard
+              service={message.content.data.service}
+              agentAddress={agentAddress || ""}
+              userAddress={account.address!}
+              onCreateTask={(jsonString) =>
+                onSendMessage(jsonString)
+              }
+            />
+          ) : message.contentType === "json" &&
+            message.content.type === "agent_list" ? (
+            <StructuredMessage
+              content={message.content.content}
+            />
+          ) : (
+            <MessageContent
+              content={message.content}
+              isReceived={message.isReceived}
+            />
+          )
+        ) : (
+          <MessageContent
+            content={message.content}
+            isReceived={message.isReceived}
+          />
+        )}
+      </div>
+    );
+  });
+
+  MemoizedMessage.displayName = "MemoizedMessage";
+
   return (
     <>
       <div>
         <AppHeader />
         <div className="flex items-start gap-4 lg:pt-8">
           <SideMenu />
-          <div className="grow w-full lg:!h-[800px] lg:bg-white rounded-[16px] p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
+          <div className="grow w-full lg:!h-[800px] h-[calc(100dvh-150px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
             <img
               src="/assets/orchestrator-pattern-bg.svg"
               alt="pattern"
-              className="lg:block hidden absolute left-0 bottom-0 w-full opacity-40"
+              className="absolute left-0 bottom-0 w-full opacity-40"
             />
             <div className="flex flex-col w-full h-full">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  {isChatOpen ? (
+                  {isChatOpen || agentAddress ? (
                     <>
                       <Link
                         href={`/agents/${
@@ -223,7 +344,7 @@ const PageContent: FC = () => {
                           <img
                             src={
                               agentData && agentData.agent
-                                ? agentData.agent?.metadata?.imageUri.startsWith(
+                                ? agentData.agent?.metadata?.imageUri?.startsWith(
                                     "https://"
                                   )
                                   ? agentData.agent?.metadata?.imageUri
@@ -256,6 +377,22 @@ const PageContent: FC = () => {
               </div>
               {isChatOpen || agentAddress ? (
                 <>
+                  {/* Error Display */}
+                  {connectionError && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex items-center gap-2 text-red-700 text-sm">
+                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        <span>{connectionError}</span>
+                        <button 
+                          onClick={() => setConnectionError(null)}
+                          className="ml-auto text-red-500 hover:text-red-700"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="w-full h-[94%] flex flex-col items-start justify-between gap-[20px]">
                     <div
                       ref={messagesContainerRef}
@@ -271,64 +408,32 @@ const PageContent: FC = () => {
                             </p>
                           </div>
                         </div>
+                      ) : messages.length === 0 && !loading ? (
+                        <div className="flex items-center justify-center h-full">
+                          <div className="flex flex-col items-center gap-2 text-center">
+                            <img 
+                              src="/assets/chat-icon.svg" 
+                              alt="chat" 
+                              className="w-12 h-12 opacity-50"
+                            />
+                            <p className="text-[#8F95B2] text-sm">
+                              No messages yet. Start a conversation!
+                            </p>
+                          </div>
+                        </div>
                       ) : (
                         <>
                           {messages?.map((message, index) => {
-                            const isPreviousFromSameSender =
-                              index > 0 &&
-                              messages[index - 1].isReceived ===
-                                message.isReceived;
                             return (
-                              <div
+                              <MemoizedMessage
                                 key={message.id}
-                                className={`flex ${
-                                  !message.isReceived
-                                    ? "justify-end"
-                                    : "justify-start"
-                                } ${
-                                  isPreviousFromSameSender ? "mb-1" : "mb-4"
-                                }`}
-                              >
-                                {message.isReceived ? (
-                                  message.contentType === "json" &&
-                                  message.content.type === "agent_services" ? (
-                                    <AgentServicesTable
-                                      services={message.content?.data?.services}
-                                      onCreateTask={(service) =>
-                                        onSendMessage(
-                                          `I want to enable ${service.name} service`
-                                        )
-                                      }
-                                    />
-                                  ) : message.contentType === "json" &&
-                                    message.content.type ===
-                                      "service_details" ? (
-                                    <ServiceDetailsCard
-                                      service={message.content.data.service}
-                                      agentAddress={agentAddress || ""}
-                                      userAddress={account.address!}
-                                      onCreateTask={(jsonString) =>
-                                        onSendMessage(jsonString)
-                                      }
-                                    />
-                                  ) : message.contentType === "json" &&
-                                    message.content.type === "agent_list" ? (
-                                    <StructuredMessage
-                                      content={message.content.content}
-                                    />
-                                  ) : (
-                                    <MessageContent
-                                      content={message.content}
-                                      isReceived={message.isReceived}
-                                    />
-                                  )
-                                ) : (
-                                  <MessageContent
-                                    content={message.content}
-                                    isReceived={message.isReceived}
-                                  />
-                                )}
-                              </div>
+                                message={message}
+                                index={index}
+                                messages={messages}
+                                onSendMessage={onSendMessage}
+                                agentAddress={agentAddress || ""}
+                                account={account}
+                              />
                             );
                           })}
                           {isWaitingForResponse ? (
@@ -340,7 +445,7 @@ const PageContent: FC = () => {
                         </>
                       )}
                     </div>
-                    <div className="h-[40px] flex-shrink-0 flex items-stretch justify-center w-full border border-[#8F95B2] rounded-[8px] bg-white z-[11]">
+                    <div className="h-[40px] flex-shrink-0 flex items-stretch justify-center w-full border border-[#8F95B2] rounded-[8px] bg-white z-[11] relative">
                       <input
                         placeholder="Chat..."
                         className="basis-[80%] grow p-4 text-[16px] placeholder:text-[#8F95B2] outline-none border-none rounded-[8px]"
@@ -360,26 +465,28 @@ const PageContent: FC = () => {
                           }
                         }}
                         disabled={isWaitingForResponse}
+                        maxLength={1000}
                       />
+                      {/* Character Counter */}
+                      {chatInput.length > 800 && (
+                        <div className="absolute right-16 top-1 text-xs text-gray-400">
+                          {chatInput.length}/1000
+                        </div>
+                      )}
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div
                               className={`basis-[10%] border-l-[1px] border-l-[#8F95B2] flex items-center justify-center ${
-                                isWaitingForResponse
+                                isWaitingForResponse || !chatInput.trim() || !client || !conversation
                                   ? "opacity-50 cursor-not-allowed"
-                                  : "cursor-pointer"
+                                  : "cursor-pointer hover:bg-gray-50 transition-colors"
                               }`}
                               onClick={
-                                !client || !conversation
+                                !client || !conversation || !chatInput.trim() || isWaitingForResponse
                                   ? undefined
                                   : () => {
-                                      if (
-                                        chatInput.trim() &&
-                                        !isWaitingForResponse
-                                      ) {
-                                        onSendMessage();
-                                      }
+                                      onSendMessage();
                                     }
                               }
                             >
@@ -387,6 +494,7 @@ const PageContent: FC = () => {
                                 <img
                                   src="/assets/pixelated-arrow-primary-icon.svg"
                                   alt="arrow"
+                                  className={!chatInput.trim() || isWaitingForResponse ? "opacity-50" : ""}
                                 />
                               ) : (
                                 <Loader />
@@ -407,7 +515,7 @@ const PageContent: FC = () => {
                     <img
                       src={
                         agentData && agentData.agent
-                          ? agentData.agent?.metadata?.imageUri.startsWith(
+                          ? agentData.agent?.metadata?.imageUri?.startsWith(
                               "https://"
                             )
                             ? agentData.agent?.metadata?.imageUri

@@ -13,17 +13,17 @@ const SideMenu = () => {
       <div className="p-4 bg-white rounded-[16px] w-full flex flex-col items-start justify-between">
         <div
           className={`p-4 rounded-[16px] ${
-            pathname === "/orchestrator" ? "bg-[#F5F5F5]" : ""
+            pathname === "/chat" ? "bg-[#F5F5F5]" : ""
           }`}
         >
-          <Link href={"/orchestrator"}>
+          <Link href={"/chat"}>
             <img
               src={
-                pathname === "/orchestrator"
+                pathname === "/chat"
                   ? "/assets/ensemble-highlighted-icon.svg"
                   : "/assets/ensemble-icon.svg"
               }
-              alt="orchestrator"
+              alt="chat"
               className="w-6 h-6"
             />
           </Link>
