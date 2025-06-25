@@ -163,10 +163,10 @@ export default function Home() {
   return (
     <>
       <div>
-        <AppHeader />
-        <div className="flex items-start gap-4 lg:pt-8">
+        <div className="flex items-start gap-4">
           <SideMenu />
           <div className="grow w-full ">
+          <AppHeader />
             <h1 className="lg:hidden text-[24px] font-semibold text-primary mb-4" style={{ textShadow: '0px 4px 12px #F94D2733' }}>MarketPlace</h1>
             <div className="flex items-stretch gap-6 mb-6 w-full overflow-x-auto">
               {topAgentData ? (
