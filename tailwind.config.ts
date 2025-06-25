@@ -13,7 +13,7 @@ export default {
         graphik: ["Graphik", ...fontFamily.sans],
       },
       colors: {
-        primary: "#FE4600",
+        primary: "#F94D27",
         "text-color": "#3D3D3D",
         "light-text-color": "#8F95B2",
         "placeholder-text": "#6F6D66",

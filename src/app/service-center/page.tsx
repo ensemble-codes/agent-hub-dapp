@@ -11,10 +11,14 @@ const Page = () => {
 
   return (
     <div>
-      <AppHeader />
       <div className="flex items-start gap-4 pt-8">
         <SideMenu />
-        <HomeMain selectedService={(service) => handleServiceSelect(service)} />
+        <div className="grow w-full">
+          <AppHeader />
+          <HomeMain
+            selectedService={(service) => handleServiceSelect(service)}
+          />
+        </div>
       </div>
     </div>
   );

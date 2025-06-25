@@ -9,18 +9,9 @@ const AppHeader = () => {
 
   return (
     <>
-      <div className="hidden w-full lg:flex items-center justify-between py-2 px-4 bg-white rounded-[16px]">
-        <Link
-          href={"/"}
-        >
-          <img
-            src="/assets/logo-icon.svg"
-            alt="logo"
-            className="w-[75px] h-[68px]"
-          />
-        </Link>
-        <div className="flex items-center gap-6">
-        <Link
+      <div className="hidden w-full lg:flex items-center justify-end py-2 px-4 bg-white rounded-[16px] lg:mb-8">
+        <div className="flex items-center justify-end gap-6">
+          <Link
             href={"/register-agent"}
             rel="noreferrer noopener"
             className="text-[14px] font-normal leading-[100%] text-[#121212]"
@@ -44,7 +35,7 @@ const AppHeader = () => {
             DOCS
           </Link>
           {isConnected ? (
-              <ConnectButton showBalance={false} />
+            <ConnectButton showBalance={false} />
           ) : (
             <button
               className="w-auto space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
