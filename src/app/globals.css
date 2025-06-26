@@ -7,6 +7,12 @@
   src: url("/fonts/GraphikRegular.otf") format("opentype");
 }
 
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("/fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
+}
+
 body {
   background: #F9F9F9;
   font-family: "Graphik";

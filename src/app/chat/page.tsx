@@ -334,7 +334,7 @@ const PageContent: FC = () => {
   return (
     <>
       <div>
-        <div className="flex items-start gap-4 lg:pt-8">
+        <div className="flex items-start gap-4">
           <SideMenu />
           <div className="grow w-full ">
             <AppHeader />
