@@ -1,5 +1,5 @@
 import { createPublicClient, PublicClient } from "viem";
-import { baseSepolia } from "wagmi/chains";
+import { base } from "wagmi/chains";
 import { http, createConfig } from "wagmi";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import {
@@ -30,9 +30,9 @@ const connectors = connectorsForWallets(
 );
 
 export const config = createConfig({
-  chains: [baseSepolia],
+  chains: [base],
   transports: {
-    [baseSepolia.id]: http(process.env.NEXT_PUBLIC_RPC_URL),
+    [base.id]: http(process.env.NEXT_PUBLIC_RPC_URL),
   },
   multiInjectedProviderDiscovery: false,
   connectors,
@@ -40,6 +40,6 @@ export const config = createConfig({
 });
 
 export const publicClient = createPublicClient({
-  chain: baseSepolia,
+  chain: base,
   transport: http(process.env.NEXT_PUBLIC_RPC_URL),
 }) as PublicClient;
