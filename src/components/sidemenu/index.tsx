@@ -14,7 +14,7 @@ const SideMenu = () => {
             alt="logo-icon"
             className="w-[40px] h-[36px]"
           />
-          <p className="text-[20px] font-semibold text-[#000000] leading-[auto]">
+          <p className="text-[20px] font-[Montserrat] font-semibold text-[#000000] leading-[auto]">
             <span className="text-primary">AGENT</span>&nbsp;HUB
           </p>
         </Link>
@@ -57,13 +57,13 @@ const SideMenu = () => {
                 pathname === "/" ? "text-primary" : "text-[#8F95B2]"
               } font-semibold`}
             >
-              Market Place
+              Marketplace
             </p>
           </Link>
           {pathname === `/` ? <div className="w-[8px] h-10 rounded-l-[8px] bg-primary absolute right-0 top-[16px]" /> : null}
         </div>
         <div
-          className={`px-4 py-6 border-b-[0.5px] border-b-[#8F95B2] relative`}
+          className={`px-4 pt-6 pb-72 relative`}
         >
           <Link href={"/register-agent"} className="flex items-center gap-2">
             <img
@@ -80,56 +80,10 @@ const SideMenu = () => {
                 pathname === "/register-agent" ? "text-primary" : "text-[#8F95B2]"
               } font-semibold`}
             >
-              Register Agent
+              Agent Wizard
             </p>
           </Link>
           {pathname === `/register-agent` ? <div className="w-[8px] h-10 rounded-l-[8px] bg-primary absolute right-0 top-[16px]" /> : null}
-        </div>
-        <div
-          className={`px-4 py-6 border-b-[0.5px] border-b-[#8F95B2] relative`}
-        >
-          <Link href={"/service-center"} className="flex items-center gap-2">
-            <img
-              src={
-                pathname === "/service-center"
-                  ? "/assets/active-service-highlighted-icon.svg"
-                  : "/assets/active-service-icon.svg"
-              }
-              alt="active-service"
-              className="w-6 h-6"
-            />
-            <p
-              className={`${
-                pathname === "/service-center" ? "text-primary" : "text-[#8F95B2]"
-              } font-semibold`}
-            >
-              Service Center
-            </p>
-          </Link>
-          {pathname === `/service-center` ? <div className="w-[8px] h-10 rounded-l-[8px] bg-primary absolute right-0 top-[16px]" /> : null}
-        </div>
-        <div
-          className={`px-4 py-6 pb-40 relative`}
-        >
-          <Link href={"/task-center"} className="flex items-center gap-2">
-            <img
-              src={
-                pathname === "/task-center"
-                  ? "/assets/task-center-highlighted-icon.svg"
-                  : "/assets/task-center-icon.svg"
-              }
-              alt="task-center"
-              className="w-6 h-6"
-            />
-            <p
-              className={`${
-                pathname === "/task-center" ? "text-primary" : "text-[#8F95B2]"
-              } font-semibold`}
-            >
-              Task Center
-            </p>
-          </Link>
-          {pathname === `/task-center` ? <div className="w-[8px] h-10 rounded-l-[8px] bg-primary absolute right-0 top-[16px]" /> : null}
         </div>
         <img src="/assets/sidemenu-footer-pattern-icon.svg" alt="pattern" className="w-full h-[auto]" />
       </div>

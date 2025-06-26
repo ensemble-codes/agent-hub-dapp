@@ -362,7 +362,7 @@ export default function Home() {
               {loading ? (
                 <Loader size="xl" />
               ) : (
-                <div className="flex items-stretch justify-start gap-6 flex-wrap">
+                <div className="flex items-stretch justify-start gap-12 flex-wrap">
                   {agents.map((a: any) => (
                     <div
                       key={a.id}
