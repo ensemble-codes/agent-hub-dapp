@@ -34,7 +34,7 @@ const SideMenu = () => {
                 pathname === "/chat" ? "text-primary" : "text-[#8F95B2]"
               } font-semibold`}
             >
-              Orchestrator
+              Console
             </p>
           </Link>
           {pathname === `/chat` ? <div className="w-[8px] h-10 rounded-l-[8px] bg-primary absolute right-0 top-[-10px]" /> : null}
