@@ -40,29 +40,116 @@ export default function Page() {
         </h1>
 
         <p className="description">
-          Click the button below, and view the sample error on the Sentry <a target="_blank" href="https://ensemble-zs.sentry.io/issues/?project=4509558876995664">Issues Page</a>.
+          Click the buttons below to test different Sentry logging methods. View the results on the Sentry <a target="_blank" href="https://ensemble-zs.sentry.io/issues/?project=4509558876995664">Issues Page</a>.
           For more details about setting up Sentry, <a target="_blank" href="https://docs.sentry.io/platforms/javascript/guides/nextjs/">read our docs</a>.
         </p>
 
-        <button
-          type="button"
-          onClick={async () => {
-            await Sentry.startSpan({
-              name: 'Example Frontend Span',
-              op: 'test'
-            }, async () => {
-              const res = await fetch("/api/sentry-example-api");
-              if (!res.ok) {
-                setHasSentError(true);
-                throw new SentryExampleFrontendError("This error is raised on the frontend of the example page.");
+        <div className="button-group">
+          <button
+            type="button"
+            onClick={async () => {
+              await Sentry.startSpan({
+                name: 'Example Frontend Span',
+                op: 'test'
+              }, async () => {
+                const res = await fetch("/api/sentry-example-api");
+                if (!res.ok) {
+                  setHasSentError(true);
+                  throw new SentryExampleFrontendError("This error is raised on the frontend of the example page.");
+                }
+              });
+            }}
+          >
+            <span>Throw Sample Error</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              // Log a simple message
+              Sentry.captureMessage("User clicked info button", "info");
+              alert("Info message logged to Sentry!");
+            }}
+          >
+            <span>Log Info Message</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              // Log a warning
+              Sentry.captureMessage("User clicked warning button", "warning");
+              alert("Warning message logged to Sentry!");
+            }}
+          >
+            <span>Log Warning</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              // Log with context
+              Sentry.setContext("user_action", {
+                action: "button_click",
+                component: "SentryExamplePage",
+                timestamp: new Date().toISOString()
+              });
+              Sentry.captureMessage("User action with context", "info");
+              alert("Message with context logged to Sentry!");
+            }}
+          >
+            <span>Log with Context</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              // Set user information
+              Sentry.setUser({
+                id: "test-user-123",
+                email: "test@example.com",
+                username: "testuser"
+              });
+              Sentry.captureMessage("User information set", "info");
+              alert("User info set and logged to Sentry!");
+            }}
+          >
+            <span>Set User Info</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              // Set tags
+              Sentry.setTag("environment", "development");
+              Sentry.setTag("feature", "sentry-testing");
+              Sentry.captureMessage("Tags set", "info");
+              alert("Tags set and logged to Sentry!");
+            }}
+          >
+            <span>Set Tags</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              // Debug: Check if Sentry is working
+              console.log("Testing Sentry functionality...");
+              
+              // Test basic functionality
+              try {
+                Sentry.captureMessage("Debug test message", "debug");
+                console.log("Sentry captureMessage called successfully");
+                alert("Sentry appears to be working! Check console for details.");
+              } catch (error) {
+                console.error("Sentry error:", error);
+                alert("Sentry error: " + (error as Error).message);
               }
-            });
-          }}
-        >
-          <span>
-            Throw Sample Error
-          </span>
-        </button>
+            }}
+          >
+            <span>Debug Sentry</span>
+          </button>
+        </div>
 
         {hasSentError ? (
           <p className="success">
@@ -119,6 +206,13 @@ export default function Page() {
           }
         }
 
+        .button-group {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          align-items: center;
+        }
+
         button {
           border-radius: 8px;
           color: white;
@@ -132,7 +226,7 @@ export default function Page() {
             display: inline-block;
             padding: 12px 16px;
             border-radius: inherit;
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             line-height: 1;
             background-color: #7553FF;
