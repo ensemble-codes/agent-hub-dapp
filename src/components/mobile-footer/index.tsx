@@ -30,25 +30,14 @@ const MobileFooter = () => {
             className="w-6 h-6"
           />
         </Link>
-        <Link href={"/service-center"} className="flex flex-col items-center">
+        <Link href={"/"} className="flex flex-col items-center">
           <img
             src={
-              pathname === "/service-center"
-                ? "/assets/active-service-highlighted-icon.svg"
-                : "/assets/active-service-icon.svg"
+              pathname === "/register-agent"
+                ? "/assets/register-agent-highlighted-icon.svg"
+                : "/assets/register-agent-dull-icon.svg"
             }
-            alt="active-service"
-            className="w-6 h-6"
-          />
-        </Link>
-        <Link href={"/task-center"} className="flex flex-col items-center">
-          <img
-            src={
-              pathname === "/task-center"
-                ? "/assets/task-center-highlighted-icon.svg"
-                : "/assets/task-center-icon.svg"
-            }
-            alt="task-center"
+            alt="marketplace"
             className="w-6 h-6"
           />
         </Link>

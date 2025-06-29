@@ -81,11 +81,11 @@ const Footer = () => {
       <footer className="max-lg:mb-[40px] lg:container lg:mx-auto flex lg:flex-row flex-col items-start justify-start lg:gap-[156px] gap-[64px] lg:mb-[120px] max-lg:px-[16px]">
         <div>
           <h6 className="font-medium text-[18px] text-[#121212] mb-[40px]">
-            Join a Newsletter
+            Join Newsletter
           </h6>
           <form 
             onSubmit={handleNewsletterSubmit} 
-            action="https://codes.us22.list-manage.com/subscribe/post?u=f6e3f626bf75a88cc7cab221d&id=0004be5780&f_id=00fec2e1f0"
+            action="https://codes.us22.list-manage.com/subscribe/post?u=f6e3f626bf75a88cc7cab221d&id=0004be5780&f_id=00cdc2e1f0"
             method="post"
             id="mc-embedded-subscribe-form"
             name="mc-embedded-subscribe-form"
