@@ -37,7 +37,7 @@ const MobileFooter = () => {
                 ? "/assets/register-agent-highlighted-icon.svg"
                 : "/assets/register-agent-dull-icon.svg"
             }
-            alt="marketplace"
+            alt="register-agent"
             className="w-6 h-6"
           />
         </Link>
