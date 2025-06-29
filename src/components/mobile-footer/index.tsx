@@ -30,7 +30,7 @@ const MobileFooter = () => {
             className="w-6 h-6"
           />
         </Link>
-        <Link href={"/"} className="flex flex-col items-center">
+        <Link href={"/register-agent"} className="flex flex-col items-center">
           <img
             src={
               pathname === "/register-agent"
