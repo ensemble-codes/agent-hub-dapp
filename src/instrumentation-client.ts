@@ -14,4 +14,85 @@ Sentry.init({
   debug: true, // Enable for local testing
 });
 
+// Global error listeners to catch console errors
+if (typeof window !== 'undefined') {
+  // Store original console methods before overriding
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+  const originalConsoleWarn = console.warn;
+  
+  originalConsoleLog('Sentry instrumentation loaded - console override active');
+  
+  // Catch unhandled errors
+  window.addEventListener('error', (event) => {
+    originalConsoleLog('Global error caught:', event.error);
+    Sentry.captureException(event.error || new Error(event.message), {
+      tags: { source: 'global_error_listener' },
+      contexts: {
+        error: {
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno,
+        }
+      }
+    });
+  });
+
+  // Catch unhandled promise rejections
+  window.addEventListener('unhandledrejection', (event) => {
+    originalConsoleLog('Unhandled rejection caught:', event.reason);
+    Sentry.captureException(event.reason, {
+      tags: { source: 'unhandled_rejection' }
+    });
+  });
+
+  // Override console.log to capture to Sentry
+  console.log = (...args) => {
+    originalConsoleLog('Console.log intercepted:', args);
+    // Call original console.log
+    originalConsoleLog.apply(console, args);
+    
+    // Capture in Sentry
+    const message = args.map(arg => 
+      typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+    ).join(' ');
+    
+    Sentry.captureMessage(`Console Log: ${message}`, 'info');
+  };
+
+  // Override console.error to capture to Sentry
+  console.error = (...args) => {
+    originalConsoleLog('Console.error intercepted:', args);
+    // Call original console.error
+    originalConsoleError.apply(console, args);
+    
+    // Capture in Sentry
+    const message = args.map(arg => 
+      typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+    ).join(' ');
+    
+    Sentry.captureMessage(`Console Error: ${message}`, 'error');
+  };
+
+  // Override console.warn to capture to Sentry
+  console.warn = (...args) => {
+    originalConsoleLog('Console.warn intercepted:', args);
+    // Call original console.warn
+    originalConsoleWarn.apply(console, args);
+    
+    // Capture in Sentry
+    const message = args.map(arg => 
+      typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+    ).join(' ');
+    
+    Sentry.captureMessage(`Console Warning: ${message}`, 'warning');
+  };
+
+  // Test that Sentry is working
+  setTimeout(() => {
+    originalConsoleLog('Testing Sentry capture...');
+    Sentry.captureMessage('Sentry instrumentation test message', 'info');
+  }, 1000);
+}
+
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
