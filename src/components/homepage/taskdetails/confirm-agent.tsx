@@ -12,6 +12,7 @@ import { formatEther } from "ethers";
 import { useWalletClient } from "wagmi";
 import { config } from "@/components/onchainconfig/config";
 import Link from "next/link";
+import { logTaskCreation, logError } from "@/utils/sentry-logging";
 
 interface ConfirmAgentProps {
   selectedAgent: number;
@@ -114,11 +115,27 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         service: selectedService,
       });
 
+      // Log successful task creation to Sentry
+      if (task?.id && selectedProposal && selectedService) {
+        logTaskCreation({
+          service: selectedService,
+          agentId: selectedAgent.toString(),
+          taskId: task.id.toString(),
+          proposalId: selectedProposal
+        });
+      }
+
       if (task?.id) {
         router.push(`/tasks/${task.id}`);
       }
     } catch (error) {
       console.error(error);
+      logError(error as Error, {
+        component: "ConfirmAgent",
+        action: "create_task",
+        agent_id: selectedAgent,
+        service: selectedService
+      });
     } finally {
       setLoadingCreate(false);
     }

@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { logServiceSelection } from "@/utils/sentry-logging";
 
 interface MainProps {
   selectedService: (service: string) => void;
@@ -38,7 +39,10 @@ const Main: FC<MainProps> = ({ selectedService }) => {
                 </div>
                 <button
                   className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                  onClick={() => selectedService("Bull Post")}
+                  onClick={() => {
+                    selectedService("Bull Post");
+                    logServiceSelection("Bull Post");
+                  }}
                 >
                   <span className="text-white text-[16px] font-[700] leading-[24px]">
                     Select
@@ -70,7 +74,10 @@ const Main: FC<MainProps> = ({ selectedService }) => {
                 </div>
                 <button
                   className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                  onClick={() => selectedService("Reply")}
+                  onClick={() => {
+                    selectedService("Reply");
+                    logServiceSelection("Reply");
+                  }}
                 >
                   <span className="text-white text-[16px] font-[700] leading-[24px]">
                     Select
@@ -104,7 +111,10 @@ const Main: FC<MainProps> = ({ selectedService }) => {
                 </div>
                 <button
                   className="space-x-2 flex items-center justify-center rounded-[50px] bg-[#3D3D3D] bg-gradient-to-[317.7deg] from-[rgba(0,0,0,0.4)] to-[rgba(255,255,255,0.4)] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                  onClick={() => selectedService("Campaign")}
+                  onClick={() => {
+                    selectedService("Campaign");
+                    logServiceSelection("Campaign");
+                  }}
                 >
                   <span className="text-white text-[16px] font-[700] leading-[24px]">
                     Select

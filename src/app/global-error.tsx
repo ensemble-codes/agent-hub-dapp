@@ -6,6 +6,19 @@ import { useEffect } from "react";
 
 export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
   useEffect(() => {
+    console.log(error);
+    // Add context to the error for better debugging
+    Sentry.setContext("global_error", {
+      error_name: error.name,
+      error_message: error.message,
+      error_stack: error.stack,
+      digest: error.digest,
+      url: window.location.href,
+      user_agent: navigator.userAgent,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Capture the error with enhanced context
     Sentry.captureException(error);
   }, [error]);
 

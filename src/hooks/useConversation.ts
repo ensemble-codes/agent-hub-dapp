@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useXMTP } from "@/context/XMTPContext";
 import { Conversation, DecodedMessage } from "@xmtp/browser-sdk";
+import { logError } from "@/utils/error-logging";
 
 type FormattedMessage = {
   id: string;
@@ -145,7 +146,11 @@ export function useConversation(address?: string) {
       const stream = await conversation.stream(
         (error: Error | null, message: DecodedMessage | undefined) => {
           if (error) {
-            console.error("Error streaming messages", error);
+            logError(error, {
+              component: "useConversation",
+              action: "stream_messages",
+              address
+            });
             return;
           }
 
@@ -163,12 +168,20 @@ export function useConversation(address?: string) {
             try {
               stream.return(undefined);
             } catch (e) {
-              console.error("Error closing stream", e);
+              logError(e as Error, {
+                component: "useConversation",
+                action: "close_stream",
+                address
+              });
             }
           }
         : noop;
     } catch (e) {
-      console.error("Error setting up stream", e);
+      logError(e as Error, {
+        component: "useConversation",
+        action: "setup_stream",
+        address
+      });
       return noop;
     }
   }, [conversation, formatMessage, addMessageToState]);

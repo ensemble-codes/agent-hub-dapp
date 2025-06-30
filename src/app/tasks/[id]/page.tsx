@@ -11,6 +11,7 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Link from "next/link";
+import { logTaskRating, logError } from "@/utils/sentry-logging";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
@@ -93,8 +94,18 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     try {
       const res = await sdk?.rateTask(id, rate);
       console.log(res);
+      logTaskRating({
+        taskId: id,
+        rating: rate,
+        agentId: task?.task?.assignee?.id || "unknown"
+      });
     } catch (e) {
       console.log(e);
+      logError(e as Error, {
+        component: "TaskPage",
+        action: "rate_task",
+        task_id: id
+      });
     }
   };
 
