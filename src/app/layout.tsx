@@ -7,6 +7,7 @@ import OnchainProvider from "@/components/onchainconfig/provider";
 import { AppContextProvider } from "@/context/app";
 import "@rainbow-me/rainbowkit/styles.css";
 import { XMTPProvider } from "@/context/XMTPContext";
+import ErrorBoundary from "@/components/error-boundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,20 +51,22 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
-        <OnchainProvider>
-          <AppContextProvider>
-            <XMTPProvider>
-              <Wrapper>
-                <MobileHeader />
-                <main className="lg:py-[72px] py-[36px] container mx-auto flex-1 max-md:px-[20px]">
-                  {children}
-                </main>
-                <Footer />
-                <MobileFooter />
-              </Wrapper>
-            </XMTPProvider>
-          </AppContextProvider>
-        </OnchainProvider>
+        <ErrorBoundary>
+          <OnchainProvider>
+            <AppContextProvider>
+              <XMTPProvider>
+                <Wrapper>
+                  <MobileHeader />
+                  <main className="lg:py-[72px] py-[36px] container mx-auto flex-1 max-md:px-[20px]">
+                    {children}
+                  </main>
+                  <Footer />
+                  <MobileFooter />
+                </Wrapper>
+              </XMTPProvider>
+            </AppContextProvider>
+          </OnchainProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

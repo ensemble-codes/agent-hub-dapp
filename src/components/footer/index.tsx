@@ -1,15 +1,96 @@
 'use client';
 import Link from "next/link";
+import { useState } from "react";
+import { captureError, addBreadcrumb } from "@/utils/sentry";
 
 const Footer = () => {
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+
+  const handleNewsletterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.stopPropagation(); // Stop event bubbling
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Get the email value to validate
+    const email = form.querySelector('input[type="email"]') as HTMLInputElement;
+
+    if (!email?.value) {
+      setEmailError("Please enter your email address");
+      addBreadcrumb({
+        category: "newsletter",
+        message: "Newsletter subscription validation failed",
+        level: "warning",
+      });
+      return;
+    }
+
+    // Add breadcrumb for tracking
+    addBreadcrumb({
+      category: "newsletter",
+      message: "Newsletter subscription attempt",
+      level: "info",
+      data: {
+        email: email.value,
+      },
+    });
+
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        mode: "no-cors", // This is required for Mailchimp
+      });
+
+      // With no-cors mode, we can't read the response, but we can assume success
+      setEmailSubmitted(true);
+      setEmailError("");
+      setSubmitStatus("success");
+
+      // Add success breadcrumb
+      addBreadcrumb({
+        category: "newsletter",
+        message: "Newsletter subscription successful",
+        level: "info",
+        data: {
+          email: email.value,
+        },
+      });
+
+      // Reset form
+      form.reset();
+    } catch (error) {
+      console.error("Mailchimp submission error:", error);
+      setEmailError("Something went wrong. Please try again.");
+      setSubmitStatus("error");
+      
+      // Capture error in Sentry
+      captureError(error as Error, {
+        component: "Footer",
+        action: "newsletter_subscription",
+        email: email.value,
+      });
+    }
+  };
+
   return (
     <>
       <footer className="max-lg:mb-[40px] lg:container lg:mx-auto flex lg:flex-row flex-col items-start justify-start lg:gap-[156px] gap-[64px] lg:mb-[120px] max-lg:px-[16px]">
         <div>
           <h6 className="font-medium text-[18px] text-[#121212] mb-[40px]">
-            Join a Newsletter
+            Join Newsletter
           </h6>
-          <div className="flex flex-col gap-6 mb-[40px]">
+          <form 
+            onSubmit={handleNewsletterSubmit} 
+            action="https://codes.us22.list-manage.com/subscribe/post?u=f6e3f626bf75a88cc7cab221d&id=0004be5780&f_id=00cdc2e1f0"
+            method="post"
+            id="mc-embedded-subscribe-form"
+            name="mc-embedded-subscribe-form"
+            className="flex flex-col gap-6 mb-[40px]"
+          >
             <label
               htmlFor="newsletter"
               className="text-[16px] font-light text-[#000]"
@@ -18,16 +99,43 @@ const Footer = () => {
             </label>
             <div className="flex items-center gap-5">
               <input
-                name="newsletter"
+                type="email"
+                name="EMAIL"
                 id="newsletter"
                 placeholder="Enter your email"
+                required
                 className="border-none bg-black/5 lg:p-6 p-3 rounded-[30px] placeholder:text-black/75 text-[16px] font-light text-[#000] outline-none"
               />
-              <button className="bg-gradient-to-r from-[#fff]/40 to-[#fff]/14 rounded-[40px] border-none outline-none font-medium text-[16px] text-primary py-4 px-8 cursor-pointer">
-                Subscribe
+              <button 
+                type="submit"
+                disabled={emailSubmitted}
+                className="bg-gradient-to-r from-[#fff]/40 to-[#fff]/14 rounded-[40px] border-none outline-none font-medium text-[16px] text-[#000] py-4 px-8 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {emailSubmitted ? "Subscribed!" : "Subscribe"}
               </button>
+              <div
+                aria-hidden="true"
+                style={{ position: "absolute", left: "-5000px" }}
+              >
+                <input
+                  type="text"
+                  name="b_f6e3f626bf75a88cc7cab221d_0004be5780"
+                  tabIndex={-1}
+                  value=""
+                />
+              </div>
             </div>
-          </div>
+            {emailError && (
+              <p className="text-red-600 text-[14px] font-light">
+                {emailError}
+              </p>
+            )}
+            {emailSubmitted && (
+              <p className="text-green-600 text-[14px] font-light">
+                Thanks! You've been added to our newsletter.
+              </p>
+            )}
+          </form>
           <div className="flex items-center gap-6">
             <Link
               href={`https://t.me/+V2yQK15ZYLw3YWU0`}

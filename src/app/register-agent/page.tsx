@@ -354,10 +354,10 @@ const Page = () => {
 
   return (
     <div>
-      <AppHeader />
-      <div className="flex items-start gap-4 pt-8">
+      <div className="flex items-start gap-4">
         <SideMenu />
         <div className="grow w-full">
+        <AppHeader />
           <p className="flex items-center gap-2 mb-2">
             <span className="font-bold text-[#3d3d3d] leading-[24px]">
               Register Agent
