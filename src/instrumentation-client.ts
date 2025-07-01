@@ -46,20 +46,6 @@ if (typeof window !== 'undefined') {
     });
   });
 
-  // Override console.log to capture to Sentry
-  console.log = (...args) => {
-    originalConsoleLog('Console.log intercepted:', args);
-    // Call original console.log
-    originalConsoleLog.apply(console, args);
-    
-    // Capture in Sentry
-    const message = args.map(arg => 
-      typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-    ).join(' ');
-    
-    Sentry.captureMessage(`Console Log: ${message}`, 'info');
-  };
-
   // Override console.error to capture to Sentry
   console.error = (...args) => {
     originalConsoleLog('Console.error intercepted:', args);
@@ -87,12 +73,6 @@ if (typeof window !== 'undefined') {
     
     Sentry.captureMessage(`Console Warning: ${message}`, 'warning');
   };
-
-  // Test that Sentry is working
-  setTimeout(() => {
-    originalConsoleLog('Testing Sentry capture...');
-    Sentry.captureMessage('Sentry instrumentation test message', 'info');
-  }, 1000);
 }
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
