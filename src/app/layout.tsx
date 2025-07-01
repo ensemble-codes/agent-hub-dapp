@@ -9,6 +9,9 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { XMTPProvider } from "@/context/XMTPContext";
 import ErrorBoundary from "@/components/error-boundary";
 
+// Initialize Sentry for all pages
+import "@/instrumentation-client";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

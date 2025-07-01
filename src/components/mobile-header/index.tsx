@@ -109,7 +109,7 @@ const MobileHeader = () => {
                 </li>
                 <li>
                   <Link
-                    href="https://github.com/ensemble-codes/ensemble-framework"
+                    href="https://docs.ensemble.codes/"
                     target="_blank"
                     rel="noreferrer noopener"
                     className="text-[16px] font-medium text-[#121212] hover:text-primary transition-colors"

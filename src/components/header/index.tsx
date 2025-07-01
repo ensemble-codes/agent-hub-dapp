@@ -27,7 +27,7 @@ const AppHeader = () => {
             ENSEMBLE
           </Link>
           <Link
-            href={"https://github.com/ensemble-codes/ensemble-framework"}
+            href={"https://docs.ensemble.codes/"}
             target="_blank"
             rel="noreferrer noopener"
             className="text-[14px] font-normal leading-[100%] text-[#121212]"

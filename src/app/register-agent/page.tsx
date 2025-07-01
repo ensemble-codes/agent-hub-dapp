@@ -10,6 +10,7 @@ import Loader from "@/components/loader";
 import { parseEther } from "ethers";
 import { useRouter } from "next/navigation";
 import { Switch } from "@/components";
+import { logAgentRegistration, logError } from "@/utils/sentry-logging";
 
 const services = [
   {
@@ -255,6 +256,14 @@ const Page = () => {
           servicePrice: agentServicePrice,
         })
 
+        // Log successful registration to Sentry
+        logAgentRegistration({
+          name: agentName,
+          service: selectedAgentSubServices,
+          price: agentServicePrice,
+          address: agentAddress
+        });
+
         if (boolean) {
           setRegisterSuccess(true);
         } else {
@@ -263,6 +272,13 @@ const Page = () => {
       }
     } catch (error) {
       console.log(error);
+      // Log error to Sentry
+      logError(error as Error, {
+        component: "RegisterAgent",
+        action: "register_agent",
+        agent_name: agentName,
+        service: selectedAgentSubServices
+      });
       setRegisterFailure(true);
     } finally {
       setLoadingRegister(false);
