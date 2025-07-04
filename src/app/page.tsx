@@ -7,6 +7,13 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useXMTP } from "@/context/XMTPContext";
 
+console.log('🔧 Environment Variables:');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS:', process.env.NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS);
+console.log('NEXT_PUBLIC_SERVICE_REGISTRY_ADDRESS:', process.env.NEXT_PUBLIC_SERVICE_REGISTRY_ADDRESS);
+console.log('NEXT_PUBLIC_TASK_REGISTRY_ADDRESS:', process.env.NEXT_PUBLIC_TASK_REGISTRY_ADDRESS);
+console.log('NEXT_PUBLIC_GRAPHQL_URL:', process.env.NEXT_PUBLIC_GRAPHQL_URL);
+
 export default function Home() {
   const { push } = useRouter();
   const [selectedProposal, setSelectedProposal] = useState<string | null>(null);
