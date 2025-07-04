@@ -165,8 +165,6 @@ export default function Home() {
     );
   }, [allAgentsData?.agents]);
 
-  const { client } = useXMTP();
-
   return (
     <>
       <div>

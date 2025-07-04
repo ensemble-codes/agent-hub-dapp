@@ -230,6 +230,14 @@ const Page = () => {
         "https://www.ensemble.codes/assets/ensemble-icon.svg";
       if (agentPfp) imgUri = await handleUploadToPinata(agentPfp);
 
+      const finalInstructions = howToUseDefault.trim()
+        ? [howToUseDefault.trim(), ...howToUseInstructions]
+        : howToUseInstructions;
+
+      const finalPrompts = starterPromptDefault.trim()
+        ? [starterPromptDefault.trim(), ...starterPromptsInstructions]
+        : starterPromptsInstructions;
+
       const boolean = await sdk?.registerAgent(agentAddress, {
         name: agentName,
         description: agentDescription,
@@ -244,12 +252,8 @@ const Page = () => {
         openingGreeting: agentGreeting,
         communicationType:
           selectedCommunicationProtocol as AgentCommunicationType,
-        instructions: howToUseDefault.trim()
-          ? [howToUseDefault.trim(), ...howToUseInstructions]
-          : howToUseInstructions,
-        prompts: starterPromptDefault.trim()
-          ? [starterPromptDefault.trim(), ...starterPromptsInstructions]
-          : starterPromptsInstructions,
+        instructions: finalInstructions,
+        prompts: finalPrompts,
         attributes: allAttributes,
         agentCategory: selectedAgentService,
         ...(selectedCommunicationProtocol === "websocket"
@@ -295,11 +299,19 @@ const Page = () => {
     agentXProfile,
     agentWebsite,
     agentGitHub,
+    agentTelegram,
+    agentDexTools,
+    howToUseDefault,
+    starterPromptDefault,
+    howToUseInstructions,
+    starterPromptsInstructions,
     selectedAgentService,
     selectedAgentSubServices,
     customCapabilities,
     agentAddress,
     address,
+    websocketUrl,
+    selectedCommunicationProtocol,
   ]);
 
   const getProgressWidth = useCallback(() => {
@@ -317,10 +329,8 @@ const Page = () => {
 
   const canProceedServicesStep =
     selectedAgentSubServices.length + customCapabilities.length > 0 &&
-    howToUseDefault.trim().length > 0 &&
-    starterPromptDefault.trim().length > 0 &&
     selectedCommunicationProtocol &&
-    (selectedCommunicationProtocol !== "Websocket" ||
+    (selectedCommunicationProtocol !== "websocket" ||
       websocketUrl.trim().length > 0);
 
   const canProceedToNextStep = useMemo(() => {
@@ -365,8 +375,6 @@ const Page = () => {
       agentDescription.trim() &&
       agentAddress.trim() &&
       selectedAgentSubServices.length + customCapabilities.length > 0 &&
-      howToUseDefault.trim().length > 0 &&
-      starterPromptDefault.trim().length > 0 &&
       selectedCommunicationProtocol &&
       (selectedCommunicationProtocol !== "websocket" ||
         websocketUrl.trim().length > 0);
@@ -977,7 +985,7 @@ const Page = () => {
                           </div>
                         ))}
                       </div>
-                      {selectedCommunicationProtocol === "Websocket" && (
+                      {selectedCommunicationProtocol === "websocket" && (
                         <input
                           type="url"
                           className="mb-2 w-full outline-none placeholder:text-primary/70 text-primary"
@@ -1061,8 +1069,13 @@ const Page = () => {
                             placeholder="Add another instruction"
                             value={howToUseInput}
                             onChange={(e) => setHowToUseInput(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && howToUseInput.trim()) {
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            className="ml-2 bg-[#f94d27] text-white px-2 py-1 rounded text-xs font-bold"
+                            onClick={() => {
+                              if (howToUseInput.trim()) {
                                 setHowToUseInstructions([
                                   ...howToUseInstructions,
                                   howToUseInput.trim(),
@@ -1071,11 +1084,12 @@ const Page = () => {
                                 setShowHowToUseInput(false);
                               }
                             }}
-                            autoFocus
-                          />
+                          >
+                            Add
+                          </button>
                           <button
                             type="button"
-                            className="ml-2"
+                            className="ml-1"
                             onClick={() => {
                               setShowHowToUseInput(false);
                               setHowToUseInput("");
@@ -1094,13 +1108,8 @@ const Page = () => {
                         howToUseInstructions.length < 3 && (
                           <button
                             type="button"
-                            className={`flex items-center gap-1 text-[#f94d27] font-bold text-[12px] mt-2 ${
-                              !howToUseDefault.trim()
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
+                            className="flex items-center gap-1 text-[#f94d27] font-bold text-[12px] mt-2"
                             onClick={() => setShowHowToUseInput(true)}
-                            disabled={!howToUseDefault.trim()}
                           >
                             <span className="text-[18px] font-bold text-primary">
                               +
@@ -1171,11 +1180,13 @@ const Page = () => {
                               onChange={(e) =>
                                 setStarterPromptInput(e.target.value)
                               }
-                              onKeyDown={(e) => {
-                                if (
-                                  e.key === "Enter" &&
-                                  starterPromptInput.trim()
-                                ) {
+                              autoFocus
+                            />
+                            <button
+                              type="button"
+                              className="ml-2 bg-[#f94d27] text-white px-2 py-1 rounded text-xs font-bold"
+                              onClick={() => {
+                                if (starterPromptInput.trim()) {
                                   setStarterPromptsInstructions([
                                     ...starterPromptsInstructions,
                                     starterPromptInput.trim(),
@@ -1184,11 +1195,12 @@ const Page = () => {
                                   setShowStarterPromptInput(false);
                                 }
                               }}
-                              autoFocus
-                            />
+                            >
+                              Add
+                            </button>
                             <button
                               type="button"
-                              className="ml-2"
+                              className="ml-1"
                               onClick={() => {
                                 setShowStarterPromptInput(false);
                                 setStarterPromptInput("");
@@ -1207,13 +1219,8 @@ const Page = () => {
                         starterPromptsInstructions.length < 3 && (
                           <button
                             type="button"
-                            className={`flex items-center gap-1 text-[#f94d27] font-bold text-[12px] mt-2 ${
-                              !starterPromptDefault.trim()
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
+                            className="flex items-center gap-1 text-[#f94d27] font-bold text-[12px] mt-2"
                             onClick={() => setShowStarterPromptInput(true)}
-                            disabled={!starterPromptDefault.trim()}
                           >
                             <span className="text-[18px] font-bold text-primary">
                               +
@@ -1394,20 +1401,35 @@ const Page = () => {
                       }}
                     />
 
-                    <button
-                      className={`w-auto space-x-2 flex items-center justify-between rounded-[50px] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] ${
-                        canRegisterAgent && !loadingRegister
-                          ? "bg-primary cursor-pointer"
-                          : "bg-primary/70 cursor-not-allowed"
-                      }`}
-                      onClick={registerAgent}
-                      disabled={!canRegisterAgent || loadingRegister}
-                    >
-                      <img src="/assets/bolt-icon.svg" alt="bolt" />
-                      <span className="text-white text-[16px] font-[700] leading-[24px]">
-                        Complete Registration
-                      </span>
-                    </button>
+                    {registerSuccess ? (
+                      <Link
+                        href={`/agents/${agentAddress}`}
+                        className="w-auto space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] cursor-pointer"
+                      >
+                        <span className="text-white text-[16px] font-[700] leading-[24px]">
+                          Go to Profile
+                        </span>
+                        <img
+                          src="/assets/pixelated-arrow-icon.svg"
+                          alt="bolt"
+                        />
+                      </Link>
+                    ) : (
+                      <button
+                        className={`w-auto space-x-2 flex items-center justify-between rounded-[50px] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] ${
+                          canRegisterAgent && !loadingRegister
+                            ? "bg-primary cursor-pointer"
+                            : "bg-primary/70 cursor-not-allowed"
+                        }`}
+                        onClick={registerAgent}
+                        disabled={!canRegisterAgent || loadingRegister}
+                      >
+                        <img src="/assets/bolt-icon.svg" alt="bolt" />
+                        <span className="text-white text-[16px] font-[700] leading-[24px]">
+                          Complete Registration
+                        </span>
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
