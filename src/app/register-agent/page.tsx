@@ -10,6 +10,8 @@ import Loader from "@/components/loader";
 import { parseEther } from "ethers";
 import { useRouter } from "next/navigation";
 import { logAgentRegistration, logError } from "@/utils/sentry-logging";
+import { AgentCommunicationType } from "@ensemble-ai/sdk/dist/src/types";
+import Link from "next/link";
 
 const services = [
   {
@@ -120,9 +122,8 @@ const Page = () => {
     SUB_SERVICES_LIST["DeFi"][0].name, // Initialize with "Swap"
   ]);
   const [selectedCommunicationProtocol, setSelectedCommunicationProtocol] =
-    useState<string>("");
+    useState<string>("xmtp");
   const [websocketUrl, setWebsocketUrl] = useState<string>("");
-  const [agentServicePrice, setAgentServicePrice] = useState("");
   const [loadingRegister, setLoadingRegister] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [registerFailure, setRegisterFailure] = useState(false);
@@ -189,16 +190,13 @@ const Page = () => {
   };
 
   const validateTelegram = (input: string) => {
-    // Accepts @username or https://t.me/username
-    return (
-      /^@?(\w){5,32}$/.test(input) ||
-      /^https?:\/\/(t\.me|telegram\.me)\/\w{5,32}$/i.test(input)
-    );
+    // Accepts https://t.me
+    return /^https?:\/\/(t\.me|telegram\.me)/i.test(input);
   };
 
   const validateDexTools = (url: string) => {
-    // Accepts https://www.dextools.io/...
-    return /^https?:\/\/(www\.)?dextools\.io\//i.test(url);
+    // Accepts https://www.dextools.io...
+    return /^https?:\/\/?dextools\.io/i.test(url);
   };
 
   const handleUploadToPinata = useCallback(async (file: File) => {
@@ -225,55 +223,50 @@ const Page = () => {
 
   const registerAgent = useCallback(async () => {
     setLoadingRegister(true);
+    const allAttributes = [...selectedAgentSubServices, ...customCapabilities];
+
     try {
       let imgUri: string =
         "https://www.ensemble.codes/assets/ensemble-icon.svg";
       if (agentPfp) imgUri = await handleUploadToPinata(agentPfp);
 
-      const service = selectedAgentSubServices.join(", ");
-
-      // Validate service price before parsing
-      if (!agentServicePrice || agentServicePrice.trim() === "") {
-        throw new Error("Service price cannot be empty");
-      }
-      const servicePrice = parseEther(agentServicePrice).toString();
-
-      const boolean = await sdk?.registerAgent(
-        agentAddress,
-        {
-          name: agentName,
-          description: agentDescription,
-          socials: {
-            twitter: agentXProfile,
-            telegram: "",
-            website: agentWebsite,
-            dexscreener: "",
-            github: agentGitHub,
-          },
-          attributes: [
-            {
-              value: "",
-              trait_type: "",
-            },
-          ],
-          imageURI: imgUri,
+      const boolean = await sdk?.registerAgent(agentAddress, {
+        name: agentName,
+        description: agentDescription,
+        imageURI: imgUri,
+        socials: {
+          github: agentGitHub,
+          twitter: agentXProfile,
+          telegram: agentTelegram,
+          website: agentWebsite,
+          dexscreener: agentDexTools,
         },
-        service,
-        Number(servicePrice)
-      );
+        openingGreeting: agentGreeting,
+        communicationType:
+          selectedCommunicationProtocol as AgentCommunicationType,
+        instructions: howToUseDefault.trim()
+          ? [howToUseDefault.trim(), ...howToUseInstructions]
+          : howToUseInstructions,
+        prompts: starterPromptDefault.trim()
+          ? [starterPromptDefault.trim(), ...starterPromptsInstructions]
+          : starterPromptsInstructions,
+        attributes: allAttributes,
+        agentCategory: selectedAgentService,
+        ...(selectedCommunicationProtocol === "websocket"
+          ? { communicationURL: websocketUrl }
+          : {}),
+      });
 
       sendGAEvent("register_agent", {
         agentName,
         agentAddress,
-        service: selectedAgentSubServices.join(", "),
-        servicePrice: agentServicePrice,
+        service: allAttributes.join(", "),
       });
 
       // Log successful registration to Sentry
       logAgentRegistration({
         name: agentName,
-        service: selectedAgentSubServices.join(", "),
-        price: agentServicePrice,
+        service: allAttributes.join(", "),
         address: agentAddress,
       });
 
@@ -289,7 +282,7 @@ const Page = () => {
         component: "RegisterAgent",
         action: "register_agent",
         agent_name: agentName,
-        service: selectedAgentSubServices.join(", "),
+        service: allAttributes.join(", "),
       });
       setRegisterFailure(true);
     } finally {
@@ -304,9 +297,9 @@ const Page = () => {
     agentGitHub,
     selectedAgentService,
     selectedAgentSubServices,
+    customCapabilities,
     agentAddress,
     address,
-    agentServicePrice,
   ]);
 
   const getProgressWidth = useCallback(() => {
@@ -365,6 +358,50 @@ const Page = () => {
     isValidDexTools,
   ]);
 
+  const canRegisterAgent = useMemo(() => {
+    // Check all required fields are filled
+    const hasRequiredFields =
+      agentName.trim() &&
+      agentDescription.trim() &&
+      agentAddress.trim() &&
+      selectedAgentSubServices.length + customCapabilities.length > 0 &&
+      howToUseDefault.trim().length > 0 &&
+      starterPromptDefault.trim().length > 0 &&
+      selectedCommunicationProtocol &&
+      (selectedCommunicationProtocol !== "websocket" ||
+        websocketUrl.trim().length > 0);
+
+    // Check all filled links are valid
+    const hasValidLinks =
+      (!agentWebsite || isValidWebsite) &&
+      (!agentGitHub || isValidGitHub) &&
+      (!agentXProfile || isValidXProfile) &&
+      (!agentTelegram || isValidTelegram) &&
+      (!agentDexTools || isValidDexTools);
+
+    return hasRequiredFields && hasValidLinks;
+  }, [
+    agentName,
+    agentDescription,
+    agentAddress,
+    selectedAgentSubServices,
+    customCapabilities,
+    howToUseDefault,
+    starterPromptDefault,
+    selectedCommunicationProtocol,
+    websocketUrl,
+    agentWebsite,
+    isValidWebsite,
+    agentGitHub,
+    isValidGitHub,
+    agentXProfile,
+    isValidXProfile,
+    agentTelegram,
+    isValidTelegram,
+    agentDexTools,
+    isValidDexTools,
+  ]);
+
   useEffect(() => {
     if (registerFailure) {
       const timer = setTimeout(() => {
@@ -399,7 +436,7 @@ const Page = () => {
                 <div className="flex items-center gap-4">
                   {detailsStep === "services" || detailsStep === "links" ? (
                     <button
-                      className="rounded-[20000px] border border-[#8F95B2] w-[120px] py-1 flex items-center justify-center gap-2"
+                      className="rounded-[20000px] border border-primary w-[120px] py-1 flex items-center justify-center gap-2"
                       onClick={() =>
                         setDetailsStep(
                           detailsStep === "links" ? "services" : "identity"
@@ -407,33 +444,35 @@ const Page = () => {
                       }
                     >
                       <img
-                        src="/assets/pixelated-arrow-light-black-icon.svg"
+                        src="/assets/pixelated-arrow-primary-icon.svg"
+                        alt="pixelated-arrow"
+                        className="w-4 h-4 rotate-180"
+                      />
+                      <p className="font-medium text-primary">Back</p>
+                    </button>
+                  ) : null}
+                  {detailsStep === "links" ? null : (
+                    <button
+                      className={`rounded-[20000px] border border-primary w-[120px] py-1 flex items-center justify-center gap-2${
+                        !canProceedToNextStep
+                          ? " opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setDetailsStep(
+                          detailsStep === "identity" ? "services" : "links"
+                        )
+                      }
+                      disabled={!canProceedToNextStep}
+                    >
+                      <p className="font-medium text-primary">Next</p>
+                      <img
+                        src="/assets/pixelated-arrow-primary-icon.svg"
                         alt="pixelated-arrow"
                         className="w-4 h-4"
                       />
-                      <p className="font-medium text-[#8F95B2]">Back</p>
                     </button>
-                  ) : null}
-                  <button
-                    className={`rounded-[20000px] border border-[#8F95B2] w-[120px] py-1 flex items-center justify-center gap-2${
-                      !canProceedToNextStep
-                        ? " opacity-50 cursor-not-allowed"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      setDetailsStep(
-                        detailsStep === "identity" ? "services" : "links"
-                      )
-                    }
-                    disabled={!canProceedToNextStep}
-                  >
-                    <p className="font-medium text-[#8F95B2]">Next</p>
-                    <img
-                      src="/assets/pixelated-arrow-light-black-icon.svg"
-                      alt="pixelated-arrow"
-                      className="w-4 h-4 rotate-180"
-                    />
-                  </button>
+                  )}
                 </div>
               </div>
               <hr
@@ -907,13 +946,19 @@ const Page = () => {
                           <div key={p} className="flex items-center gap-2">
                             <input
                               type="checkbox"
-                              id={`checkbox-protocol-${p}`}
-                              checked={selectedCommunicationProtocol === p}
+                              id={`checkbox-protocol-${p.toLowerCase()}`}
+                              checked={
+                                selectedCommunicationProtocol ===
+                                p.toLowerCase()
+                              }
                               onChange={(e) => {
                                 if (e.target.checked) {
-                                  setSelectedCommunicationProtocol(p);
+                                  setSelectedCommunicationProtocol(
+                                    p.toLowerCase()
+                                  );
                                 } else if (
-                                  selectedCommunicationProtocol === p
+                                  selectedCommunicationProtocol ===
+                                  p.toLowerCase()
                                 ) {
                                   setSelectedCommunicationProtocol("");
                                 }
@@ -1332,7 +1377,7 @@ const Page = () => {
                             ? "text-red-500"
                             : ""
                         }`}
-                        placeholder="Dex"
+                        placeholder="Dextools"
                         value={agentDexTools}
                         onChange={(e) => {
                           setAgentDexTools(e.target.value);
@@ -1350,8 +1395,13 @@ const Page = () => {
                     />
 
                     <button
-                      className="w-auto space-x-2 flex items-center justify-between rounded-[50px] bg-primary disabled:bg-primary/70 py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                      disabled
+                      className={`w-auto space-x-2 flex items-center justify-between rounded-[50px] py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] ${
+                        canRegisterAgent && !loadingRegister
+                          ? "bg-primary cursor-pointer"
+                          : "bg-primary/70 cursor-not-allowed"
+                      }`}
+                      onClick={registerAgent}
+                      disabled={!canRegisterAgent || loadingRegister}
                     >
                       <img src="/assets/bolt-icon.svg" alt="bolt" />
                       <span className="text-white text-[16px] font-[700] leading-[24px]">
@@ -1472,39 +1522,69 @@ const Page = () => {
                         </p>
                         <div className="flex items-center justify-end gap-2">
                           {agentXProfile && isValidXProfile ? (
-                            <img
-                              src="/assets/register-twitter-icon.svg"
-                              alt="X"
-                              className="w-6 h-6"
-                            />
+                            <Link
+                              href={agentXProfile}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              <img
+                                src="/assets/register-twitter-icon.svg"
+                                alt="X"
+                                className="w-6 h-6"
+                              />
+                            </Link>
                           ) : null}
                           {agentWebsite && isValidWebsite ? (
-                            <img
-                              src="/assets/register-website-icon.svg"
-                              alt="website"
-                              className="w-6 h-6"
-                            />
+                            <Link
+                              href={agentWebsite}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              <img
+                                src="/assets/register-website-icon.svg"
+                                alt="website"
+                                className="w-6 h-6"
+                              />
+                            </Link>
                           ) : null}
                           {agentGitHub && isValidGitHub ? (
-                            <img
-                              src="/assets/register-github-icon.svg"
-                              alt="GitHub"
-                              className="w-6 h-6"
-                            />
+                            <Link
+                              href={agentGitHub}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              <img
+                                src="/assets/register-github-icon.svg"
+                                alt="GitHub"
+                                className="w-6 h-6"
+                              />
+                            </Link>
                           ) : null}
                           {agentTelegram && isValidTelegram ? (
-                            <img
-                              src="/assets/register-telegram-icon.svg"
-                              alt="GitHub"
-                              className="w-6 h-6"
-                            />
+                            <Link
+                              href={agentTelegram}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              <img
+                                src="/assets/register-telegram-icon.svg"
+                                alt="GitHub"
+                                className="w-6 h-6"
+                              />
+                            </Link>
                           ) : null}
                           {agentDexTools && isValidDexTools ? (
-                            <img
-                              src="/assets/register-dex-icon.svg"
-                              alt="GitHub"
-                              className="w-6 h-6"
-                            />
+                            <Link
+                              href={agentDexTools}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              <img
+                                src="/assets/register-dex-icon.svg"
+                                alt="GitHub"
+                                className="w-6 h-6"
+                              />
+                            </Link>
                           ) : null}
                         </div>
                       </div>
@@ -1523,7 +1603,12 @@ const Page = () => {
                         <p className="text-end w-1/2 ellipsis whitespace-nowrap overflow-hidden text-[16px] font-bold leading-[20px] text-text-color">
                           {selectedAgentService}&nbsp;
                           <span className="text-[16px] font-bold leading-[20px] text-light-text-color">
-                            ({selectedAgentSubServices.join(", ")})
+                            (
+                            {[
+                              ...selectedAgentSubServices,
+                              ...customCapabilities,
+                            ].join(", ")}
+                            )
                           </span>
                         </p>
                       </div>
