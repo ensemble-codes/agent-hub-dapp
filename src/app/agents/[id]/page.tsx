@@ -239,30 +239,6 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         {agent.agent.metadata?.description}
                       </p>
                     </div>
-                    <hr
-                      className="my-5 border-[1px] border-[#8F95B2]"
-                      style={{
-                        borderImageSource:
-                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                        borderImageSlice: "1",
-                      }}
-                    />
-                    <div className="space-y-2">
-                      <p className="text-primary font-medium leading-[100%]">
-                        Capabilities
-                      </p>
-                      <p className="text-[14px] font-medium text-text-color flex items-center gap-1">
-                        <img
-                          src="/assets/check-icon.svg"
-                          alt="check"
-                          className="w-4 h-4"
-                        />
-                        {agent.agent.metadata?.agentCategory ||
-                          (agent.agent.proposals &&
-                            agent.agent.proposals.length &&
-                            agent.agent.proposals[0].service)}
-                      </p>
-                    </div>
                     {agent.agent.metadata?.attributes &&
                       agent.agent.metadata.attributes.length > 0 && (
                         <>
@@ -382,7 +358,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                 </div>
                 <div className="flex-shrink-0 lg:w-[368px] w-full rounded-[10px]">
                   <div
-                    className="relative lg:h-[700px] overflow-auto lg:p-4 rounded-[10px] w-full lg:bg-white z-[1]"
+                    className="relative lg:max-h-[620px] overflow-auto lg:p-4 rounded-[10px] w-full lg:bg-white z-[1]"
                     style={{ scrollbarWidth: "none" }}
                   >
                     {id === "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
