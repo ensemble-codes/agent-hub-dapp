@@ -5,14 +5,6 @@ import { convertRatingToStars } from "@/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { useXMTP } from "@/context/XMTPContext";
-
-console.log('🔧 Environment Variables:');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS:', process.env.NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS);
-console.log('NEXT_PUBLIC_SERVICE_REGISTRY_ADDRESS:', process.env.NEXT_PUBLIC_SERVICE_REGISTRY_ADDRESS);
-console.log('NEXT_PUBLIC_TASK_REGISTRY_ADDRESS:', process.env.NEXT_PUBLIC_TASK_REGISTRY_ADDRESS);
-console.log('NEXT_PUBLIC_GRAPHQL_URL:', process.env.NEXT_PUBLIC_GRAPHQL_URL);
 
 export default function Home() {
   const { push } = useRouter();
@@ -27,120 +19,96 @@ export default function Home() {
 
   const GET_ALL_PROPOSALS = gql`
     query MyQuery {
-      proposals {
-        id
-        isRemoved
-        price
-        service
+      ipfsMetadata_collection {
+        attributes
       }
     }
   `;
 
-  const GET_TOP_AGENT = useMemo(
+  /* const GET_TOP_AGENT = useMemo(
     () => gql`
       query MyQuery {
-        agent(id: "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d") {
-          agentUri
-          id
-          metadata {
-            description
-            dexscreener
-            github
-            id
-            imageUri
-            name
-            telegram
-            twitter
-            website
-          }
-          name
-          owner
-          reputation
-          proposals {
-            id
-            isRemoved
-            price
-            service
-          }
-          tasks {
-            id
-            issuer
-            prompt
-            proposalId
-            rating
-            result
-            status
-          }
-        }
-      }
+  agent(id: "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d") {
+    id
+    metadata {
+      description
+      dexscreener
+      github
+      id
+      imageUri
+      name
+      telegram
+      twitter
+      website
+      agentCategory
+      attributes
+      communicationType
+      communicationURL
+      instructions
+      openingGreeting
+      prompts
+    }
+    name
+    owner
+    reputation
+    tasks {
+      status
+    }
+  }
+}
     `,
     []
-  );
+  ); */
 
-  const GET_ALL_AGENTS = gql`
+  /* const GET_ALL_AGENTS = gql`
     query MyQuery {
       agents {
         id
-        tasks {
-          id
-        }
       }
     }
-  `;
+  `; */
 
   const GET_AGENTS = useMemo(
     () =>
       gql`
         query MyQuery {
-          agents
-            ${
-              selectedProposal
-                ? `(where: {proposals_: {service: "${selectedProposal}"}})`
-                : ""
-            }
-            {
+          agents {
+            id
+            metadata {
+              description
+              dexscreener
+              github
               id
-              agentUri
-              metadata {
-                description
-                dexscreener
-                github
-                id
-                imageUri
-                name
-                telegram
-                twitter
-                website
-              }
+              imageUri
               name
-              owner
-              reputation
-              tasks {
-                id
-                issuer
-                prompt
-                proposalId
-                rating
-                result
-                status
-              }
-              proposals {
-                id
-                isRemoved
-                price
-                service
-              }
+              telegram
+              twitter
+              website
+              agentCategory
+              attributes
+              communicationType
+              communicationURL
+              instructions
+              openingGreeting
+              prompts
+            }
+            name
+            owner
+            reputation
+            tasks {
+              status
             }
           }
+        }
       `,
     [selectedProposal]
   );
 
   const { data, loading } = useQuery(GET_AGENTS);
   const { data: proposalsData } = useQuery(GET_ALL_PROPOSALS);
-  const { data: topAgentData } = useQuery(GET_TOP_AGENT);
+  // const { data: topAgentData } = useQuery(GET_TOP_AGENT);
 
-  const { data: allAgentsData } = useQuery(GET_ALL_AGENTS);
+  // const { data: allAgentsData } = useQuery(GET_ALL_AGENTS);
 
   const agents = [...(data?.agents || [])]?.sort(
     (a: any, b: any) => b.tasks.length - a.tasks.length
@@ -149,12 +117,16 @@ export default function Home() {
   // Get unique proposals from all agents
   const uniqueProposals = useMemo(() => {
     const proposals = new Set<string>();
-    proposalsData?.proposals?.forEach((p: any) => {
-      proposals.add(p.service);
+    proposalsData?.ipfsMetadata_collection?.forEach((item: any) => {
+      if (item.attributes && Array.isArray(item.attributes)) {
+        item.attributes.forEach((attr: string) => {
+          proposals.add(attr);
+        });
+      }
     });
     return Array.from(proposals);
   }, [proposalsData]);
-
+  /* 
   // Calculate total tasks across all agents, regardless of filter
   const totalTasks = useMemo(() => {
     return (
@@ -163,7 +135,14 @@ export default function Home() {
         0
       ) || 0
     );
-  }, [allAgentsData?.agents]);
+  }, [allAgentsData?.agents]); */
+
+  console.log(
+    data,
+    proposalsData,
+    uniqueProposals,
+    /* topAgentData, allAgentsData */
+  );
 
   return (
     <>
@@ -171,10 +150,15 @@ export default function Home() {
         <div className="flex items-start gap-4">
           <SideMenu />
           <div className="grow w-full ">
-          <AppHeader />
-            <h1 className="lg:hidden text-[24px] font-semibold text-primary mb-4" style={{ textShadow: '0px 4px 12px #F94D2733' }}>MarketPlace</h1>
-            <div className="flex items-stretch gap-6 mb-6 w-full overflow-x-auto">
-              {topAgentData ? (
+            <AppHeader />
+            <h1
+              className="lg:hidden text-[24px] font-semibold text-primary mb-4"
+              style={{ textShadow: "0px 4px 12px #F94D2733" }}
+            >
+              MarketPlace
+            </h1>
+            {/* <div className="flex items-stretch gap-6 mb-6 w-full overflow-x-auto">
+                          {topAgentData ? (
                 <div className="basis-[calc(50%-12px)] min-w-[318px] flex flex-col justify-between bg-white rounded-[16px] border-[0.5px] border-[#CADFF4]">
                   <div className="flex items-center justify-between py-2 px-4">
                     <div className="flex items-center gap-2">
@@ -278,7 +262,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-              ) : null}
+              ) : null
               <div className="basis-[calc(50%-12px)] min-w-[318px]">
                 <div className="mb-2 flex items-center">
                   <img src="/assets/ornament-pattern-icon.svg" alt="ornament" />
@@ -307,7 +291,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
             <div className="lg:p-6 rounded-[16px] lg:bg-white">
               <div className="w-full flex items-center justify-between lg:mb-6 mb-4 overflow-x-auto">
                 <div className="flex items-center justify-start gap-3">
@@ -426,46 +410,38 @@ export default function Home() {
                             )}
                             <div
                               className={`p-2 rounded-[200px] flex items-center gap-1 max-w-[12ch] overflow-hidden whitespace-nowrap text-ellipsis ${
-                                a.proposals[0].service === "Swap"
+                                a.metadata.agentCategory === "DeFi"
                                   ? "bg-[#FFC8F9]"
-                                  : ["Bull-Post", "Bless Me"].includes(
-                                      a.proposals[0].service
-                                    )
+                                  : a.metadata.agentCategory === "Social"
                                   ? "bg-[#FBFFC8]"
-                                  : ["Trends", "Markets"].includes(
-                                      a.proposals[0].service
-                                    )
+                                  : a.metadata.agentCategory === "Research"
                                   ? "bg-[#C8FFCE]"
                                   : "bg-[#C8E6FF]"
                               }`}
                             >
-                              {a.proposals[0].service === "Swap" ? (
+                              {a.metadata.agentCategory === "DeFi" ? (
                                 <img
                                   src="/assets/defi-service-black-icon.svg"
-                                  alt={a.proposals[0].service}
+                                  alt={a.metadata.agentCategory}
                                 />
-                              ) : ["Bull-Post", "Bless Me"].includes(
-                                  a.proposals[0].service
-                                ) ? (
+                              ) : a.metadata.agentCategory === "Social" ? (
                                 <img
                                   src="/assets/social-service-black-icon.svg"
-                                  alt={a.proposals[0].service}
+                                  alt={a.metadata.agentCategory}
                                 />
-                              ) : ["Trends", "Markets"].includes(
-                                  a.proposals[0].service
-                                ) ? (
+                              ) : a.metadata.agentCategory === "Research" ? (
                                 <img
                                   src="/assets/research-service-black-icon.svg"
-                                  alt={a.proposals[0].service}
+                                  alt={a.metadata.agentCategory}
                                 />
                               ) : (
                                 <img
                                   src="/assets/security-service-black-icon.svg"
-                                  alt={a.proposals[0].service}
+                                  alt={a.metadata.agentCategory}
                                 />
                               )}
                               <p className="font-bold text-[14px] leading-[19px] text-[#3D3D3D] truncate">
-                                {a.proposals[0].service}
+                                {a.metadata.agentCategory}
                               </p>
                             </div>
                           </div>
@@ -478,6 +454,15 @@ export default function Home() {
                                 borderImageSlice: "1",
                               }}
                             />
+                            <div className="flex items-center gap-2 flex-wrap mb-2">
+                              {a?.metadata?.attributes?.map((up: string) => (
+                                <div className="p-[2px] px-2 border-[0.5px] border-primary rounded-[2000px]">
+                                  <p className="text-[12px] text-primary font-semibold">
+                                    {up}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
                             <p className="font-normal text-[14px] leading-[19px] text-[#3D3D3D] line-clamp-2">
                               {a.metadata.description}
                             </p>
