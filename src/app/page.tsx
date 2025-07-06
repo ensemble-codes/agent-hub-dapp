@@ -19,10 +19,10 @@ export default function Home() {
 
   const GET_ALL_PROPOSALS = gql`
     query MyQuery {
-      ipfsMetadata_collection {
-        attributes
-      }
-    }
+  ipfsMetadata_collection {
+    agentCategory
+  }
+}
   `;
 
   /* const GET_TOP_AGENT = useMemo(
@@ -72,7 +72,7 @@ export default function Home() {
     () =>
       gql`
         query MyQuery {
-          agents {
+          agents${selectedProposal ? `(where: {metadata_: {agentCategory: "${selectedProposal}"}})` : ''} {
             id
             metadata {
               description
@@ -118,10 +118,8 @@ export default function Home() {
   const uniqueProposals = useMemo(() => {
     const proposals = new Set<string>();
     proposalsData?.ipfsMetadata_collection?.forEach((item: any) => {
-      if (item.attributes && Array.isArray(item.attributes)) {
-        item.attributes.forEach((attr: string) => {
-          proposals.add(attr);
-        });
+      if (item.agentCategory) {
+        proposals.add(item.agentCategory);
       }
     });
     return Array.from(proposals);
