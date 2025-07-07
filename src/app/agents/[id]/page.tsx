@@ -68,7 +68,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   `;
 
   const { data: agent, loading } = useQuery(GET_AGENT);
-
+  console.log(agent);
   return (
     <div>
       <div className="flex items-start gap-4">
@@ -121,6 +121,32 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           >
                             <img
                               src="/assets/agent-list-card-gh-icon.svg"
+                              alt="github"
+                              className="w-8 h-8 cursor-pointer"
+                            />
+                          </Link>
+                        ) : null}
+                        {agent.agent.metadata?.website ? (
+                          <Link
+                            href={agent.agent.metadata?.website}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            <img
+                              src="/assets/agent-list-website-icon.svg"
+                              alt="github"
+                              className="w-8 h-8 cursor-pointer"
+                            />
+                          </Link>
+                        ) : null}
+                        {agent.agent.metadata?.dexscreener ? (
+                          <Link
+                            href={agent.agent.metadata?.dexscreener}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            <img
+                              src="/assets/agent-list-dex-icon.svg"
                               alt="github"
                               className="w-8 h-8 cursor-pointer"
                             />
@@ -465,7 +491,8 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                                       className="text-[12px] font-bold"
                                       style={{
                                         color:
-                                          Number(td.status) === TaskStatus.CREATED
+                                          Number(td.status) ===
+                                          TaskStatus.CREATED
                                             ? "#3B82F6"
                                             : Number(td.status) ===
                                               TaskStatus.ASSIGNED
@@ -482,7 +509,8 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                                     </p>
                                   </Link>
                                 </div>
-                                {index === agent.agent.tasks.length - 1 ? null : (
+                                {index ===
+                                agent.agent.tasks.length - 1 ? null : (
                                   <hr
                                     className="my-3 border-[0.5px] border-[#8F95B2] w-[70%]"
                                     style={{
