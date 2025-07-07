@@ -135,13 +135,6 @@ export default function Home() {
     );
   }, [allAgentsData?.agents]); */
 
-  console.log(
-    data,
-    proposalsData,
-    uniqueProposals,
-    /* topAgentData, allAgentsData */
-  );
-
   return (
     <>
       <div>

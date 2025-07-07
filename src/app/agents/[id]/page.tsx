@@ -591,7 +591,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         }}
                       />
                       {agent.agent.metadata.instructions.map(
-                        (ins: string, arr: string[], i: number) => (
+                        (ins: string, i: number, arr: string[]) => (
                           <div
                             className={`p-4 flex items-center justify-start gap-2 ${
                               i < arr.length - 1
@@ -627,7 +627,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         }}
                       />
                       {agent.agent.metadata.prompts.map(
-                        (p: string, arr: string[], i: number) => (
+                        (p: string, i: number, arr: string[]) => (
                           <div
                             className={`p-4 flex items-center justify-between gap-2 ${
                               i < arr.length - 1
