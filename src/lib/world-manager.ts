@@ -1,4 +1,6 @@
-import type { UUID } from '@elizaos/core';
+'use client'
+
+export type UUID = `${string}-${string}-${string}-${string}-${string}`
 
 // Key used for storing the worldId in localStorage
 const WORLD_ID_KEY = 'elizaos-world-id';
@@ -9,14 +11,14 @@ export function randomUUID(): UUID {
 
 export function getEntityId(): UUID {
     const USER_ID_KEY = 'elizaos-client-user-id';
-    const existingUserId = localStorage.getItem(USER_ID_KEY);
+    const existingUserId = window.localStorage.getItem(USER_ID_KEY);
   
     if (existingUserId) {
       return existingUserId as UUID;
     }
   
     const newUserId = randomUUID() as UUID;
-    localStorage.setItem(USER_ID_KEY, newUserId);
+    window.localStorage.setItem(USER_ID_KEY, newUserId);
   
     return newUserId;
 }
@@ -47,7 +49,7 @@ export const WorldManager = {
 
     // Create a new worldId if one doesn't exist
     const newWorldId = randomUUID() as UUID;
-    localStorage.setItem(WORLD_ID_KEY, newWorldId);
+    window.localStorage.setItem(WORLD_ID_KEY, newWorldId);
 
     return newWorldId;
   },
@@ -57,7 +59,7 @@ export const WorldManager = {
    */
   resetWorldId: (): UUID => {
     const newWorldId = randomUUID() as UUID;
-    localStorage.setItem(WORLD_ID_KEY, newWorldId);
+    window.localStorage.setItem(WORLD_ID_KEY, newWorldId);
     return newWorldId;
   },
 

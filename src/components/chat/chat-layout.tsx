@@ -4,7 +4,15 @@ import { Loader2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { SideMenu } from "@/components"
 
-export const ChatLayout: FC = () => {
+export const ChatLayout: FC<{
+    messages: any[];
+    handleSend: () => void;
+    setInput: (input: string) => void;
+    input: string;
+    messageProcessing?: boolean;
+}> = ({ messages, handleSend, setInput, input, messageProcessing }) => {
+
+  // FIXME: Improve the Chat UI
     return (
         <div>
             <div className="flex flex-col w-full h-full">
@@ -43,6 +51,12 @@ export const ChatLayout: FC = () => {
                     className="grow overflow-y-auto w-full h-[80%] mt-[20px]"
                     style={{ scrollbarWidth: "none" }}
                   >
+                    {messages.map(message => (
+                      <div key={message.id} className="flex flex-col gap-2">
+                        <p>{message.text}</p>
+                        <p>{message.createdAt}</p>
+                      </div>
+                    ))}
                     {/* Loading State */}
                     <div className="flex items-center justify-center h-full">
                       <div className="flex flex-col items-center gap-2">
@@ -60,11 +74,13 @@ export const ChatLayout: FC = () => {
                       placeholder="Chat..."
                       className="basis-[80%] grow p-4 text-[16px] placeholder:text-[#8F95B2] outline-none border-none rounded-[8px]"
                       maxLength={1000}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
                     />
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <div className="basis-[10%] border-l-[1px] border-l-[#8F95B2] flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">
+                          <div className="basis-[10%] border-l-[1px] border-l-[#8F95B2] flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => handleSend()}>
                             <img
                               src="/assets/pixelated-arrow-primary-icon.svg"
                               alt="arrow"

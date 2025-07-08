@@ -12,7 +12,9 @@ export const WebsocketChat: FC = () => {
     const [input, setInput] = useState("")
     const [messages, setMessages] = useState<any[]>([])
     const [messageProcessing, setMessageProcessing] = useState(false)
+    
     const entityId = getEntityId();
+    // FIXME: Store agentId in constant, Address -> AgentId mapping
     const agentId = "c44c5b36-0fb1-0769-b0c1-fa0965cf61fb"
     const roomId = WorldManager.generateRoomId(agentId)
 
@@ -67,29 +69,19 @@ export const WebsocketChat: FC = () => {
     }, [roomId, agentId, entityId, messages, socketIOManager])
 
     const handleSend = useCallback(() => {
-        const messageId = randomUUID()
-
         if (!input || messageProcessing) return
-
-        const userMessage = {
-            text: input,
-            name: USER_NAME,
-            createdAt: Date.now(),
-            senderId: entityId,
-            senderName: USER_NAME,
-            roomId: roomId,
-            source: CHAT_SOURCE,
-            id: messageId
-        }
-
-        console.log("Adding user message to UI", userMessage)
-
-        setMessages(prev => [...prev, userMessage])
 
         socketIOManager.sendMessage(input, roomId, CHAT_SOURCE)
 
         setMessageProcessing(true)
+        setInput('')
     }, [roomId, entityId, input, socketIOManager, messageProcessing])
 
-    return <ChatLayout />
+    return <ChatLayout
+        messages={messages}
+        handleSend={handleSend}
+        setInput={setInput}
+        input={input}
+        messageProcessing={messageProcessing}
+    />
 }

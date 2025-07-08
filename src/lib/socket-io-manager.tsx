@@ -1,9 +1,16 @@
 'use client'
 import { Evt } from "evt";
 import { io, Socket } from "socket.io-client";
-import { SOCKET_MESSAGE_TYPE } from '@elizaos/core';
 import { randomUUID, WorldManager } from "./world-manager";
 import { USER_NAME } from "@/constants";
+
+enum SOCKET_MESSAGE_TYPE {
+  ROOM_JOINING = 1,
+  SEND_MESSAGE = 2,
+  MESSAGE = 3,
+  ACK = 4,
+  THINKING = 5
+}
 
 export type MessageBroadcastData = {
     senderId: string;
@@ -129,7 +136,7 @@ export type MessageBroadcastData = {
       }
   
       // Create a single socket connection
-      const fullURL = 'http://localhost:3000';
+      const fullURL = process.env.NEXT_PUBLIC_SOCKET_URL;
       console.info('connecting to', fullURL);
       this.socket = io(fullURL, {
         autoConnect: true,
