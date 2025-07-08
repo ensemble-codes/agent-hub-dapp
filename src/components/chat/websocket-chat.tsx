@@ -1,0 +1,95 @@
+'use client'
+
+import { FC, useCallback, useEffect, useState } from "react"
+
+import { ChatLayout } from "./chat-layout"
+import { getEntityId, randomUUID, WorldManager } from "@/lib/world-manager"
+import SocketIOManager from "@/lib/socket-io-manager"
+import { Content } from "@elizaos/core"
+import { CHAT_SOURCE, USER_NAME } from "@/constants"
+
+export const WebsocketChat: FC = () => {
+    const [input, setInput] = useState("")
+    const [messages, setMessages] = useState<any[]>([])
+    const [messageProcessing, setMessageProcessing] = useState(false)
+    const entityId = getEntityId();
+    const agentId = "c44c5b36-0fb1-0769-b0c1-fa0965cf61fb"
+    const roomId = WorldManager.generateRoomId(agentId)
+
+    const socketIOManager = SocketIOManager.getInstance();
+
+    useEffect(() => {
+        socketIOManager.initialize(entityId, [agentId])
+
+        socketIOManager.joinRoom(roomId)
+
+        console.log("joined room", roomId)
+
+        const handleMessageBroadcasting = (data: Content) => {
+            console.log("message received", data)
+
+            if (!data) {
+                console.warn("No data received", data)
+                return
+            }
+
+            if (data.roomId !== roomId) {
+                console.warn("Message received from a different room", data)
+                return
+            }
+
+            const isCurrentUser = data.senderId === entityId
+
+            setMessages(prev => [...prev, { ...data, name: isCurrentUser ? USER_NAME : data.senderName }])
+        }
+
+        const handleMessageComplete = (data: Content) => {
+            if (data.roomId ===  roomId) {
+                setMessageProcessing(false)
+            }
+        }
+
+        const msgHandler = socketIOManager.evtMessageBroadcast.attach((data) => [
+            data as unknown as Content
+        ])
+        const completeHandler = socketIOManager.evtMessageComplete.attach((data) => [
+            data as unknown as Content
+        ])
+
+        msgHandler.attach(handleMessageBroadcasting)
+        completeHandler.attach(handleMessageComplete)
+
+        return () => {
+            socketIOManager.leaveRoom(roomId)
+            msgHandler.detach()
+            completeHandler.detach()
+        }
+    }, [roomId, agentId, entityId, messages, socketIOManager])
+
+    const handleSend = useCallback(() => {
+        const messageId = randomUUID()
+
+        if (!input || messageProcessing) return
+
+        const userMessage = {
+            text: input,
+            name: USER_NAME,
+            createdAt: Date.now(),
+            senderId: entityId,
+            senderName: USER_NAME,
+            roomId: roomId,
+            source: CHAT_SOURCE,
+            id: messageId
+        }
+
+        console.log("Adding user message to UI", userMessage)
+
+        setMessages(prev => [...prev, userMessage])
+
+        socketIOManager.sendMessage(input, roomId, CHAT_SOURCE)
+
+        setMessageProcessing(true)
+    }, [roomId, entityId, input, socketIOManager, messageProcessing])
+
+    return <ChatLayout />
+}
