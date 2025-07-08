@@ -56,13 +56,11 @@ export const setTags = (tags: Record<string, string>) => {
 export const logAgentRegistration = (agentData: {
   name: string;
   service: string;
-  price: string;
   address: string;
 }) => {
   logBusinessEvent("Agent Registration", {
     agent_name: agentData.name,
     service: agentData.service,
-    price: agentData.price,
     agent_address: agentData.address
   });
 };

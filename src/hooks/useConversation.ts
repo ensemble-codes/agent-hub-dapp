@@ -43,7 +43,6 @@ export function useConversation(address?: string) {
   }, [client])
 
   const formatMessage = useCallback((message: DecodedMessage): FormattedMessage | null => {
-    console.log(message.content, typeof message.content);
 
     if (typeof message.content !== 'string') {
       return null;

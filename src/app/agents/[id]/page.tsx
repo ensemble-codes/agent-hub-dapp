@@ -23,49 +23,58 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const GET_AGENT = gql`
     query MyQuery {
   agent(id: "${id}") {
+    agentUri
     id
-            agentUri
-            metadata {
-              description
-              dexscreener
-              github
-              id
-              imageUri
-              name
-              telegram
-              twitter
-              website
-            }
-            name
-            owner
-            reputation
-            tasks {
-              id
-              issuer
-              prompt
-              proposalId
-              rating
-              result
-              status
-            }
-            proposals {
-              id
-              isRemoved
-              price
-              service
-            }
+    name
+    owner
+    reputation
+    metadata {
+      agentCategory
+      attributes
+      communicationType
+      communicationURL
+      description
+      dexscreener
+      github
+      id
+      imageUri
+      instructions
+      name
+      openingGreeting
+      prompts
+      telegram
+      twitter
+      website
+    }
+    proposals {
+      id
+      isRemoved
+      price
+      service
+      tokenAddress
+    }
+    tasks {
+      id
+      prompt
+      issuer
+      proposalId
+      rating
+      result
+      status
+      taskId
+    }
   }
 }
   `;
 
   const { data: agent, loading } = useQuery(GET_AGENT);
-
+  console.log(agent);
   return (
     <div>
       <div className="flex items-start gap-4">
         <SideMenu />
         <div className="grow w-full">
-        <AppHeader />
+          <AppHeader />
           {loading ? (
             <Loader size="xl" />
           ) : agent && agent.agent ? (
@@ -112,6 +121,32 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           >
                             <img
                               src="/assets/agent-list-card-gh-icon.svg"
+                              alt="github"
+                              className="w-8 h-8 cursor-pointer"
+                            />
+                          </Link>
+                        ) : null}
+                        {agent.agent.metadata?.website ? (
+                          <Link
+                            href={agent.agent.metadata?.website}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            <img
+                              src="/assets/agent-list-website-icon.svg"
+                              alt="github"
+                              className="w-8 h-8 cursor-pointer"
+                            />
+                          </Link>
+                        ) : null}
+                        {agent.agent.metadata?.dexscreener ? (
+                          <Link
+                            href={agent.agent.metadata?.dexscreener}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            <img
+                              src="/assets/agent-list-dex-icon.svg"
                               alt="github"
                               className="w-8 h-8 cursor-pointer"
                             />
@@ -168,6 +203,51 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                                 Vibes
                               </p>
                             </div>
+                          ) : agent.agent.metadata?.agentCategory ? (
+                            <div
+                              className={`py-1 px-4 rounded-[2000px] flex items-center gap-2 ${
+                                agent.agent.metadata.agentCategory === "DeFi"
+                                  ? "bg-[#FFC8F9]"
+                                  : agent.agent.metadata.agentCategory ===
+                                    "Social"
+                                  ? "bg-[#FBFFC8]"
+                                  : agent.agent.metadata.agentCategory ===
+                                    "Research"
+                                  ? "bg-[#C8FFCE]"
+                                  : "bg-[#C8E6FF]"
+                              }`}
+                            >
+                              {agent.agent.metadata.agentCategory === "DeFi" ? (
+                                <img
+                                  src="/assets/defi-service-black-icon.svg"
+                                  alt={agent.agent.metadata.agentCategory}
+                                  className="w-[18px] h-[18px]"
+                                />
+                              ) : agent.agent.metadata.agentCategory ===
+                                "Social" ? (
+                                <img
+                                  src="/assets/social-service-black-icon.svg"
+                                  alt={agent.agent.metadata.agentCategory}
+                                  className="w-[18px] h-[18px]"
+                                />
+                              ) : agent.agent.metadata.agentCategory ===
+                                "Research" ? (
+                                <img
+                                  src="/assets/research-service-black-icon.svg"
+                                  alt={agent.agent.metadata.agentCategory}
+                                  className="w-[18px] h-[18px]"
+                                />
+                              ) : (
+                                <img
+                                  src="/assets/security-service-black-icon.svg"
+                                  alt={agent.agent.metadata.agentCategory}
+                                  className="w-[18px] h-[18px]"
+                                />
+                              )}
+                              <p className="text-[#3d3d3d] text-[14px] font-medium leading-[18px]">
+                                {agent.agent.metadata.agentCategory}
+                              </p>
+                            </div>
                           ) : null}
                         </div>
                       </div>
@@ -185,29 +265,38 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         {agent.agent.metadata?.description}
                       </p>
                     </div>
-                    <hr
-                      className="my-5 border-[1px] border-[#8F95B2]"
-                      style={{
-                        borderImageSource:
-                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                        borderImageSlice: "1",
-                      }}
-                    />
-                    <div className="space-y-2">
-                      <p className="text-primary font-medium leading-[100%]">
-                        Capabilities
-                      </p>
-                      <p className="text-[14px] font-medium text-text-color flex items-center gap-1">
-                        <img
-                          src="/assets/check-icon.svg"
-                          alt="check"
-                          className="w-4 h-4"
-                        />
-                        {agent.agent.proposals &&
-                          agent.agent.proposals.length &&
-                          agent.agent.proposals[0].service}
-                      </p>
-                    </div>
+                    {agent.agent.metadata?.attributes &&
+                      agent.agent.metadata.attributes.length > 0 && (
+                        <>
+                          <hr
+                            className="my-5 border-[1px] border-[#8F95B2]"
+                            style={{
+                              borderImageSource:
+                                "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                              borderImageSlice: "1",
+                            }}
+                          />
+                          <div className="space-y-2">
+                            <p className="text-primary font-medium leading-[100%]">
+                              Attributes
+                            </p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {agent.agent.metadata.attributes.map(
+                                (attr: string, index: number) => (
+                                  <div
+                                    key={index}
+                                    className="p-[2px] px-2 border-[0.5px] border-primary rounded-[2000px]"
+                                  >
+                                    <p className="text-[12px] text-primary font-semibold">
+                                      {attr}
+                                    </p>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
                     <hr
                       className="my-5 border-[1px] border-[#8F95B2]"
                       style={{
@@ -223,20 +312,17 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       <div className="flex items-start gap-12 mb-6">
                         <div className="flex items-start justify-center gap-1">
                           <img
-                            src="/assets/price-tag-icon.svg"
-                            alt="price-tag"
+                            src="/assets/ensemble-icon.svg"
+                            alt="credits"
                             className="w-4 h-4 mt-[2px]"
                           />
                           <div className="flex flex-col items-start gap-1">
                             <span className="text-[14px] text-light-text-color font-bold">
-                              Price
+                              Credits
                             </span>
-                            {agent.agent?.proposals?.length ? (
-                              <p className="font-bold leading-[19px] text-primary">
-                                {formatEther(agent.agent?.proposals[0].price)}{" "}
-                                ETH
-                              </p>
-                            ) : null}
+                            <p className="font-bold leading-[19px] text-primary">
+                              20-50
+                            </p>
                           </div>
                         </div>
                         <div className="flex items-start justify-center gap-1">
@@ -280,33 +366,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       }}
                     />
                     <div className="w-full flex lg:flex-row flex-col items-center gap-4">
-                      {id ===
-                      "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d" ? null : (
-                        <button
-                          className="lg:w-fit w-full space-x-2 flex items-center justify-center rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-                          onClick={() =>
-                            push(
-                              `/task-center?service=${agent.agent.proposals[0]?.service}&proposal=${agent.agent.proposals[0]?.id}`
-                            )
-                          }
-                        >
-                          <img
-                            src="/assets/bolt-icon.svg"
-                            alt="bolt"
-                            className="w-4 h-4"
-                          />
-                          <span className="text-white text-[18px] font-[700] leading-[24px]">
-                            {agent.agent.proposals &&
-                              agent.agent.proposals.length &&
-                              agent.agent.proposals[0].service}
-                          </span>
-                        </button>
-                      )}
                       <button
                         className="lg:w-fit w-full space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#121212]"
-                        onClick={() =>
-                          push(`/chat?agent=${agent.agent.id}`)
-                        }
+                        onClick={() => push(`/chat?agent=${agent.agent.id}`)}
                       >
                         <img
                           src="/assets/chat-icon.svg"
@@ -322,7 +384,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                 </div>
                 <div className="flex-shrink-0 lg:w-[368px] w-full rounded-[10px]">
                   <div
-                    className="relative lg:h-[614px] overflow-auto lg:p-4 rounded-[10px] w-full lg:bg-white z-[1]"
+                    className="relative lg:max-h-[620px] overflow-auto lg:p-4 rounded-[10px] w-full lg:bg-white z-[1]"
                     style={{ scrollbarWidth: "none" }}
                   >
                     {id === "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
@@ -388,7 +450,6 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       </>
                     ) : (
                       <>
-                        {/**/}
                         <div className="flex items-center gap-2">
                           <img
                             src="/assets/task-history-icon.svg"
@@ -407,137 +468,144 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             borderImageSlice: "1",
                           }}
                         />
-                        {[...agent.agent.tasks]
-                          .sort(
-                            (a: { id: string }, b: { id: string }) =>
-                              Number(b.id) - Number(a.id)
-                          )
-                          .map((td: any, index: number) => (
-                            <>
-                              <div
-                                key={`${td.id}-${td.prompt}`}
-                                className="z-[1]"
-                              >
-                                <Link
-                                  href={`/tasks/${td.id}`}
-                                  className="flex items-center justify-between"
+                        {agent.agent.tasks && agent.agent.tasks.length > 0 ? (
+                          [...agent.agent.tasks]
+                            .sort(
+                              (a: { id: string }, b: { id: string }) =>
+                                Number(b.id) - Number(a.id)
+                            )
+                            .map((td: any, index: number) => (
+                              <>
+                                <div
+                                  key={`${td.id}-${td.prompt}`}
+                                  className="z-[1]"
                                 >
-                                  <p className="text-light-text-color font-[500] lg:max-w-[12ch] max-w-[20ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {td.prompt}
-                                  </p>
-                                  <p
-                                    className="text-[12px] font-bold"
-                                    style={{
-                                      color:
-                                        Number(td.status) === TaskStatus.CREATED
-                                          ? "#3B82F6"
-                                          : Number(td.status) ===
-                                            TaskStatus.ASSIGNED
-                                          ? "#F59E0B"
-                                          : Number(td.status) ===
-                                            TaskStatus.COMPLETED
-                                          ? "#00D64F"
-                                          : "#EF4444",
-                                    }}
+                                  <Link
+                                    href={`/tasks/${td.id}`}
+                                    className="flex items-center justify-between"
                                   >
-                                    {getTaskStatusText(
-                                      Number(td.status) as TaskStatus
-                                    )}
-                                  </p>
-                                </Link>
-                              </div>
-                              {index === agent.agent.tasks.length - 1 ? null : (
-                                <hr
-                                  className="my-3 border-[0.5px] border-[#8F95B2] w-[70%]"
-                                  style={{
-                                    borderImageSource:
-                                      "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
-                                    borderImageSlice: "1",
-                                  }}
-                                />
-                              )}
-                            </>
-                          ))}
+                                    <p className="text-light-text-color font-[500] lg:max-w-[12ch] max-w-[20ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                                      {td.prompt}
+                                    </p>
+                                    <p
+                                      className="text-[12px] font-bold"
+                                      style={{
+                                        color:
+                                          Number(td.status) ===
+                                          TaskStatus.CREATED
+                                            ? "#3B82F6"
+                                            : Number(td.status) ===
+                                              TaskStatus.ASSIGNED
+                                            ? "#F59E0B"
+                                            : Number(td.status) ===
+                                              TaskStatus.COMPLETED
+                                            ? "#00D64F"
+                                            : "#EF4444",
+                                      }}
+                                    >
+                                      {getTaskStatusText(
+                                        Number(td.status) as TaskStatus
+                                      )}
+                                    </p>
+                                  </Link>
+                                </div>
+                                {index ===
+                                agent.agent.tasks.length - 1 ? null : (
+                                  <hr
+                                    className="my-3 border-[0.5px] border-[#8F95B2] w-[70%]"
+                                    style={{
+                                      borderImageSource:
+                                        "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                                      borderImageSlice: "1",
+                                    }}
+                                  />
+                                )}
+                              </>
+                            ))
+                        ) : (
+                          <p className="text-light-text-color font-[500]">
+                            No task history found
+                          </p>
+                        )}
                       </>
                     )}
                   </div>
                 </div>
               </div>
-              {id === "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ||
-              id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d" ? (
-                <>
-                  <div className="flex lg:flex-row flex-col items-stretch gap-4 w-full mt-4">
-                    <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
-                      <p className="p-4 text-primary text-[16px] font-medium">
-                        How agent works
-                      </p>
+              <>
+                <div className="flex lg:flex-row flex-col items-stretch gap-4 w-full mt-4">
+                  {/* <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
+                    <p className="p-4 text-primary text-[16px] font-medium">
+                      How agent works
+                    </p>
+                    <hr
+                      className="lg:block hidden border-[1px] border-[#8F95B2]"
+                      style={{
+                        borderImageSource:
+                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                        borderImageSlice: "1",
+                      }}
+                    />
+                    <div className="p-4">
+                      <img
+                        src="/assets/featured-agent-graph-icon.svg"
+                        alt="graph"
+                        className="w-full"
+                      />
+                      <div className="flex items-center justify-between">
+                        <p className="text-[#8F95B2] text-[14px] font-normal">
+                          Mcap
+                        </p>
+                        <p className="text-[#121212] text-[14px] font-normal">
+                          -
+                        </p>
+                      </div>
                       <hr
-                        className="lg:block hidden border-[1px] border-[#8F95B2]"
+                        className="my-2 lg:block hidden border-[1px] border-[#8F95B2]"
                         style={{
                           borderImageSource:
                             "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
                           borderImageSlice: "1",
                         }}
                       />
-                      <div className="p-4">
-                        <img
-                          src="/assets/featured-agent-graph-icon.svg"
-                          alt="graph"
-                          className="w-full"
-                        />
-                        <div className="flex items-center justify-between">
-                          <p className="text-[#8F95B2] text-[14px] font-normal">
-                            Mcap
-                          </p>
-                          <p className="text-[#121212] text-[14px] font-normal">
-                            -
-                          </p>
-                        </div>
-                        <hr
-                          className="my-2 lg:block hidden border-[1px] border-[#8F95B2]"
-                          style={{
-                            borderImageSource:
-                              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                            borderImageSlice: "1",
-                          }}
-                        />
-                        <div className="flex items-center justify-between">
-                          <p className="text-[#8F95B2] text-[14px] font-normal">
-                            Liquidity
-                          </p>
-                          <p className="text-[#121212] text-[14px] font-normal">
-                            -
-                          </p>
-                        </div>
-                        <hr
-                          className="my-2 lg:block hidden border-[1px] border-[#8F95B2]"
-                          style={{
-                            borderImageSource:
-                              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                            borderImageSlice: "1",
-                          }}
-                        />
-                        <div className="flex items-center justify-between">
-                          <p className="text-[#8F95B2] text-[14px] font-normal">
-                            Holders
-                          </p>
-                          <p className="text-[#121212] text-[14px] font-normal">
-                            -
-                          </p>
-                        </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-[#8F95B2] text-[14px] font-normal">
+                          Liquidity
+                        </p>
+                        <p className="text-[#121212] text-[14px] font-normal">
+                          -
+                        </p>
+                      </div>
+                      <hr
+                        className="my-2 lg:block hidden border-[1px] border-[#8F95B2]"
+                        style={{
+                          borderImageSource:
+                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                          borderImageSlice: "1",
+                        }}
+                      />
+                      <div className="flex items-center justify-between">
+                        <p className="text-[#8F95B2] text-[14px] font-normal">
+                          Holders
+                        </p>
+                        <p className="text-[#121212] text-[14px] font-normal">
+                          -
+                        </p>
+                      </div>
 
-                        <button className="w-full mt-2 space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#8F95B2]">
-                          <img
-                            src="/assets/cross-gray-icon.svg"
-                            alt="cross"
-                            className="w-[18px] h-[18px]"
-                          />
-                          <span className="text-[#8F95B2] text-[14px] font-[700] leading-[18px]">
-                            Agent does not have a token
-                          </span>
-                        </button>
-                      </div>
+                      <button className="w-full mt-2 space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#8F95B2]">
+                        <img
+                          src="/assets/cross-gray-icon.svg"
+                          alt="cross"
+                          className="w-[18px] h-[18px]"
+                        />
+                        <span className="text-[#8F95B2] text-[14px] font-[700] leading-[18px]">
+                          Agent does not have a token
+                        </span>
+                      </button>
                     </div>
+                  </div> */}
+                  {agent?.agent?.metadata?.instructions?.length ? (
                     <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
                       <p className="p-4 text-primary text-[16px] font-medium">
                         How agent works
@@ -550,50 +618,30 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           borderImageSlice: "1",
                         }}
                       />
-                      <div className="p-4 flex items-center justify-start gap-2 border-b-[1px] border-b-[#8F95B2]">
-                        <img
-                          src="/assets/check-squared-icon.svg"
-                          alt="check"
-                          className="w-4 h-4"
-                        />
-                        <p className="text-[#121212] text-[14px] font-normal">
-                          This agent is deployed on X (Twitter)
-                        </p>
-                      </div>
-                      <div className="p-4 flex items-center justify-start gap-2 border-b-[1px] border-b-[#8F95B2]">
-                        <img
-                          src="/assets/check-squared-icon.svg"
-                          alt="check"
-                          className="w-4 h-4"
-                        />
-                        <p className="text-[#121212] text-[14px] font-normal">
-                          The agent can only operate on X, and not perform
-                          actions outside of it
-                        </p>
-                      </div>
-                      <div className="p-4 flex items-center justify-start gap-2 border-b-[1px] border-b-[#8F95B2]">
-                        <img
-                          src="/assets/check-squared-icon.svg"
-                          alt="check"
-                          className="w-4 h-4"
-                        />
-                        <p className="text-[#121212] text-[14px] font-normal">
-                          This agent can be used to send a greeting/wish to
-                          someone on X
-                        </p>
-                      </div>
-                      <div className="p-4 flex items-center justify-start gap-2">
-                        <img
-                          src="/assets/check-squared-icon.svg"
-                          alt="check"
-                          className="w-4 h-4"
-                        />
-                        <p className="text-[#121212] text-[14px] font-normal">
-                          Agent will never provide financial advice, please
-                          check the profile before interacting
-                        </p>
-                      </div>
+                      {agent.agent.metadata.instructions.map(
+                        (ins: string, i: number, arr: string[]) => (
+                          <div
+                            className={`p-4 flex items-center justify-start gap-2 ${
+                              i < arr.length - 1
+                                ? "border-b-[1px] border-b-[#8F95B2]"
+                                : ""
+                            }`}
+                            key={ins}
+                          >
+                            <img
+                              src="/assets/check-squared-icon.svg"
+                              alt="check"
+                              className="w-4 h-4"
+                            />
+                            <p className="text-[#121212] text-[14px] font-normal">
+                              {ins}
+                            </p>
+                          </div>
+                        )
+                      )}
                     </div>
+                  ) : null}
+                  {agent?.agent?.metadata?.prompts?.length ? (
                     <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
                       <p className="p-4 text-primary text-[16px] font-medium">
                         Starter prompts
@@ -606,158 +654,37 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           borderImageSlice: "1",
                         }}
                       />
-                      <div className="p-4 flex items-center justify-between gap-2 border-b-[1px] border-b-[#8F95B2] group relative">
-                        <p
-                          className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
-                          onClick={() =>
-                            copyToClipboard(
-                              id ===
-                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                                ? "Which services can you provide?"
-                                : "I want you to make a blessing or a greeting"
-                            )
-                          }
-                        >
-                          {id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                            ? "Which services can you provide?"
-                            : "I want you to make a blessing or a greeting"}
-                        </p>
-                        <img
-                          src="/assets/copy-icon.svg"
-                          alt="copy"
-                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
-                            copiedPrompt ===
-                            (id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                              ? "Which services can you provide?"
-                              : "I want you to make a blessing or a greeting")
-                              ? "opacity-50"
-                              : ""
-                          }`}
-                          onClick={() =>
-                            copyToClipboard(
-                              id ===
-                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                                ? "Which services can you provide?"
-                                : "I want you to make a blessing or a greeting"
-                            )
-                          }
-                        />
-                      </div>
-                      <div className="p-4 flex items-center justify-between gap-2 border-b-[1px] border-b-[#8F95B2] group relative">
-                        <p
-                          className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
-                          onClick={() =>
-                            copyToClipboard(
-                              id ===
-                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                                ? "Write a bull post about AI agents and crypto"
-                                : "I want you to reply to an account on Twitter"
-                            )
-                          }
-                        >
-                          {id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                            ? "Write a bull post about AI agents and crypto"
-                            : "I want you to reply to an account on Twitter"}
-                        </p>
-                        <img
-                          src="/assets/copy-icon.svg"
-                          alt="copy"
-                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
-                            copiedPrompt ===
-                            (id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                              ? "Write a bull post about AI agents and crypto"
-                              : "I want you to reply to an account on Twitter")
-                              ? "opacity-50"
-                              : ""
-                          }`}
-                          onClick={() =>
-                            copyToClipboard(
-                              id ===
-                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                                ? "Write a bull post about AI agents and crypto"
-                                : "I want you to reply to an account on Twitter"
-                            )
-                          }
-                        />
-                      </div>
-                      <div className="p-4 flex items-center justify-between gap-2 border-b-[1px] border-b-[#8F95B2] group relative">
-                        <p
-                          className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
-                          onClick={() =>
-                            copyToClipboard(
-                              id ===
-                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                                ? "Post a twitter that explains how LLMs work"
-                                : "I want you to shill a project on Twitter for maximum reach"
-                            )
-                          }
-                        >
-                          {id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                            ? "Post a twitter that explains how LLMs work"
-                            : "I want you to shill a project on Twitter for maximum reach"}
-                        </p>
-                        <img
-                          src="/assets/copy-icon.svg"
-                          alt="copy"
-                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
-                            copiedPrompt ===
-                            (id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                              ? "Post a twitter that explains how LLMs work"
-                              : "I want you to shill a project on Twitter for maximum reach")
-                              ? "opacity-50"
-                              : ""
-                          }`}
-                          onClick={() =>
-                            copyToClipboard(
-                              id ===
-                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                                ? "Post a twitter that explains how LLMs work"
-                                : "I want you to shill a project on Twitter for maximum reach"
-                            )
-                          }
-                        />
-                      </div>
-                      <div className="p-4 flex items-center justify-between gap-2 group relative">
-                        <p
-                          className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
-                          onClick={() =>
-                            copyToClipboard(
-                              id ===
-                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                                ? "Help to market my crypto product"
-                                : "Show me some samples of your best work so far"
-                            )
-                          }
-                        >
-                          {id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                            ? "Help to market my crypto product"
-                            : "Show me some samples of your best work so far"}
-                        </p>
-                        <img
-                          src="/assets/copy-icon.svg"
-                          alt="copy"
-                          className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
-                            copiedPrompt ===
-                            (id === "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                              ? "Help to market my crypto product"
-                              : "Show me some samples of your best work so far")
-                              ? "opacity-50"
-                              : ""
-                          }`}
-                          onClick={() =>
-                            copyToClipboard(
-                              id ===
-                                "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d"
-                                ? "Help to market my crypto product"
-                                : "Show me some samples of your best work so far"
-                            )
-                          }
-                        />
-                      </div>
+                      {agent.agent.metadata.prompts.map(
+                        (p: string, i: number, arr: string[]) => (
+                          <div
+                            className={`p-4 flex items-center justify-between gap-2 ${
+                              i < arr.length - 1
+                                ? "border-b-[1px] border-b-[#8F95B2]"
+                                : ""
+                            } group relative`}
+                            key={p}
+                          >
+                            <p
+                              className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
+                              onClick={() => copyToClipboard(p)}
+                            >
+                              {p}
+                            </p>
+                            <img
+                              src="/assets/copy-icon.svg"
+                              alt="copy"
+                              className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
+                                copiedPrompt === p ? "opacity-50" : ""
+                              }`}
+                              onClick={() => copyToClipboard(p)}
+                            />
+                          </div>
+                        )
+                      )}
                     </div>
-                  </div>
-                </>
-              ) : null}
+                  ) : null}
+                </div>
+              </>
             </>
           ) : null}
         </div>

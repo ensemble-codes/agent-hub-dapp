@@ -29,7 +29,6 @@ const connectors = connectorsForWallets(
   }
 );
 
-debugger;
 export const config = createConfig({
   chains: [baseSepolia],
   transports: {
