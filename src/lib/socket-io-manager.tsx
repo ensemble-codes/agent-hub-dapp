@@ -126,7 +126,7 @@ export type MessageBroadcastData = {
      * Initialize the Socket.io connection to the server
      * @param entityId The client entity ID
      */
-    public initialize(entityId: string, agentIds: string[]): void {
+    public initialize(entityId: string, communicationURL: string, agentIds: string[]): void {
       this.entityId = entityId;
       this.agentIds = agentIds;
   
@@ -136,7 +136,7 @@ export type MessageBroadcastData = {
       }
   
       // Create a single socket connection
-      const fullURL = process.env.NEXT_PUBLIC_SOCKET_URL;
+      const fullURL = communicationURL;
       console.info('connecting to', fullURL);
       this.socket = io(fullURL, {
         autoConnect: true,

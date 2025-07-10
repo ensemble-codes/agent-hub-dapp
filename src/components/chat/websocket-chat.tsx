@@ -6,31 +6,31 @@ import { ChatLayout } from "./chat-layout";
 import { getEntityId, randomUUID, WorldManager } from "@/lib/world-manager";
 import SocketIOManager from "@/lib/socket-io-manager";
 import { Content } from "@elizaos/core";
-import { CHAT_SOURCE, USER_NAME } from "@/constants";
+import { CHAT_DATA, CHAT_SOURCE, USER_NAME } from "@/constants";
+import { Agent } from "@/graphql/generated/ensemble";
 
-export const WebsocketChat: FC<{ agentAddress: string }> = ({
-  agentAddress,
+export const WebsocketChat: FC<{ agent: { id: string, metadata: { communicationURL: string } } }> = ({
+  agent,
 }) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
 
   const entityId = getEntityId();
-  // FIXME: Store agentId in constant, Address -> AgentId mapping
-  const agentId = "c44c5b36-0fb1-0769-b0c1-fa0965cf61fb";
+  const agentId = CHAT_DATA[agent.id].agentId;
   const roomId = WorldManager.generateRoomId(agentId);
 
   const socketIOManager = SocketIOManager.getInstance();
 
   useEffect(() => {
-    socketIOManager.initialize(entityId, [agentId]);
+    socketIOManager.initialize(entityId, agent.metadata?.communicationURL, [agentId]);
 
     socketIOManager.joinRoom(roomId);
 
     console.log("joined room", roomId);
 
     const handleMessageBroadcasting = (data: Content) => {
-      console.log("message received", data, agentAddress);
+      console.log("message received", data, agent.id);
 
       if (!data) {
         console.warn("No data received", data);

@@ -29,42 +29,18 @@ import { AgentServicesTable } from "@/components/chat/agent-services-table";
 import { ServiceDetailsCard } from "@/components/chat/service-details-card";
 import { StructuredMessage } from "@/components/chat/structured-message";
 
-const XMTPChat: FC = () => {
-  const searchParams = useSearchParams();
-  const agentAddress = searchParams.get("agent");
+export const XmtpChat: FC<{ agent: {
+  id: string
+  metadata: {
+    imageUri: string
+    name: string
+  }
+}}> = ({ agent }) => {
+  
   const account = useAccount();
   const { signMessageAsync } = useSignMessage();
   const [isInitializing, setIsInitializing] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
-
-  const GET_AGENT = useMemo(
-    () => gql`
-      query MyQuery {
-        agent(id: "${
-          agentAddress || "0x5C02b4685492D36a40107B6eC48A91ab3f8875cb"
-        }") {
-          id
-          metadata {
-            description
-            dexscreener
-            github
-            id
-            imageUri
-            name
-            telegram
-            twitter
-            website
-          }
-          name
-          owner
-          reputation
-        }
-      }
-    `,
-    [agentAddress]
-  );
-
-  const { data: agentData } = useQuery(GET_AGENT);
 
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
@@ -73,9 +49,7 @@ const XMTPChat: FC = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { getMessages, streamMessages, messages, send, loading, conversation } =
-    useConversation(
-      agentAddress || "0x5C02b4685492D36a40107B6eC48A91ab3f8875cb"
-    );
+    useConversation(agent.id);
   const { client, initialize, initializing, error: xmtpError } = useXMTP();
 
   // Initialize XMTP client when the page loads
@@ -347,25 +321,24 @@ const XMTPChat: FC = () => {
               <div className="flex flex-col w-full h-full">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {isChatOpen || agentAddress ? (
+                    {isChatOpen || agent.id ? (
                       <>
                         <Link
                           href={`/agents/${
-                            (agentData &&
-                              agentData.agent &&
-                              agentData.agent.id) ||
+                            (agent &&
+                              agent.id) ||
                             "0x5C02b4685492D36a40107B6eC48A91ab3f8875cb"
                           }`}
                         >
                           <div className="relative">
                             <img
                               src={
-                                agentData && agentData.agent
-                                  ? agentData.agent?.metadata?.imageUri?.startsWith(
+                                agent
+                                  ? agent?.metadata?.imageUri?.startsWith(
                                       "https://"
                                     )
-                                    ? agentData.agent?.metadata?.imageUri
-                                    : `https://${agentData.agent?.metadata?.imageUri}`
+                                    ? agent?.metadata?.imageUri
+                                    : `https://${agent?.metadata?.imageUri}`
                                   : "/assets/orchestrator-mascot-icon.svg"
                               }
                               alt="mascot"
@@ -380,8 +353,8 @@ const XMTPChat: FC = () => {
                         </Link>
                         <div>
                           <p className="text-primary text-[16px] font-medium">
-                            {agentData && agentData.agent
-                              ? agentData?.agent?.metadata?.name
+                            {agent
+                              ? agent?.metadata?.name
                               : "Orchestrator"}
                           </p>
                           <p className="text-[#8F95B2] text-[14px] font-normal">
@@ -392,7 +365,7 @@ const XMTPChat: FC = () => {
                     ) : null}
                   </div>
                 </div>
-                {isChatOpen || agentAddress ? (
+                {isChatOpen || agent.id ? (
                   <>
                     {/* Error Display */}
                     {connectionError && (
@@ -448,7 +421,7 @@ const XMTPChat: FC = () => {
                                   index={index}
                                   messages={messages}
                                   onSendMessage={onSendMessage}
-                                  agentAddress={agentAddress || ""}
+                                  agentAddress={agent.id || ""}
                                   account={account}
                                 />
                               );
@@ -547,12 +520,12 @@ const XMTPChat: FC = () => {
                     <div className="flex flex-col gap-2 items-center justify-center mb-8">
                       <img
                         src={
-                          agentData && agentData.agent
-                            ? agentData.agent?.metadata?.imageUri?.startsWith(
+                          agent
+                            ? agent?.metadata?.imageUri?.startsWith(
                                 "https://"
                               )
-                              ? agentData.agent?.metadata?.imageUri
-                              : `https://${agentData.agent?.metadata?.imageUri}`
+                              ? agent?.metadata?.imageUri
+                              : `https://${agent?.metadata?.imageUri}`
                             : "/assets/orchestrator-mascot-icon.svg"
                         }
                         alt="mascot"
@@ -749,4 +722,4 @@ const XMTPChat: FC = () => {
   );
 };
 
-export default XMTPChat;
+

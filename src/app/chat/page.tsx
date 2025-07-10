@@ -1,11 +1,45 @@
 "use client";
 
-import XMTPChat from "@/components/chat/xmtp-chat";
+import { XmtpChat } from "@/components/chat/xmtp-chat";
 import { WebsocketChat } from "@/components/chat/websocket-chat";
-import { FC, Suspense } from "react";
+import { FC, Suspense, useMemo } from "react";
+import { useAgentQuery } from "@/graphql/generated/ensemble";
+import { useSearchParams } from "next/navigation";
+import { ensembleClient } from "@/graphql/clients";
 
 const PageContent: FC = () => {
-  return true ? <WebsocketChat agentAddress="0x1234567890abcdef" /> : <XMTPChat />
+  const searchParams = useSearchParams()
+  const agentAddress = searchParams.get("agent")
+
+  const { data, loading, error } = useAgentQuery({
+    variables: {
+      id: agentAddress ?? '',
+    },
+    skip: !agentAddress,
+    client: ensembleClient,
+  });
+
+  const agent = useMemo(() => {
+    if (data?.agent) {
+      return data.agent
+    }
+
+    return null
+  }, [data])
+
+  const communicationType = useMemo(() => agent?.metadata?.communicationType ?? '', [data])
+
+  switch (communicationType) {
+    case "websocket":
+      return <WebsocketChat agent={{
+        id: agent?.id ?? '',
+        metadata: { communicationURL: agent?.metadata?.communicationURL ?? '' }
+      }} />
+    case "xmtp":
+      return <XmtpChat agent={{ id: agent?.id ?? '', metadata: { imageUri: agent?.metadata?.imageUri ?? '', name: agent?.name ?? '' } }} />
+    default:
+      return <p>Unknown chat type: {communicationType}</p>
+  }
 }
 
 const Page: FC = () => {
