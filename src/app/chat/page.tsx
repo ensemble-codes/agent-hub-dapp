@@ -6,6 +6,8 @@ import { FC, Suspense, useMemo } from "react";
 import { useAgentQuery } from "@/graphql/generated/ensemble";
 import { useSearchParams } from "next/navigation";
 import { ensembleClient } from "@/graphql/clients";
+import { Loader } from "@/components";
+import { CHAT_DATA } from "@/constants";
 
 const PageContent: FC = () => {
   const searchParams = useSearchParams()
@@ -28,6 +30,17 @@ const PageContent: FC = () => {
   }, [data])
 
   const communicationType = useMemo(() => agent?.metadata?.communicationType ?? '', [data])
+  const isWebsocketAgent = useMemo(() => agentAddress && CHAT_DATA[agentAddress], [agentAddress])
+
+  if (loading)
+    return <Loader />
+
+  if (isWebsocketAgent && agentAddress) {
+    return <WebsocketChat agent={{
+      id: agentAddress,
+      metadata: { communicationURL: agent?.metadata?.communicationURL ?? '' }
+    }} />
+  }
 
   switch (communicationType) {
     case "websocket":

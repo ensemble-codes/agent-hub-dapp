@@ -3,11 +3,10 @@
 import { FC, useCallback, useEffect, useState } from "react";
 
 import { ChatLayout } from "./chat-layout";
-import { getEntityId, randomUUID, WorldManager } from "@/lib/world-manager";
+import { getEntityId, WorldManager } from "@/lib/world-manager";
 import SocketIOManager from "@/lib/socket-io-manager";
 import { Content } from "@elizaos/core";
-import { CHAT_DATA, CHAT_SOURCE, USER_NAME } from "@/constants";
-import { Agent } from "@/graphql/generated/ensemble";
+import { CHAT_DATA, CHAT_SOURCE } from "@/constants";
 
 export const WebsocketChat: FC<{ agent: { id: string, metadata: { communicationURL: string } } }> = ({
   agent,
@@ -17,13 +16,13 @@ export const WebsocketChat: FC<{ agent: { id: string, metadata: { communicationU
   const [messageProcessing, setMessageProcessing] = useState(false);
 
   const entityId = getEntityId();
-  const agentId = CHAT_DATA[agent.id].agentId;
+  const agentId = CHAT_DATA[agent.id]?.agentId;
   const roomId = WorldManager.generateRoomId(agentId);
 
   const socketIOManager = SocketIOManager.getInstance();
 
   useEffect(() => {
-    socketIOManager.initialize(entityId, agent.metadata?.communicationURL, [agentId]);
+    socketIOManager.initialize(entityId, agent.metadata?.communicationURL || process.env.NEXT_PUBLIC_SOCKET_URL!, [agentId]);
 
     socketIOManager.joinRoom(roomId);
 
