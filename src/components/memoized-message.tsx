@@ -30,9 +30,9 @@ const MemoizedMessage = memo(
             message.content.type === "agent_services" ? (
               <AgentServicesTable
                 services={message.content?.data?.services}
-                onCreateTask={(service) =>
+                onCreateTask={(service) =>{
                   onSendMessage(`I want to enable ${service.name} service`)
-                }
+                }}
               />
             ) : message.contentType === "json" &&
               message.content.type === "service_details" ? (
