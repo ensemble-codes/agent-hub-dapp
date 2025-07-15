@@ -1,15 +1,6 @@
 import posthog from "posthog-js"
 import * as Sentry from "@sentry/nextjs";
 
-// Initialize PostHog for client-side instrumentation
-posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-  api_host: "/ingest",
-  ui_host: "https://eu.posthog.com",
-  defaults: '2025-05-24',
-  capture_exceptions: true, // This enables capturing exceptions using Error Tracking, set to false if you don't want this
-  debug: process.env.NODE_ENV === "development",
-});
-
 // This file configures the initialization of Sentry on the client.
 // The added config here will be used whenever a users loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
@@ -26,6 +17,16 @@ Sentry.init({
 
 // Global error listeners to catch console errors
 if (typeof window !== 'undefined') {
+
+  // Initialize PostHog for client-side instrumentation
+  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+    api_host: "/ingest",
+    ui_host: "https://eu.posthog.com",
+    defaults: '2025-05-24',
+    capture_exceptions: true, // This enables capturing exceptions using Error Tracking, set to false if you don't want this
+    debug: process.env.NODE_ENV === "development",
+  });
+  
   // Store original console methods before overriding
   const originalConsoleLog = console.log;
   const originalConsoleError = console.error;
