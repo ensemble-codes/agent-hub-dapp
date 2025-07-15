@@ -13,10 +13,18 @@ import MemoizedMessage from "../memoized-message";
 export const ChatLayout: FC<{
   messages: any[];
   handleSend: () => void;
+  handleTaskSend: (msg: string) => void;
   setInput: (input: string) => void;
   input: string;
   messageProcessing?: boolean;
-}> = ({ messages, handleSend, setInput, input, messageProcessing }) => {
+}> = ({
+  messages,
+  handleSend,
+  handleTaskSend,
+  setInput,
+  input,
+  messageProcessing,
+}) => {
   return (
     <>
       <div>
@@ -84,7 +92,9 @@ export const ChatLayout: FC<{
                             message={message}
                             index={index}
                             messages={messages}
-                            onSendMessage={() => console.log("")}
+                            onSendMessage={(service: string) =>
+                              handleTaskSend(service)
+                            }
                             agentAddress={""}
                             account={""}
                           />
