@@ -45,6 +45,8 @@
     "next": "^15.3.5",
     "pinata-web3": "^0.5.4",
     "pino-pretty": "^13.0.0",
+    "posthog-js": "^1.257.0",
+    "posthog-node": "^5.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0",
