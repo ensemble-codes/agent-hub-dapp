@@ -19,11 +19,11 @@
     "@ensemble-ai/sdk": "^0.4.0",
     "@mantine/hooks": "^8.1.2",
     "@next/third-parties": "^15.3.5",
+    "@privy-io/react-auth": "^2.18.1",
     "@radix-ui/react-hover-card": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-switch": "^1.2.5",
     "@radix-ui/react-tooltip": "^1.2.7",
-    "@rainbow-me/rainbowkit": "^2.2.8",
     "@sentry/nextjs": "^9.34.0",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.16",
@@ -44,8 +44,10 @@
     "clsx": "^2.1.1",
     "ethers": "^6.15.0",
     "evt": "^2.5.9",
+    "install": "^0.13.0",
     "lucide-react": "^0.511.0",
     "next": "^15.3.5",
+    "npm": "^11.4.2",
     "pinata-web3": "^0.5.4",
     "pino-pretty": "^13.0.0",
     "react": "^19.1.0",
@@ -60,8 +62,7 @@
     "tailwind-variants": "^1.0.0",
     "tailwindcss-animate": "^1.0.7",
     "uint8array-extras": "^1.4.0",
-    "viem": "^2.31.6",
-    "wagmi": "^2.15.6"
+    "viem": "^2.31.6"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.3",

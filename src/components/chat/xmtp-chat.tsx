@@ -23,7 +23,7 @@ import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
-import { useAccount, useSignMessage } from "wagmi";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { createEOASigner } from "@/utils";
 import { AgentServicesTable } from "@/components/chat/agent-services-table";
 import { ServiceDetailsCard } from "@/components/chat/service-details-card";
@@ -37,8 +37,14 @@ export const XmtpChat: FC<{ agent: {
   }
 }}> = ({ agent }) => {
   
-  const account = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const { user, authenticated, } = usePrivy();
+  const { wallets } = useWallets();
+  const account = { isConnected: authenticated, address: user?.wallet?.address };
+  const signMessageAsync = async ({ message }: { message: string }) => {
+    const wallet = wallets[0];
+    // Use Privy's wallet directly for signing
+    return await wallet.sign(message);
+  };
   const [isInitializing, setIsInitializing] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
 
@@ -68,7 +74,7 @@ export const XmtpChat: FC<{ agent: {
         setIsInitializing(true);
         try {
           await initialize({
-            signer: createEOASigner(account.address!, (message: string) =>
+            signer: createEOASigner(wallets[0].address as `0x${string}`, (message: string) =>
               signMessageAsync({ message })
             ),
             env: "production",

@@ -5,7 +5,7 @@ import "./globals.css";
 import { Footer, MobileFooter, MobileHeader, Wrapper } from "@/components";
 import OnchainProvider from "@/components/onchainconfig/provider";
 import { AppContextProvider } from "@/context/app";
-import "@rainbow-me/rainbowkit/styles.css";
+
 import { XMTPProvider } from "@/context/XMTPContext";
 import ErrorBoundary from "@/components/error-boundary";
 

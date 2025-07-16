@@ -1,13 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useConnectModal, ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
+
 import { useState, useEffect } from "react";
+import { usePrivy } from "@privy-io/react-auth";
 
 const MobileHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { openConnectModal } = useConnectModal();
-  const { isConnected } = useAccount();
+  const { login, authenticated } = usePrivy();
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -66,13 +65,13 @@ const MobileHeader = () => {
                 className="w-[40px] h-[36px]"
               />
             </div>
-            {isConnected ? (
-              <ConnectButton showBalance={false} />
+            {authenticated ? (
+              <>logged in </>
             ) : (
               <button
                 className="w-full space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                 onClick={() => {
-                  openConnectModal?.();
+                  login();
                   setIsMenuOpen(false);
                 }}
               >

@@ -5,8 +5,8 @@ import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 import ReactMarkdown from "react-markdown";
 import { useSdk } from "@/sdk-config";
-import { useAccount, useWalletClient } from "wagmi";
-import { config } from "@/components/onchainconfig/config";
+import { usePrivy } from "@privy-io/react-auth";
+
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -15,7 +15,9 @@ import { logTaskRating, logError } from "@/utils/sentry-logging";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
-  const { isConnected, address } = useAccount();
+  const { user, authenticated } = usePrivy();
+  const address = user?.wallet?.address;
+  const isConnected = authenticated;
 
   const isTwitterLink = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -63,10 +65,8 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
 }
   `;
 
-  const { data: walletClient } = useWalletClient({
-    config: config,
-  });
-  const sdk = useSdk(walletClient);
+
+  const sdk = useSdk();
   const { data: task, loading, startPolling, stopPolling } = useQuery(GET_TASK);
   const [isPolling, setIsPolling] = useState(false);
   const [openAuditMarkdown, setOpenAuditMarkdown] = useState(false);
