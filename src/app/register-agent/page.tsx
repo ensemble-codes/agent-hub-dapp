@@ -1003,7 +1003,7 @@ const Page = () => {
                         borderImageSlice: "1",
                       }}
                     />
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <p className="font-medium leading-[21.6px] text-[#121212]">
                         Opening greeting
                       </p>
@@ -1021,7 +1021,7 @@ const Page = () => {
                           "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
                         borderImageSlice: "1",
                       }}
-                    />
+                    /> */}
                     <div className="space-y-2">
                       <p className="font-medium leading-[21.6px] text-[#121212]">
                         How to use agent

@@ -68,7 +68,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   `;
 
   const { data: agent, loading } = useQuery(GET_AGENT);
-  console.log(agent);
+  
   return (
     <div>
       <div className="flex items-start gap-4">
