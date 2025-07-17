@@ -1,8 +1,9 @@
 "use client";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useContext } from "react";
 import Modal from "../modal";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { usePrivy } from "@privy-io/react-auth";
 import { baseSepolia } from "viem/chains";
+import { AppContext } from "@/context/app";
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -10,19 +11,17 @@ interface WrapperProps {
 
 const Wrapper: FC<WrapperProps> = ({ children }) => {
   const { login, authenticated, ready } = usePrivy();
-  const { wallets } = useWallets();
+  const [state] = useContext(AppContext);
 
-  // Auto-switch to Base Sepolia when wallet connects
+  // Auto-switch to Base Sepolia when embedded wallet is available
   useEffect(() => {
-    if (ready && authenticated && wallets.length > 0) {
-      const wallet = wallets[0];
-      // Switch to Base Sepolia if not already on it
-      wallet.switchChain(baseSepolia.id).catch((error) => {
-        console.log('Chain switch failed:', error);
+    if (ready && authenticated && state.embeddedWallet) {
+      state.embeddedWallet.switchChain(baseSepolia.id).catch((error: any) => {
+        console.log("Chain switch failed:", error);
         // This is normal if user rejects the switch
       });
     }
-  }, [ready, authenticated, wallets]);
+  }, [ready, authenticated, state.embeddedWallet]);
 
   // Don't show modal until Privy is ready
   const shouldShowModal = ready && !authenticated;
@@ -57,10 +56,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
             className="w-auto mt-6 space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
             onClick={login}
           >
-            <img
-              src="/assets/connect-wallet-icon.svg"
-              alt="connect-wallet"
-            />
+            <img src="/assets/connect-wallet-icon.svg" alt="connect-wallet" />
             <span className="text-white text-[16px] font-[700] leading-[24px]">
               Connect Wallet
             </span>

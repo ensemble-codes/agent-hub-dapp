@@ -13,8 +13,8 @@ export function useSdk() {
   const { wallets } = useWallets();
 
   useEffect(() => {
-    if (authenticated && wallets.length > 0) {
-      const wallet = wallets[0];
+    if (authenticated && wallets && wallets.length > 0) {
+      const wallet = wallets.find(w => w.walletClientType === 'privy');
       const initializedSdk = initSdk(wallet);
       setSdk(initializedSdk);
     } else {

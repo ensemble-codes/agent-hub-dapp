@@ -20,14 +20,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { usePrivy } from "@privy-io/react-auth";
 import { createEOASigner } from "@/utils";
 import { AgentServicesTable } from "@/components/chat/agent-services-table";
 import { ServiceDetailsCard } from "@/components/chat/service-details-card";
 import { StructuredMessage } from "@/components/chat/structured-message";
+import { useContext } from "react";
+import { AppContext } from "@/context/app";
 
 export const XmtpChat: FC<{ agent: {
   id: string
@@ -37,13 +37,15 @@ export const XmtpChat: FC<{ agent: {
   }
 }}> = ({ agent }) => {
   
-  const { user, authenticated, } = usePrivy();
-  const { wallets } = useWallets();
-  const account = { isConnected: authenticated, address: user?.wallet?.address };
+  const { user, authenticated } = usePrivy();
+  const [state] = useContext(AppContext);
+  const account = { isConnected: authenticated, address: state.embeddedWallet?.address };
   const signMessageAsync = async ({ message }: { message: string }) => {
-    const wallet = wallets[0];
-    // Use Privy's wallet directly for signing
-    return await wallet.sign(message);
+    if (!state.embeddedWallet) {
+      throw new Error("No embedded wallet available");
+    }
+    // Use embedded wallet for signing
+    return await state.embeddedWallet.sign(message);
   };
   const [isInitializing, setIsInitializing] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
@@ -74,7 +76,7 @@ export const XmtpChat: FC<{ agent: {
         setIsInitializing(true);
         try {
           await initialize({
-            signer: createEOASigner(wallets[0].address as `0x${string}`, (message: string) =>
+            signer: createEOASigner(state.embeddedWallet?.address as `0x${string}`, (message: string) =>
               signMessageAsync({ message })
             ),
             env: "production",
