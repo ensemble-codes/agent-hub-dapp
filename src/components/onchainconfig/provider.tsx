@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { ApolloProvider } from "@apollo/client";
 import { client } from "@/lib/apollo-client";
-import { baseSepolia } from "viem/chains";
+import { base } from "viem/chains";
 
 type Props = { children: ReactNode };
 
@@ -20,11 +20,11 @@ function OnchainProvider({ children }: Props) {
             showWalletLoginFirst: true,
             walletChainType: "ethereum-only",
           },
-          defaultChain: baseSepolia,
-          supportedChains: [baseSepolia],
+          defaultChain: base,
+          supportedChains: [base],
           loginMethods: ["google", "email", "wallet"],
           embeddedWallets: {
-            createOnLogin: "off",
+            createOnLogin: "all-users",
             requireUserPasswordOnCreate: false,
             ethereum: {
               createOnLogin: "all-users",
