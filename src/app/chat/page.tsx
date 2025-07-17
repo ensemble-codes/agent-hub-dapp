@@ -30,15 +30,15 @@ const PageContent: FC = () => {
   }, [data])
 
   const communicationType = useMemo(() => agent?.metadata?.communicationType ?? '', [data])
-  const isWebsocketAgent = useMemo(() => agentAddress && CHAT_DATA[agentAddress], [agentAddress])
+  const chatData = useMemo(() => agentAddress && CHAT_DATA[agentAddress], [agentAddress])
 
   if (loading)
     return <Loader />
 
-  if (isWebsocketAgent && agentAddress) {
+  if (chatData && agentAddress) {
     return <WebsocketChat agent={{
       id: agentAddress,
-      metadata: { communicationURL: agent?.metadata?.communicationURL ?? '' }
+      metadata: { communicationURL: chatData.communicationURL }
     }} />
   }
 
