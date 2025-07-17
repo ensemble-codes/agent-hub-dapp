@@ -8,14 +8,17 @@ export const USER_NAME = "USER";
 
 export const CHAT_SOURCE = "client_chat";
 
-export const CHAT_DATA: { [key: string]: { agentId: UUID } } = {
+export const CHAT_DATA: { [key: string]: { agentId: UUID, communicationURL: string } } = {
   [ONII_AGENT_ADDRESS]: {
     agentId: "c44c5b36-0fb1-0769-b0c1-fa0965cf61fb",
+    communicationURL: "https://agents.ensemble.codes",
   },
   [ORCHESTRATOR_AGENT_ADDRESS]: {
     agentId: "28d29474-23c7-01b9-aee8-ba150c366103",
+    communicationURL: "https://agents.ensemble.codes",
   },
   [UNION_AGENT_ADDRESS]: {
-    agentId: "72d1bc17-8678-0b9f-9cf6-f8701a1fb442",
+    agentId: "83809084-1a8f-4532-bb99-af959827067c",
+    communicationURL: "https://agents.ensemble.codes:444",
   },
 };
