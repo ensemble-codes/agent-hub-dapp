@@ -2,10 +2,10 @@
 import { AppHeader, SideMenu } from "@/components";
 import axios from "axios";
 import { useCallback, useMemo, useState, useEffect } from "react";
-import { useAccount, useWalletClient } from "wagmi";
+import { usePrivy } from "@privy-io/react-auth";
 import { sendGAEvent } from "@next/third-parties/google";
 import { useSdk } from "@/sdk-config";
-import { config } from "@/components/onchainconfig/config";
+
 import Loader from "@/components/loader";
 import { parseEther } from "ethers";
 import { useRouter } from "next/navigation";
@@ -96,11 +96,11 @@ const SUB_SERVICES_LIST = {
 };
 
 const Page = () => {
-  const { address, isConnected } = useAccount();
-  const { data: walletClient } = useWalletClient({
-    config: config,
-  });
-  const sdk = useSdk(walletClient);
+  const { user, authenticated } = usePrivy();
+  const address = user?.wallet?.address;
+  const isConnected = authenticated;
+
+  const sdk = useSdk();
   const { push } = useRouter();
 
   const [detailsStep, setDetailsStep] = useState<

@@ -15,9 +15,8 @@ const PageContent: FC = () => {
 
   const { data, loading, error } = useAgentQuery({
     variables: {
-      id: agentAddress ?? '',
+      id: agentAddress || '0x5c02b4685492d36a40107b6ec48a91ab3f8875cb',
     },
-    skip: !agentAddress,
     client: ensembleClient,
   });
 

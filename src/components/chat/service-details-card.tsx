@@ -1,7 +1,7 @@
 "use client";
 import { FC, useState } from "react";
-import { useWalletClient } from "wagmi";
-import { config } from "../onchainconfig/config";
+
+
 import { useSdk } from "@/sdk-config";
 import { sendGAEvent } from "@next/third-parties/google";
 
@@ -33,10 +33,8 @@ export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
   agentAddress,
   onCreateTask,
 }) => {
-  const { data: walletClient } = useWalletClient({
-    config: config,
-  });
-  const sdk = useSdk(walletClient);
+
+  const sdk = useSdk();
 
   const [inputs, setInputs] = useState<Record<string, string>>(
     Object.fromEntries(service.parameters.map((p) => [p.name, ""]))

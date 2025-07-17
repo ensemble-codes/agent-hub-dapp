@@ -1,16 +1,18 @@
-import { FC } from "react";
+import { FC, Suspense, useMemo } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { AppHeader, Loader, SideMenu } from "@/components";
+import { AppHeader, SideMenu } from "@/components";
 import MemoizedMessage from "../memoized-message";
+import { useAgentQuery } from "@/graphql/generated/ensemble";
+import { useSearchParams } from "next/navigation";
+import { ensembleClient } from "@/graphql/clients";
 
-export const ChatLayout: FC<{
+const ChatLayoutContent: FC<{
   messages: any[];
   handleSend: () => void;
   handleTaskSend: (msg: string) => void;
@@ -25,6 +27,23 @@ export const ChatLayout: FC<{
   input,
   messageProcessing,
 }) => {
+  const searchParams = useSearchParams();
+  const agentAddress = searchParams.get("agent");
+  const { data, loading, error } = useAgentQuery({
+    variables: {
+      id: agentAddress || "0x5c02b4685492d36a40107b6ec48a91ab3f8875cb",
+    },
+    client: ensembleClient,
+  });
+
+  const agent = useMemo(() => {
+    if (data?.agent) {
+      return data.agent;
+    }
+
+    return null;
+  }, [data]);
+
   return (
     <>
       <div>
@@ -44,7 +63,11 @@ export const ChatLayout: FC<{
                     <Link href="/agents/0x5C02b4685492D36a40107B6eC48A91ab3f8875cb">
                       <div className="relative">
                         <img
-                          src="https://red-bright-fowl-628.mypinata.cloud/ipfs/bafkreigjbqqycvr65j2pyrbhtlqvkm3kycyyym7ynjzln2e5p5xs2uadri"
+                          src={agent?.metadata?.imageUri.startsWith(
+                            "https://"
+                          )
+                            ? agent?.metadata?.imageUri
+                            : `https://${agent?.metadata?.imageUri}`}
                           alt="mascot"
                           className="w-10 h-10 border-[0.5px] border-[#8F95B2] rounded-full object-cover"
                         />
@@ -57,7 +80,7 @@ export const ChatLayout: FC<{
                     </Link>
                     <div>
                       <p className="text-primary text-[16px] font-medium">
-                        Onii-Chan
+                        {agent?.metadata?.name}
                       </p>
                       <p className="text-[#8F95B2] text-[14px] font-normal">
                         always online
@@ -181,3 +204,34 @@ export const ChatLayout: FC<{
     </>
   );
 };
+
+const ChatLayout: FC<{
+  messages: any[];
+  handleSend: () => void;
+  handleTaskSend: (msg: string) => void;
+  setInput: (input: string) => void;
+  input: string;
+  messageProcessing?: boolean;
+}> = ({
+  messages,
+  handleSend,
+  handleTaskSend,
+  setInput,
+  input,
+  messageProcessing,
+}) => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ChatLayoutContent
+        messages={messages}
+        handleSend={handleSend}
+        handleTaskSend={handleTaskSend}
+        setInput={setInput}
+        input={input}
+        messageProcessing={messageProcessing}
+      />
+    </Suspense>
+  );
+};
+
+export default ChatLayout;
