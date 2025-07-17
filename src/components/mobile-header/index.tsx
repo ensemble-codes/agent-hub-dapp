@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { usePrivy, useWallets, useFundWallet } from "@privy-io/react-auth";
 import { ethers } from "ethers";
 import Modal from "../modal";
@@ -11,6 +11,11 @@ const MobileHeader = () => {
   const { login, authenticated, user, logout, ready } = usePrivy();
   const { wallets } = useWallets();
   const { fundWallet } = useFundWallet();
+
+  const embeddedWallet = useMemo(
+    () => wallets.find((w) => w.walletClientType === "privy"),
+    [wallets]
+  );
 
   // Wallet modal states
   const [showWalletModal, setShowWalletModal] = useState(false);
@@ -39,8 +44,8 @@ const MobileHeader = () => {
   }, [isMenuOpen]);
 
   const copyAddress = async () => {
-    if (wallets && wallets[0]) {
-      await navigator.clipboard.writeText(wallets[0].address);
+    if (embeddedWallet) {
+      await navigator.clipboard.writeText(embeddedWallet?.address || "");
       setCopiedAddress(true);
       setTimeout(() => setCopiedAddress(false), 2000);
     }
@@ -61,10 +66,10 @@ const MobileHeader = () => {
   };
 
   const fund = useCallback(async () => {
-    if (wallets && wallets.length) {
+    if (embeddedWallet) {
       try {
         fetchBalance();
-        await fundWallet(wallets[0].address, {
+        await fundWallet(embeddedWallet.address, {
           amount: "0.00033",
           chain: baseSepolia,
           card: {
@@ -75,18 +80,18 @@ const MobileHeader = () => {
         console.error("Funding error:", error);
       }
     }
-  }, [wallets, fundWallet]);
+  }, [embeddedWallet, fundWallet]);
 
   // Fetch wallet balance
   const fetchBalance = async () => {
-    if (!wallets || !wallets[0]) return;
-    
+    if (!embeddedWallet) return;
+
     setIsLoadingBalance(true);
     try {
       const provider = new ethers.JsonRpcProvider(
         process.env.NEXT_PUBLIC_RPC_URL!
       );
-      const balanceWei = await provider.getBalance(wallets[0].address);
+      const balanceWei = await provider.getBalance(embeddedWallet.address);
       const balanceEth = ethers.formatEther(balanceWei);
       setBalance(balanceEth);
     } catch (error) {
@@ -99,10 +104,10 @@ const MobileHeader = () => {
 
   // Fetch balance when modal opens
   useEffect(() => {
-    if (showWalletModal && wallets && wallets[0]) {
+    if (showWalletModal && embeddedWallet) {
       fetchBalance();
     }
-  }, [showWalletModal, wallets]);
+  }, [showWalletModal, embeddedWallet]);
 
   const validateAddress = (address: string): boolean => {
     const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
@@ -112,18 +117,18 @@ const MobileHeader = () => {
   const handleWithdraw = async () => {
     setWithdrawError("");
     setWithdrawSuccess("");
-    
+
     if (!withdrawAddress || !withdrawAmount) {
       setWithdrawError("Please enter both address and amount.");
       return;
     }
-    
+
     if (!validateAddress(withdrawAddress)) {
       setWithdrawError("Please enter a valid Ethereum address.");
       return;
     }
-    
-    if (!wallets || !wallets[0]) {
+
+    if (!embeddedWallet) {
       setWithdrawError("No wallet found.");
       return;
     }
@@ -133,7 +138,7 @@ const MobileHeader = () => {
         process.env.NEXT_PUBLIC_RPC_URL!
       );
 
-      const signer = new ethers.JsonRpcSigner(provider, wallets[0].address);
+      const signer = new ethers.JsonRpcSigner(provider, embeddedWallet.address);
       const tx = await signer.sendTransaction({
         to: withdrawAddress,
         value: ethers.parseEther(withdrawAmount),
@@ -210,7 +215,7 @@ const MobileHeader = () => {
                 className="w-[40px] h-[36px]"
               />
             </div>
-            {ready && authenticated && wallets && wallets.length ? (
+            {ready && authenticated && embeddedWallet ? (
               <button
                 className="py-1 px-4 text-[16px] text-[#000] border border-[#000] rounded-[20000px] font-normal flex items-center gap-2"
                 style={{
@@ -221,8 +226,8 @@ const MobileHeader = () => {
                   setIsMenuOpen(false);
                 }}
               >
-                {wallets[0].address.slice(0, 4)}...
-                {wallets[0].address.slice(-4)}
+                {embeddedWallet.address.slice(0, 4)}...
+                {embeddedWallet.address.slice(-4)}
               </button>
             ) : (
               <button
@@ -284,10 +289,13 @@ const MobileHeader = () => {
       </div>
 
       {/* Mobile Wallet Management Modal */}
-      <Modal isOpen={showWalletModal} onClose={() => {
-        setShowWalletModal(false);
-        resetWithdrawStates();
-      }}>
+      <Modal
+        isOpen={showWalletModal}
+        onClose={() => {
+          setShowWalletModal(false);
+          resetWithdrawStates();
+        }}
+      >
         <div className="bg-white rounded-[16px] p-6 w-[90vw] max-w-[400px] max-h-[80vh] overflow-y-auto">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-[20px] font-bold text-[#121212]">Wallet</h3>
@@ -306,14 +314,14 @@ const MobileHeader = () => {
             </button>
           </div>
 
-          {wallets && wallets[0] && (
+          {embeddedWallet && (
             <div className="space-y-4">
               {/* Wallet Address */}
               <div className="flex flex-col items-center justify-center gap-[2px]">
                 <div className="flex items-center justify-center gap-2">
                   <p className="text-[18px] leading-[24px] text-[#000] font-extrabold">
-                    {wallets[0].address.slice(0, 4)}...
-                    {wallets[0].address.slice(-4)}
+                    {embeddedWallet.address.slice(0, 4)}...
+                    {embeddedWallet.address.slice(-4)}
                   </p>
                   <button
                     onClick={copyAddress}

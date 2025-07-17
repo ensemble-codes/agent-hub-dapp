@@ -1,7 +1,7 @@
 "use client";
 import { useFundWallet, usePrivy, useWallets } from "@privy-io/react-auth";
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import Modal from "../modal";
 import { ethers } from "ethers";
 import { baseSepolia } from "viem/chains";
@@ -23,9 +23,14 @@ const AppHeader = () => {
   const withdrawRef = useRef<HTMLDivElement>(null);
   const [withdrawHeight, setWithdrawHeight] = useState(0);
 
+  const embeddedWallet = useMemo(
+    () => wallets.find((w) => w.walletClientType === "privy"),
+    [wallets]
+  );
+
   const copyAddress = async () => {
-    if (wallets && wallets[0]) {
-      await navigator.clipboard.writeText(wallets[0].address);
+    if (embeddedWallet) {
+      await navigator.clipboard.writeText(embeddedWallet.address);
       setCopiedAddress(true);
       setTimeout(() => setCopiedAddress(false), 2000);
     }
@@ -46,11 +51,11 @@ const AppHeader = () => {
   };
 
   const fund = useCallback(async () => {
-    if (wallets && wallets.length) {
+    if (embeddedWallet) {
       try {
         fetchBalance();
 
-        await fundWallet(wallets[0].address, {
+        await fundWallet(embeddedWallet.address, {
           amount: "0.00033",
           chain: baseSepolia,
           card: {
@@ -61,7 +66,7 @@ const AppHeader = () => {
         console.error("Funding error:", error);
       }
     }
-  }, [wallets, fundWallet]);
+  }, [embeddedWallet, fundWallet]);
 
   const validateAddress = (address: string): boolean => {
     // Check if it's a valid Ethereum address format
@@ -83,7 +88,7 @@ const AppHeader = () => {
       return;
     }
 
-    if (!wallets || !wallets[0]) {
+    if (!embeddedWallet) {
       setWithdrawError("No wallet found.");
       return;
     }
@@ -95,7 +100,7 @@ const AppHeader = () => {
       );
 
       // Create a custom signer that uses the Privy wallet with Viem
-      const signer = new ethers.JsonRpcSigner(provider, wallets[0].address);
+      const signer = new ethers.JsonRpcSigner(provider, embeddedWallet.address);
       // Send transaction
       const tx = await signer.sendTransaction({
         to: withdrawAddress,
@@ -115,14 +120,14 @@ const AppHeader = () => {
 
   // Fetch wallet balance
   const fetchBalance = async () => {
-    if (!wallets || !wallets[0]) return;
+    if (!embeddedWallet) return;
 
     setIsLoadingBalance(true);
     try {
       const provider = new ethers.JsonRpcProvider(
         process.env.NEXT_PUBLIC_RPC_URL!
       );
-      const balanceWei = await provider.getBalance(wallets[0].address);
+      const balanceWei = await provider.getBalance(embeddedWallet.address);
       const balanceEth = ethers.formatEther(balanceWei);
       setBalance(balanceEth);
     } catch (error) {
@@ -135,10 +140,10 @@ const AppHeader = () => {
 
   // Fetch balance when modal opens
   useEffect(() => {
-    if (showWalletModal && wallets && wallets[0]) {
+    if (showWalletModal && embeddedWallet) {
       fetchBalance();
     }
-  }, [showWalletModal, wallets]);
+  }, [showWalletModal, embeddedWallet]);
 
   useEffect(() => {
     if (showWithdraw && withdrawRef.current) {
@@ -182,13 +187,13 @@ const AppHeader = () => {
           >
             DOCS
           </Link>
-          {ready && authenticated && wallets && wallets.length ? (
+          {ready && authenticated && embeddedWallet ? (
             <button
               className="py-1 px-4 text-[16px] text-[#000] border border-[#000] rounded-[20000px] font-normal flex items-center gap-2"
               style={{ boxShadow: "0px 4px 12px 0px rgba(249, 77, 39, 0.24)" }}
               onClick={() => setShowWalletModal(true)}
             >
-              {wallets[0].address.slice(0, 4)}...{wallets[0].address.slice(-4)}
+              {embeddedWallet.address.slice(0, 4)}...{embeddedWallet.address.slice(-4)}
             </button>
           ) : (
             <button
@@ -224,14 +229,14 @@ const AppHeader = () => {
             </button>
           </div>
 
-          {wallets && wallets[0] && (
+          {embeddedWallet && (
             <div className="space-y-4">
               {/* Wallet Address */}
               <div className="flex flex-col items-center justify-center gap-[2px]">
                 <div className="flex items-center justify-center gap-2">
                   <p className="text-[18px] leading-[24px] text-[#000] font-extrabold">
-                    {wallets[0].address.slice(0, 4)}...
-                    {wallets[0].address.slice(-4)}
+                    {embeddedWallet.address.slice(0, 4)}...
+                    {embeddedWallet.address.slice(-4)}
                   </p>
                   <button
                     onClick={copyAddress}
