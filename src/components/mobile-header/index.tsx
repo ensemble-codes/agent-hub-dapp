@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { usePrivy, useWallets, useFundWallet } from "@privy-io/react-auth";
 import { ethers } from "ethers";
 import Modal from "../modal";
+import { baseSepolia } from "viem/chains";
 
 const MobileHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -65,6 +66,7 @@ const MobileHeader = () => {
         fetchBalance();
         await fundWallet(wallets[0].address, {
           amount: "0.00033",
+          chain: baseSepolia,
           card: {
             preferredProvider: "moonpay",
           },

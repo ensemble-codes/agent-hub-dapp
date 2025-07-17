@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Modal from "../modal";
 import { ethers } from "ethers";
+import { baseSepolia } from "viem/chains";
 
 const AppHeader = () => {
   const { login, authenticated, user, logout, ready } = usePrivy();
@@ -51,6 +52,7 @@ const AppHeader = () => {
 
         await fundWallet(wallets[0].address, {
           amount: "0.00033",
+          chain: baseSepolia,
           card: {
             preferredProvider: "moonpay",
           },
