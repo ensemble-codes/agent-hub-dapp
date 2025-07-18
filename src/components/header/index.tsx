@@ -1,15 +1,17 @@
 "use client";
-import { useFundWallet, usePrivy } from "@privy-io/react-auth";
+import { useFundWallet, usePrivy, useWallets } from "@privy-io/react-auth";
 import Link from "next/link";
 import { useState, useEffect, useCallback, useRef, useMemo, useContext } from "react";
 import Modal from "../modal";
 import { ethers } from "ethers";
 import { baseSepolia } from "viem/chains";
+import { createWalletClient, custom, parseEther } from "viem";
 import { AppContext } from "@/context/app";
 
 const AppHeader = () => {
   const [state] = useContext(AppContext);
   const { login, authenticated, user, logout, ready } = usePrivy();
+  const { wallets } = useWallets();
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [balance, setBalance] = useState<string>("0");
@@ -84,30 +86,50 @@ const AppHeader = () => {
       return;
     }
 
-    if (!state.embeddedWallet) {
+    if (!wallets || !wallets.length) {
       setWithdrawError("No wallet found.");
       return;
     }
     setWithdrawLoading(true);
     try {
-      // Get ethers provider and signer from the embedded wallet
-      const provider = new ethers.JsonRpcProvider(
-        process.env.NEXT_PUBLIC_RPC_URL!
-      );
-
-      // Create a custom signer that uses the Privy wallet with Viem
-      const signer = new ethers.JsonRpcSigner(provider, state.embeddedWallet.address);
-      // Send transaction
-      const tx = await signer.sendTransaction({
-        to: withdrawAddress,
-        value: ethers.parseEther(withdrawAmount),
+      // Get the Privy wallet
+      const wallet = wallets.find(w => w.walletClientType === 'privy');
+      if (!wallet) {
+        throw new Error('Privy wallet not found');
+      }
+      
+      // Switch to Base Sepolia chain first
+      await wallet.switchChain(baseSepolia.id);
+      
+      // Get the Ethereum provider from the wallet
+      const ethereumProvider = await wallet.getEthereumProvider();
+      
+      // Create Viem wallet client
+      const walletClient = createWalletClient({
+        account: wallet.address as `0x${string}`,
+        chain: baseSepolia,
+        transport: custom(ethereumProvider),
       });
-      await tx.wait();
+      
+      // Convert to Viem transaction format
+      const transactionRequest = {
+        to: withdrawAddress as `0x${string}`,
+        value: parseEther(withdrawAmount),
+      };
+      
+      // Send transaction using Viem
+      const hash = await walletClient.sendTransaction(transactionRequest);
+      
+      // Wait for transaction to be mined
+      const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL!);
+      await provider.waitForTransaction(hash);
+      
       setWithdrawSuccess("Transaction sent!");
       setWithdrawAddress("");
       setWithdrawAmount("");
       fetchBalance();
     } catch (err: any) {
+      console.error("Withdraw error:", err);
       setWithdrawError("Failed to send transaction.");
     } finally {
       setWithdrawLoading(false);

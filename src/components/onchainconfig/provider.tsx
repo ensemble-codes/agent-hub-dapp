@@ -24,10 +24,10 @@ function OnchainProvider({ children }: Props) {
           supportedChains: [baseSepolia],
           loginMethods: ["google", "email", "wallet"],
           embeddedWallets: {
-            createOnLogin: "all-users",
+            createOnLogin: "users-without-wallets",
             requireUserPasswordOnCreate: false,
             ethereum: {
-              createOnLogin: "all-users",
+              createOnLogin: "users-without-wallets",
             },
           },
           mfa: {

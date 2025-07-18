@@ -1,5 +1,5 @@
 "use client";
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 
 
 import { useSdk } from "@/sdk-config";
@@ -41,6 +41,24 @@ export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
   );
   const [notes, setNotes] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [showLeftSide, setShowLeftSide] = useState(false);
+  const [showRightSide, setShowRightSide] = useState(false);
+
+  useEffect(() => {
+    // Show card container first
+    setIsVisible(true);
+    
+    // Show left side after 200ms
+    setTimeout(() => {
+      setShowLeftSide(true);
+    }, 200);
+    
+    // Show right side after 400ms
+    setTimeout(() => {
+      setShowRightSide(true);
+    }, 400);
+  }, []);
 
   const handleInputChange = (name: string, value: string) => {
     setInputs((prev) => ({ ...prev, [name]: value }));
@@ -100,9 +118,13 @@ export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
     .every((param) => inputs[param.name]?.trim());
 
   return (
-    <div className="z-[2] border border-[#E5E7EB] rounded-xl bg-white flex flex-col md:flex-row p-4 gap-4 max-w-[676px] w-full">
+    <div className={`z-[2] border border-[#E5E7EB] rounded-xl bg-white flex flex-col md:flex-row p-4 gap-4 max-w-[676px] w-full transition-all duration-500 ${
+      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    }`}>
       {/* Left Side */}
-      <div className="flex-1 min-w-[220px]">
+      <div className={`flex-1 min-w-[220px] transition-all duration-500 ${
+        showLeftSide ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+      }`}>
         <div className="flex items-center gap-2 mb-1">
           <div className="text-[#FF4D29] font-bold text-lg flex items-center gap-2">
             <img
@@ -140,7 +162,9 @@ export const ServiceDetailsCard: FC<ServiceDetailsCardProps> = ({
         </div>
       </div>
       {/* Right Side */}
-      <div className="flex flex-col justify-between min-w-[240px]">
+      <div className={`flex flex-col justify-between min-w-[240px] transition-all duration-500 ${
+        showRightSide ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+      }`}>
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
