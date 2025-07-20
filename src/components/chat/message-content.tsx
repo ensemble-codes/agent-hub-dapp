@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -8,6 +8,33 @@ interface MessageContentProps {
 }
 
 export const MessageContent: FC<MessageContentProps> = ({ content, isReceived }) => {
+  const [displayedContent, setDisplayedContent] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    if (isReceived) {
+      setIsTyping(true);
+      setDisplayedContent('');
+      
+      let index = 0;
+      const typeInterval = setInterval(() => {
+        if (index < content.length) {
+          setDisplayedContent(content.slice(0, index + 1));
+          index++;
+        } else {
+          setIsTyping(false);
+          clearInterval(typeInterval);
+        }
+      }, 30); // Adjust speed here (lower = faster)
+
+      return () => clearInterval(typeInterval);
+    } else {
+      // For user messages, show content immediately
+      setDisplayedContent(content);
+      setIsTyping(false);
+    }
+  }, [content, isReceived]);
+
   return (
     <div className={`max-w-[70%] text-[#121212] rounded-[2000px] z-[2] ${
       !isReceived ? 'py-[2px] px-3 bg-primary/15' : ''
@@ -26,8 +53,11 @@ export const MessageContent: FC<MessageContentProps> = ({ content, isReceived })
             ),
           }}
         >
-          {content}
+          {displayedContent}
         </ReactMarkdown>
+        {isTyping && (
+          <span className="inline-block w-0.5 h-4 bg-primary animate-pulse ml-1"></span>
+        )}
       </div>
     </div>
   );

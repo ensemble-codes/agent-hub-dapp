@@ -342,7 +342,7 @@ export default function Home() {
               {loading ? (
                 <Loader size="xl" />
               ) : (
-                <div className="flex items-stretch justify-start gap-12 flex-wrap">
+                <div className="flex items-stretch justify-start gap-8 flex-wrap">
                   {agents.map((a: any) => (
                     <div
                       key={a.id}
@@ -447,7 +447,7 @@ export default function Home() {
                             />
                             <div className="flex items-center gap-2 flex-wrap mb-2">
                               {a?.metadata?.attributes?.map((up: string) => (
-                                <div className="p-[2px] px-2 border-[0.5px] border-primary rounded-[2000px]">
+                                <div className="p-[2px] px-2 border-[0.5px] border-primary rounded-[2000px]" key={up}>
                                   <p className="text-[12px] text-primary font-semibold">
                                     {up}
                                   </p>

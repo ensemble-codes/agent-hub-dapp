@@ -9,8 +9,8 @@ import { useSdk } from "@/sdk-config";
 import Loader from "@/components/loader";
 import { gql, useQuery } from "@apollo/client";
 import { formatEther } from "ethers";
-import { useWalletClient } from "wagmi";
-import { config } from "@/components/onchainconfig/config";
+
+
 import Link from "next/link";
 import { logTaskCreation, logError } from "@/utils/sentry-logging";
 
@@ -32,10 +32,8 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
   const selectedProposal = searchParams.get("proposal");
   const [state] = useContext(AppContext);
   const router = useRouter();
-  const { data: walletClient } = useWalletClient({
-    config: config,
-  });
-  const sdk = useSdk(walletClient);
+
+  const sdk = useSdk();
   const [loadingCreate, setLoadingCreate] = useState(false);
 
   const GET_PROPOSAL = gql`
