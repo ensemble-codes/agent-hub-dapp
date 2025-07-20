@@ -1,16 +1,18 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect, useCallback, useRef, useMemo, useContext } from "react";
-import { usePrivy, useFundWallet } from "@privy-io/react-auth";
+import { usePrivy, useFundWallet, useWallets } from "@privy-io/react-auth";
 import { ethers } from "ethers";
 import Modal from "../modal";
 import { baseSepolia } from "viem/chains";
+import { createWalletClient, custom, parseEther } from "viem";
 import { AppContext } from "@/context/app";
 
 const MobileHeader = () => {
   const [state] = useContext(AppContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { login, authenticated, user, logout, ready } = usePrivy();
+  const { wallets } = useWallets();
   const { fundWallet } = useFundWallet();
 
   // Wallet modal states
@@ -124,27 +126,50 @@ const MobileHeader = () => {
       return;
     }
 
-    if (!state.embeddedWallet) {
+    if (!wallets || !wallets.length) {
       setWithdrawError("No wallet found.");
       return;
     }
     setWithdrawLoading(true);
     try {
-      const provider = new ethers.JsonRpcProvider(
-        process.env.NEXT_PUBLIC_RPC_URL!
-      );
-
-      const signer = new ethers.JsonRpcSigner(provider, state.embeddedWallet.address);
-      const tx = await signer.sendTransaction({
-        to: withdrawAddress,
-        value: ethers.parseEther(withdrawAmount),
+      // Get the Privy wallet
+      const wallet = wallets.find(w => w.walletClientType === 'privy');
+      if (!wallet) {
+        throw new Error('Privy wallet not found');
+      }
+      
+      // Switch to Base Sepolia chain first
+      await wallet.switchChain(baseSepolia.id);
+      
+      // Get the Ethereum provider from the wallet
+      const ethereumProvider = await wallet.getEthereumProvider();
+      
+      // Create Viem wallet client
+      const walletClient = createWalletClient({
+        account: wallet.address as `0x${string}`,
+        chain: baseSepolia,
+        transport: custom(ethereumProvider),
       });
-      await tx.wait();
+      
+      // Convert to Viem transaction format
+      const transactionRequest = {
+        to: withdrawAddress as `0x${string}`,
+        value: parseEther(withdrawAmount),
+      };
+      
+      // Send transaction using Viem
+      const hash = await walletClient.sendTransaction(transactionRequest);
+      
+      // Wait for transaction to be mined
+      const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL!);
+      await provider.waitForTransaction(hash);
+      
       setWithdrawSuccess("Transaction sent!");
       setWithdrawAddress("");
       setWithdrawAmount("");
       fetchBalance();
     } catch (err: any) {
+      console.error("Withdraw error:", err);
       setWithdrawError("Failed to send transaction.");
     } finally {
       setWithdrawLoading(false);
@@ -227,7 +252,7 @@ const MobileHeader = () => {
               </button>
             ) : (
               <button
-                className="w-full space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                className="w-fit space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                 onClick={() => {
                   login();
                   setIsMenuOpen(false);

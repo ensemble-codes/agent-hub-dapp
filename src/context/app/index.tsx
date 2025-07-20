@@ -25,7 +25,7 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
       const embeddedWallet = wallets.find(w => w.walletClientType === 'privy');
       dispatch({
         type: SET_EMBEDDED_WALLET,
-        payload: embeddedWallet
+        payload: embeddedWallet || wallets[0]
       })
     }
   }, [authenticated, wallets]);

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 
 interface Service {
   id: string;
@@ -13,8 +13,25 @@ interface AgentServicesTableProps {
 }
 
 export const AgentServicesTable: FC<AgentServicesTableProps> = ({ services, onCreateTask }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [visibleRows, setVisibleRows] = useState<number[]>([]);
+
+  useEffect(() => {
+    // Show table container first
+    setIsVisible(true);
+    
+    // Then reveal rows one by one
+    services.forEach((_, idx) => {
+      setTimeout(() => {
+        setVisibleRows(prev => [...prev, idx]);
+      }, idx * 150); // 150ms delay between each row
+    });
+  }, [services]);
+
   return (
-    <div className="max-w-[70%] z-[2] overflow-x-auto border border-[#E5E7EB] rounded-xl bg-white">
+    <div className={`max-w-[70%] z-[2] overflow-x-auto border border-[#E5E7EB] rounded-xl bg-white transition-all duration-500 ${
+      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    }`}>
       <table className="min-w-full text-[15px]">
         <thead>
           <tr className="bg-white">
@@ -25,7 +42,16 @@ export const AgentServicesTable: FC<AgentServicesTableProps> = ({ services, onCr
         </thead>
         <tbody>
           {services?.map((service, idx) => (
-            <tr key={service.id} className={idx !== services.length - 1 ? "border-b border-[#E5E7EB]" : ""}>
+            <tr 
+              key={service.id} 
+              className={`transition-all duration-300 ease-out ${
+                idx !== services.length - 1 ? "border-b border-[#E5E7EB]" : ""
+              } ${
+                visibleRows.includes(idx)
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 translate-x-4'
+              }`}
+            >
               <td className="pl-6 pr-2 py-4 font-bold text-[#FF4D29] align-middle whitespace-nowrap">{service.name}</td>
               <td className="px-2 py-4 align-middle whitespace-nowrap">
                 <span className="flex items-center gap-1 font-semibold text-[#FF4D29]">

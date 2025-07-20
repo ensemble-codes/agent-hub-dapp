@@ -14,7 +14,10 @@ export function useSdk() {
 
   useEffect(() => {
     if (authenticated && wallets && wallets.length > 0) {
-      const wallet = wallets.find(w => w.walletClientType === 'privy');
+      // Use any connected wallet - embedded wallet takes priority, otherwise use the first available wallet
+      const embeddedWallet = wallets.find(w => w.walletClientType === 'privy');
+      const wallet = embeddedWallet || wallets[0];
+      
       const initializedSdk = initSdk(wallet);
       setSdk(initializedSdk);
     } else {
