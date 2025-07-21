@@ -282,7 +282,7 @@ const ChatLayoutContent: FC<{
                             {agent.metadata.prompts.map((prompt, idx) => (
                               <button
                                 key={idx}
-                                className="cursor-pointer px-2 py-[0.5px] text-[14px] font-normal rounded-[20000px] border bg-white text-primary/90 hover:border-primary hover:text-primary transition"
+                                className="cursor-pointer px-2 py-[0.5px] text-[16px] font-normal rounded-[20000px] border bg-white text-primary/90 hover:border-primary hover:text-primary transition"
                                 onClick={() => handleTaskSend(prompt)}
                               >
                                 {prompt}
