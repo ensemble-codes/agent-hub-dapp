@@ -1,4 +1,5 @@
 import { convertRatingToStars } from "@/utils";
+import { getAddress } from "ethers";
 import Link from "next/link";
 import { FC, useState, useEffect } from "react";
 
@@ -83,7 +84,7 @@ export const StructuredMessage: FC<StructuredMessageProps> = ({ content }) => {
                 : 'opacity-0 translate-y-4'
             }`}
           >
-            <Link href={`/agents/${agent.id}`}>
+            <Link href={`/agents/${getAddress(agent.id)}`}>
               <div className="p-3 w-[320px] border border-[#8F95B2] rounded-lg z-[2]">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">

@@ -7,7 +7,7 @@ import { sendGAEvent } from "@next/third-parties/google";
 import { useSdk } from "@/sdk-config";
 
 import Loader from "@/components/loader";
-import { parseEther } from "ethers";
+import { getAddress, parseEther } from "ethers";
 import { useRouter } from "next/navigation";
 import { logAgentRegistration, logError } from "@/utils/sentry-logging";
 import { AgentCommunicationType } from "@ensemble-ai/sdk/dist/src/types";
@@ -673,7 +673,7 @@ const Page = () => {
                         <input
                           className="w-full outline-none focus:outline-none placeholder:text-primary/70 text-primary"
                           placeholder="Receives Payments"
-                          value={address}
+                          value={address ? getAddress(address) : ""}
                           disabled
                         />
                       </div>

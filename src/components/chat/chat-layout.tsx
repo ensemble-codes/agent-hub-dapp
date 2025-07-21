@@ -38,6 +38,7 @@ const ChatLayoutContent: FC<{
 
   const agent = useMemo(() => {
     if (data?.agent) {
+      console.log(data.agent);
       return data.agent;
     }
 
@@ -51,23 +52,18 @@ const ChatLayoutContent: FC<{
           <SideMenu />
           <div className="grow w-full ">
             <AppHeader />
-            <div className="lg:!h-[800px] h-[calc(100dvh-150px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
-              <img
-                src="/assets/orchestrator-pattern-bg.svg"
-                alt="pattern"
-                className="absolute left-0 bottom-0 w-full opacity-40"
-              />
+            <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
               <div className="flex flex-col w-full h-full">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Link href="/agents/0x5C02b4685492D36a40107B6eC48A91ab3f8875cb">
                       <div className="relative">
                         <img
-                          src={agent?.metadata?.imageUri.startsWith(
-                            "https://"
-                          )
-                            ? agent?.metadata?.imageUri
-                            : `https://${agent?.metadata?.imageUri}`}
+                          src={
+                            agent?.metadata?.imageUri.startsWith("https://")
+                              ? agent?.metadata?.imageUri
+                              : `https://${agent?.metadata?.imageUri}`
+                          }
                           alt="mascot"
                           className="w-10 h-10 border-[0.5px] border-[#8F95B2] rounded-full object-cover"
                         />
@@ -137,7 +133,21 @@ const ChatLayoutContent: FC<{
                       </>
                     )}
                   </div>
-
+                  {messages.length === 0 &&
+                    agent?.metadata?.prompts &&
+                    agent?.metadata?.prompts?.length > 0 && (
+                      <div className="flex flex-wrap gap-2 my-4">
+                        {agent.metadata.prompts.map((prompt, idx) => (
+                          <button
+                            key={idx}
+                            className="cursor-pointer px-2 py-[0.5px] text-[14px] font-normal rounded-[20000px] border border-primary/90 bg-white text-primary/90 hover:border-primary hover:text-primary transition"
+                            onClick={() => handleTaskSend(prompt)}
+                          >
+                            {prompt}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   <div className="h-[40px] flex-shrink-0 flex items-stretch justify-center w-full border border-[#8F95B2] rounded-[8px] bg-white z-[11] relative">
                     <input
                       placeholder="Chat..."
