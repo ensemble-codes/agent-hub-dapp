@@ -22,7 +22,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
 
   const GET_AGENT = gql`
     query MyQuery {
-  agent(id: "${id}") {
+  agent(id: "${id.toLowerCase()}") {
     agentUri
     id
     name
@@ -79,7 +79,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
             <Loader size="xl" />
           ) : agent && agent.agent ? (
             <>
-              <div className="flex lg:flex-row flex-col items-stretch lg:gap-4 gap-6 w-full">
+              <div className="flex lg:flex-row flex-col items-stretch gap-6 w-full">
                 <div className="grow rounded-[10px]">
                   <div className="lg:py-8 lg:px-5 rounded-[10px] w-full lg:bg-white">
                     <div className="flex w-full items-start justify-between mb-4 lg:mb-0">
@@ -382,230 +382,8 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                     </div>
                   </div>
                 </div>
-                <div className="flex-shrink-0 lg:w-[368px] w-full rounded-[10px]">
-                  <div
-                    className="relative lg:max-h-[620px] overflow-auto lg:p-4 rounded-[10px] w-full lg:bg-white z-[1]"
-                    style={{ scrollbarWidth: "none" }}
-                  >
-                    {id === "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
-                      <>
-                        <img
-                          src="/assets/past-works-icon.svg"
-                          alt="past-work"
-                          className="absolute z-[-1] w-full top-0 left-0"
-                        />
-                        <div className="lg:px-4">
-                          <div className="flex w-full items-center justify-center gap-2 my-4">
-                            <img
-                              src="/assets/og-x-icon.svg"
-                              alt="x"
-                              className="w-5 h-5"
-                            />
-                            <p className="text-[16px] font-semibold text-primary leading-[20px]">
-                              PAST WORKS
-                            </p>
-                          </div>
-                          {AGENTS_INFO[id].PAST_WORKS.map((p, index) => (
-                            <div
-                              key={`${p.name}-${index}`}
-                              className="bg-white rounded-[8px] shadow-[0px_4px_4px_0px_#00000025] p-4 mb-4"
-                            >
-                              <div className="flex items-start gap-2 mb-2">
-                                <img
-                                  src={p.img}
-                                  alt={p.name}
-                                  className="w-10 h-10 rounded-full"
-                                />
-                                <div className="space-y-2">
-                                  <p className="text-[#3d3d3d] text-[12px] font-medium">
-                                    {p.name}
-                                  </p>
-                                  <p className="text-[#8F95B2] text-[12px] font-medium">
-                                    {p.username}
-                                  </p>
-                                </div>
-                              </div>
-                              <p
-                                dangerouslySetInnerHTML={{ __html: p.tweet }}
-                                className="mb-2"
-                              />
-                              <div className="flex items-baseline gap-1">
-                                <p className="text-[#8F95B2] text-[12px] font-normal">
-                                  {p.time}
-                                </p>
-                                <span className="text-[#8F95B2] text-[12px] font-normal">
-                                  ·
-                                </span>
-                                <p className="text-[#8F95B2] text-[12px] font-normal">
-                                  <span className="text-[#3d3d3d] font-medium">
-                                    {p.views}
-                                  </span>
-                                  &nbsp;
-                                  <span>Views</span>
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-center gap-2">
-                          <img
-                            src="/assets/task-history-icon.svg"
-                            alt="task-history"
-                            className="w-6 h-6"
-                          />
-                          <p className="text-light-text-color font-bold">
-                            Task History
-                          </p>
-                        </div>
-                        <hr
-                          className="my-3 border-[0.5px] border-[#8F95B2] w-[70%]"
-                          style={{
-                            borderImageSource:
-                              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
-                            borderImageSlice: "1",
-                          }}
-                        />
-                        {agent.agent.tasks && agent.agent.tasks.length > 0 ? (
-                          [...agent.agent.tasks]
-                            .sort(
-                              (a: { id: string }, b: { id: string }) =>
-                                Number(b.id) - Number(a.id)
-                            )
-                            .map((td: any, index: number) => (
-                              <>
-                                <div
-                                  key={`${td.id}-${td.prompt}`}
-                                  className="z-[1]"
-                                >
-                                  <Link
-                                    href={`/tasks/${td.id}`}
-                                    className="flex items-center justify-between"
-                                  >
-                                    <p className="text-light-text-color font-[500] lg:max-w-[12ch] max-w-[20ch] w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                                      {td.prompt}
-                                    </p>
-                                    <p
-                                      className="text-[12px] font-bold"
-                                      style={{
-                                        color:
-                                          Number(td.status) ===
-                                          TaskStatus.CREATED
-                                            ? "#3B82F6"
-                                            : Number(td.status) ===
-                                              TaskStatus.ASSIGNED
-                                            ? "#F59E0B"
-                                            : Number(td.status) ===
-                                              TaskStatus.COMPLETED
-                                            ? "#00D64F"
-                                            : "#EF4444",
-                                      }}
-                                    >
-                                      {getTaskStatusText(
-                                        Number(td.status) as TaskStatus
-                                      )}
-                                    </p>
-                                  </Link>
-                                </div>
-                                {index ===
-                                agent.agent.tasks.length - 1 ? null : (
-                                  <hr
-                                    className="my-3 border-[0.5px] border-[#8F95B2] w-[70%]"
-                                    style={{
-                                      borderImageSource:
-                                        "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
-                                      borderImageSlice: "1",
-                                    }}
-                                  />
-                                )}
-                              </>
-                            ))
-                        ) : (
-                          <p className="text-light-text-color font-[500]">
-                            No task history found
-                          </p>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <>
-                <div className="flex lg:flex-row flex-col items-stretch gap-4 w-full mt-4">
-                  {/* <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
-                    <p className="p-4 text-primary text-[16px] font-medium">
-                      How agent works
-                    </p>
-                    <hr
-                      className="lg:block hidden border-[1px] border-[#8F95B2]"
-                      style={{
-                        borderImageSource:
-                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                        borderImageSlice: "1",
-                      }}
-                    />
-                    <div className="p-4">
-                      <img
-                        src="/assets/featured-agent-graph-icon.svg"
-                        alt="graph"
-                        className="w-full"
-                      />
-                      <div className="flex items-center justify-between">
-                        <p className="text-[#8F95B2] text-[14px] font-normal">
-                          Mcap
-                        </p>
-                        <p className="text-[#121212] text-[14px] font-normal">
-                          -
-                        </p>
-                      </div>
-                      <hr
-                        className="my-2 lg:block hidden border-[1px] border-[#8F95B2]"
-                        style={{
-                          borderImageSource:
-                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                          borderImageSlice: "1",
-                        }}
-                      />
-                      <div className="flex items-center justify-between">
-                        <p className="text-[#8F95B2] text-[14px] font-normal">
-                          Liquidity
-                        </p>
-                        <p className="text-[#121212] text-[14px] font-normal">
-                          -
-                        </p>
-                      </div>
-                      <hr
-                        className="my-2 lg:block hidden border-[1px] border-[#8F95B2]"
-                        style={{
-                          borderImageSource:
-                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
-                          borderImageSlice: "1",
-                        }}
-                      />
-                      <div className="flex items-center justify-between">
-                        <p className="text-[#8F95B2] text-[14px] font-normal">
-                          Holders
-                        </p>
-                        <p className="text-[#121212] text-[14px] font-normal">
-                          -
-                        </p>
-                      </div>
-
-                      <button className="w-full mt-2 space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#8F95B2]">
-                        <img
-                          src="/assets/cross-gray-icon.svg"
-                          alt="cross"
-                          className="w-[18px] h-[18px]"
-                        />
-                        <span className="text-[#8F95B2] text-[14px] font-[700] leading-[18px]">
-                          Agent does not have a token
-                        </span>
-                      </button>
-                    </div>
-                  </div> */}
-                  {agent?.agent?.metadata?.instructions?.length ? (
+                <div className="flex-shrink-0 flex flex-col lg:gap-12 gap-4 lg:w-[368px]">
+                {agent?.agent?.metadata?.instructions?.length ? (
                     <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
                       <p className="p-4 text-primary text-[16px] font-medium">
                         How agent works
@@ -683,6 +461,159 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       )}
                     </div>
                   ) : null}
+                </div>
+              </div>
+              <>
+                <div className="flex lg:flex-row flex-col items-stretch gap-4 w-full mt-4">
+                  {/* <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
+                    <p className="p-4 text-primary text-[16px] font-medium">
+                      How agent works
+                    </p>
+                    <hr
+                      className="lg:block hidden border-[1px] border-[#8F95B2]"
+                      style={{
+                        borderImageSource:
+                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                        borderImageSlice: "1",
+                      }}
+                    />
+                    <div className="p-4">
+                      <img
+                        src="/assets/featured-agent-graph-icon.svg"
+                        alt="graph"
+                        className="w-full"
+                      />
+                      <div className="flex items-center justify-between">
+                        <p className="text-[#8F95B2] text-[14px] font-normal">
+                          Mcap
+                        </p>
+                        <p className="text-[#121212] text-[14px] font-normal">
+                          -
+                        </p>
+                      </div>
+                      <hr
+                        className="my-2 lg:block hidden border-[1px] border-[#8F95B2]"
+                        style={{
+                          borderImageSource:
+                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                          borderImageSlice: "1",
+                        }}
+                      />
+                      <div className="flex items-center justify-between">
+                        <p className="text-[#8F95B2] text-[14px] font-normal">
+                          Liquidity
+                        </p>
+                        <p className="text-[#121212] text-[14px] font-normal">
+                          -
+                        </p>
+                      </div>
+                      <hr
+                        className="my-2 lg:block hidden border-[1px] border-[#8F95B2]"
+                        style={{
+                          borderImageSource:
+                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                          borderImageSlice: "1",
+                        }}
+                      />
+                      <div className="flex items-center justify-between">
+                        <p className="text-[#8F95B2] text-[14px] font-normal">
+                          Holders
+                        </p>
+                        <p className="text-[#121212] text-[14px] font-normal">
+                          -
+                        </p>
+                      </div>
+
+                      <button className="w-full mt-2 space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#8F95B2]">
+                        <img
+                          src="/assets/cross-gray-icon.svg"
+                          alt="cross"
+                          className="w-[18px] h-[18px]"
+                        />
+                        <span className="text-[#8F95B2] text-[14px] font-[700] leading-[18px]">
+                          Agent does not have a token
+                        </span>
+                      </button>
+                    </div>
+                  </div> */}
+                  {/* {agent?.agent?.metadata?.instructions?.length ? (
+                    <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
+                      <p className="p-4 text-primary text-[16px] font-medium">
+                        How agent works
+                      </p>
+                      <hr
+                        className="lg:block hidden border-[1px] border-[#8F95B2]"
+                        style={{
+                          borderImageSource:
+                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                          borderImageSlice: "1",
+                        }}
+                      />
+                      {agent.agent.metadata.instructions.map(
+                        (ins: string, i: number, arr: string[]) => (
+                          <div
+                            className={`p-4 flex items-center justify-start gap-2 ${
+                              i < arr.length - 1
+                                ? "border-b-[1px] border-b-[#8F95B2]"
+                                : ""
+                            }`}
+                            key={ins}
+                          >
+                            <img
+                              src="/assets/check-squared-icon.svg"
+                              alt="check"
+                              className="w-4 h-4"
+                            />
+                            <p className="text-[#121212] text-[14px] font-normal">
+                              {ins}
+                            </p>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  ) : null}
+                  {agent?.agent?.metadata?.prompts?.length ? (
+                    <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
+                      <p className="p-4 text-primary text-[16px] font-medium">
+                        Starter prompts
+                      </p>
+                      <hr
+                        className="lg:block hidden border-[1px] border-[#8F95B2]"
+                        style={{
+                          borderImageSource:
+                            "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 60%)",
+                          borderImageSlice: "1",
+                        }}
+                      />
+                      {agent.agent.metadata.prompts.map(
+                        (p: string, i: number, arr: string[]) => (
+                          <div
+                            className={`p-4 flex items-center justify-between gap-2 ${
+                              i < arr.length - 1
+                                ? "border-b-[1px] border-b-[#8F95B2]"
+                                : ""
+                            } group relative`}
+                            key={p}
+                          >
+                            <p
+                              className="text-[#121212] text-[14px] font-normal w-[80%] cursor-pointer active:bg-gray-100 transition-colors duration-200 rounded-md p-2 -m-2"
+                              onClick={() => copyToClipboard(p)}
+                            >
+                              {p}
+                            </p>
+                            <img
+                              src="/assets/copy-icon.svg"
+                              alt="copy"
+                              className={`w-5 h-5 cursor-pointer transition-opacity duration-200 absolute right-4 opacity-0 group-hover:opacity-100 hidden lg:block ${
+                                copiedPrompt === p ? "opacity-50" : ""
+                              }`}
+                              onClick={() => copyToClipboard(p)}
+                            />
+                          </div>
+                        )
+                      )}
+                    </div>
+                  ) : null} */}
                 </div>
               </>
             </>

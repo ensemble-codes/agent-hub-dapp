@@ -5,6 +5,7 @@ import { convertRatingToStars } from "@/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { getAddress } from "ethers";
 
 export default function Home() {
   const { push } = useRouter();
@@ -355,7 +356,7 @@ export default function Home() {
                               <div className="flex items-start justify-start gap-2">
                                 <Link
                                   className="cursor-pointer"
-                                  href={`/agents/${a.id}`}
+                                  href={`/agents/${getAddress(a.id)}`}
                                 >
                                   <div className="w-14 h-14 rounded-full relative">
                                     <img
@@ -516,7 +517,7 @@ export default function Home() {
                         </div>
                         <button
                           className="w-full border border-primary bg-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
-                          onClick={() => push(`/agents/${a.id}`)}
+                          onClick={() => push(`/agents/${getAddress(a.id)}`)}
                         >
                           <img
                             src="/assets/bolt-icon.svg"

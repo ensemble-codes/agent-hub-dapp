@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -10,9 +10,11 @@ interface MessageContentProps {
 export const MessageContent: FC<MessageContentProps> = ({ content, isReceived }) => {
   const [displayedContent, setDisplayedContent] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (isReceived) {
+    if (isReceived && !hasAnimated.current) {
+      // Only animate if this is a new received message
       setIsTyping(true);
       setDisplayedContent('');
       
@@ -23,11 +25,16 @@ export const MessageContent: FC<MessageContentProps> = ({ content, isReceived })
           index++;
         } else {
           setIsTyping(false);
+          hasAnimated.current = true;
           clearInterval(typeInterval);
         }
       }, 30); // Adjust speed here (lower = faster)
 
       return () => clearInterval(typeInterval);
+    } else if (isReceived && hasAnimated.current) {
+      // For past received messages, show content immediately
+      setDisplayedContent(content);
+      setIsTyping(false);
     } else {
       // For user messages, show content immediately
       setDisplayedContent(content);
@@ -40,13 +47,14 @@ export const MessageContent: FC<MessageContentProps> = ({ content, isReceived })
       !isReceived ? 'py-[2px] px-3 bg-primary/15' : ''
     }`}>
       <div className="prose prose-sm max-w-none">
-        <ReactMarkdown 
+        <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
+            p: ({ node, ...props }) => <span {...props} />,
             a: ({ node, ...props }) => (
-              <a 
-                {...props} 
-                target="_blank" 
+              <a
+                {...props}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline"
               />
