@@ -34,6 +34,7 @@ export const XmtpChat: FC<{ agent: {
   id: string
   metadata: {
     imageUri: string
+    prompts: string[]
     name: string
   }
 }}> = ({ agent }) => {
@@ -450,6 +451,21 @@ export const XmtpChat: FC<{ agent: {
                           </>
                         )}
                       </div>
+                      {messages.length === 0 &&
+                        agent?.metadata?.prompts &&
+                        agent?.metadata?.prompts?.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {agent.metadata.prompts.map((prompt, idx) => (
+                              <button
+                                key={idx}
+                                className="cursor-pointer px-2 py-[0.5px] text-[14px] font-normal rounded-[20000px] border bg-white text-primary/90 hover:border-primary hover:text-primary transition"
+                                onClick={() => onSendMessage(prompt)}
+                              >
+                                {prompt}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       <div className="h-[40px] flex-shrink-0 flex items-stretch justify-center w-full border border-[#8F95B2] rounded-[8px] bg-white z-[11] relative">
                         <input
                           placeholder="Chat..."

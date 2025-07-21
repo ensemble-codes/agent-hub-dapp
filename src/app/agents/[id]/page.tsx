@@ -176,11 +176,11 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           alt={agent.agent.metadata?.name}
                         />
                         <div className="flex flex-col items-start gap-2">
-                          <p className="font-bold text-[#3d3d3d] text-[20px] leading-[auto]">
+                          <p className="font-bold text-[#3d3d3d] text-[20px] leading-[auto] z-[1]">
                             {agent.agent.metadata?.name}
                           </p>
                           <p
-                            className="font-bold text-light-text-color text-[16px] leading-[auto] cursor-pointer flex items-center gap-1"
+                            className="font-bold text-light-text-color text-[16px] leading-[auto] cursor-pointer flex items-center gap-1 z-[1]"
                             onClick={() => copyToClipboard(agent.agent.id)}
                             style={{
                               transition: "all 0.3s ease",
@@ -193,7 +193,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           </p>
                           {id ===
                           "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
-                            <div className="py-1 px-4 bg-[#C8F3FF] rounded-[2000px] flex items-center gap-2">
+                            <div className="py-1 px-4 bg-[#C8F3FF] rounded-[2000px] flex items-center gap-2 z-[1]">
                               <img
                                 src="/assets/vibes-dark-icon.svg"
                                 alt="vibes"
@@ -215,33 +215,33 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                                     "Research"
                                   ? "bg-[#C8FFCE]"
                                   : "bg-[#C8E6FF]"
-                              }`}
+                              } z-[1]`}
                             >
                               {agent.agent.metadata.agentCategory === "DeFi" ? (
                                 <img
                                   src="/assets/defi-service-black-icon.svg"
                                   alt={agent.agent.metadata.agentCategory}
-                                  className="w-[18px] h-[18px]"
+                                  className="w-[18px] h-[18px] z-[1]"
                                 />
                               ) : agent.agent.metadata.agentCategory ===
                                 "Social" ? (
                                 <img
                                   src="/assets/social-service-black-icon.svg"
                                   alt={agent.agent.metadata.agentCategory}
-                                  className="w-[18px] h-[18px]"
+                                  className="w-[18px] h-[18px] z-[1]"
                                 />
                               ) : agent.agent.metadata.agentCategory ===
                                 "Research" ? (
                                 <img
                                   src="/assets/research-service-black-icon.svg"
                                   alt={agent.agent.metadata.agentCategory}
-                                  className="w-[18px] h-[18px]"
+                                  className="w-[18px] h-[18px] z-[1]"
                                 />
                               ) : (
                                 <img
                                   src="/assets/security-service-black-icon.svg"
                                   alt={agent.agent.metadata.agentCategory}
-                                  className="w-[18px] h-[18px]"
+                                  className="w-[18px] h-[18px] z-[1]"
                                 />
                               )}
                               <p className="text-[#3d3d3d] text-[14px] font-medium leading-[18px]">
@@ -254,7 +254,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       <img
                         src="/assets/profile-ornament.svg"
                         alt="ornament"
-                        className="absolute w-[214px] h-[158px] right-[0px]"
+                        className="absolute w-[214px] h-[158px] right-[0px] z-0"
                       />
                     </div>
                     <div className="space-y-2">

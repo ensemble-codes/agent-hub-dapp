@@ -81,6 +81,7 @@ const PageContent: FC = () => {
               metadata: {
                 imageUri: agent?.metadata?.imageUri ?? "",
                 name: agent?.name ?? "",
+                prompts: agent?.metadata?.prompts ?? []
               },
             }}
           />
