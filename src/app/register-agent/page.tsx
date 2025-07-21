@@ -7,7 +7,7 @@ import { sendGAEvent } from "@next/third-parties/google";
 import { useSdk } from "@/sdk-config";
 
 import Loader from "@/components/loader";
-import { parseEther } from "ethers";
+import { getAddress } from "ethers";
 import { useRouter } from "next/navigation";
 import { logAgentRegistration, logError } from "@/utils/sentry-logging";
 import { AgentCommunicationType } from "@ensemble-ai/sdk/dist/src/types";
@@ -673,7 +673,7 @@ const Page = () => {
                         <input
                           className="w-full outline-none focus:outline-none placeholder:text-primary/70 text-primary"
                           placeholder="Receives Payments"
-                          value={address}
+                          value={address ? getAddress(address) : ""}
                           disabled
                         />
                       </div>
@@ -1403,7 +1403,7 @@ const Page = () => {
 
                     {registerSuccess ? (
                       <Link
-                        href={`/agents/${agentAddress}`}
+                        href={`/agents/${getAddress(agentAddress)}`}
                         className="w-fit space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] cursor-pointer"
                       >
                         <span className="text-white text-[16px] font-[700] leading-[24px]">

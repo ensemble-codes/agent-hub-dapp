@@ -28,6 +28,7 @@ import { ServiceDetailsCard } from "@/components/chat/service-details-card";
 import { StructuredMessage } from "@/components/chat/structured-message";
 import { useContext } from "react";
 import { AppContext } from "@/context/app";
+import { getAddress } from "ethers";
 
 export const XmtpChat: FC<{ agent: {
   id: string
@@ -320,7 +321,7 @@ export const XmtpChat: FC<{ agent: {
           <SideMenu />
           <div className="grow w-full ">
             <AppHeader />
-            <div className="lg:!h-[800px] h-[calc(100dvh-150px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
+            <div className="h-[calc(100dvh-150px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
               <img
                 src="/assets/orchestrator-pattern-bg.svg"
                 alt="pattern"
@@ -333,8 +334,8 @@ export const XmtpChat: FC<{ agent: {
                       <>
                         <Link
                           href={`/agents/${
-                            (agent &&
-                              agent.id) ||
+                            (getAddress(agent &&
+                              agent.id)) ||
                             "0x5C02b4685492D36a40107B6eC48A91ab3f8875cb"
                           }`}
                         >

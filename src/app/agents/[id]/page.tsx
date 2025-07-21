@@ -22,7 +22,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
 
   const GET_AGENT = gql`
     query MyQuery {
-  agent(id: "${id}") {
+  agent(id: "${id.toLowerCase()}") {
     agentUri
     id
     name

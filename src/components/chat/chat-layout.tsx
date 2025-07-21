@@ -51,7 +51,7 @@ const ChatLayoutContent: FC<{
           <SideMenu />
           <div className="grow w-full ">
             <AppHeader />
-            <div className="lg:!h-[800px] h-[calc(100dvh-150px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
+            <div className="h-[calc(100dvh-150px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
               <img
                 src="/assets/orchestrator-pattern-bg.svg"
                 alt="pattern"
