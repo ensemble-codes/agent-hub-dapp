@@ -99,15 +99,7 @@ const ChatLayoutContent: FC<{
                           <div className="flex flex-col items-center justify-center lg:mt-[128px] mt-[72px]">
                             <div className="flex flex-col gap-2 items-center justify-center mb-8">
                               <img
-                                src={
-                                  agent
-                                    ? agent?.metadata?.imageUri?.startsWith(
-                                        "https://"
-                                      )
-                                      ? agent?.metadata?.imageUri
-                                      : `https://${agent?.metadata?.imageUri}`
-                                    : "/assets/orchestrator-mascot-icon.svg"
-                                }
+                                src={"/assets/orchestrator-mascot-icon.svg"}
                                 alt="mascot"
                                 className="w-[120px] h-[120px] rounded-full object-cover"
                               />

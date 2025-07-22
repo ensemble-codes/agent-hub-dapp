@@ -438,7 +438,7 @@ const Page = () => {
           <div className="flex items-start gap-10 w-full bg-white py-6 px-4 rounded-[16px]">
             <div className="grow py-4 w-full">
               <div className="flex w-full justify-between items-center">
-                <p className="text-primary font-semibold text-[20px] leading-[auto]">
+                <p className="text-primary font-semibold text-[20px] leading-[auto] font-[Montserrat]">
                   REGISTER AGENT
                 </p>
                 <div className="flex items-center gap-4">
@@ -529,7 +529,7 @@ const Page = () => {
                 </div>
                 <div className="w-[90%] flex items-center justify-between">
                   <p
-                    className={`text-[14px] ${
+                    className={`text-[14px] font-[Montserrat] ${
                       detailsStep === "identity"
                         ? "font-semibold text-primary"
                         : "font-medium text-[#8F95B2]"
@@ -538,7 +538,7 @@ const Page = () => {
                     Identity
                   </p>
                   <p
-                    className={`text-[14px] ${
+                    className={`text-[14px] font-[Montserrat] ${
                       detailsStep === "services"
                         ? "font-semibold text-primary"
                         : "font-medium text-[#8F95B2]"
@@ -547,7 +547,7 @@ const Page = () => {
                     Services
                   </p>
                   <p
-                    className={`text-[14px] ${
+                    className={`text-[14px] font-[Montserrat] ${
                       detailsStep === "links"
                         ? "font-semibold text-primary"
                         : "font-medium text-[#8F95B2]"
@@ -568,7 +568,7 @@ const Page = () => {
               {detailsStep === "identity" ? (
                 <div className="w-full">
                   <div className="space-y-2">
-                    <p className="font-medium leading-[20px] text-[#121212]">
+                    <p className="font-medium leading-[20px] text-[#121212] font-[Montserrat]">
                       Name*
                     </p>
                     <input
@@ -622,7 +622,7 @@ const Page = () => {
                       </label>
                     </div> */}
                   <div className="max-w-[616px] space-y-2">
-                    <p className="font-medium leading-[20px] text-[#121212]">
+                    <p className="font-medium leading-[20px] text-[#121212] font-[Montserrat]">
                       Description*
                     </p>
                     <textarea
@@ -644,7 +644,7 @@ const Page = () => {
                   <div className="flex items-center gap-4">
                     <div className="flex-1 w-[176px]">
                       <div className="space-y-2">
-                        <p className="font-medium leading-[20px] text-[#121212]">
+                        <p className="font-medium leading-[20px] text-[#121212 font-[Montserrat]">
                           Agent Address*
                         </p>
                         <input
@@ -667,7 +667,7 @@ const Page = () => {
                     </div>
                     <div className="flex-1 w-[176px]">
                       <div className="space-y-2">
-                        <p className="font-medium leading-[20px] text-[#121212]">
+                        <p className="font-medium leading-[20px] text-[#121212] font-[Montserrat]">
                           Your Address*
                         </p>
                         <input
@@ -688,7 +688,7 @@ const Page = () => {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <p className="font-medium leading-[20px] text-[#121212]">
+                    <p className="font-medium leading-[20px] text-[#121212] font-[Montserrat]">
                       Photo
                     </p>
                     <div className="flex items-start gap-4">
@@ -729,7 +729,7 @@ const Page = () => {
                             className="w-[56px] h-[56px]"
                           />
                         </div>
-                        <p className="text-[#8F95B2] text-[12px] font-medium text-center">
+                        <p className="text-[#8F95B2] text-[12px] font-medium text-center font-[Montserrat]">
                           Default
                         </p>
                       </div>
@@ -739,7 +739,7 @@ const Page = () => {
               ) : detailsStep === "services" ? (
                 <div className="w-full">
                   <div className="flex-1">
-                    <p className="font-medium leading-[21.6px] mb-2 text-[#121212]">
+                    <p className="font-medium leading-[21.6px] mb-2 text-[#121212] font-[Montserrat]">
                       Service type*
                     </p>
                     <div className="flex items-center gap-2">
@@ -796,7 +796,7 @@ const Page = () => {
                       }}
                     />
                     <div className="space-y-2">
-                      <p className="font-medium leading-[21.6px] mb-2 text-[#121212]">
+                      <p className="font-medium leading-[21.6px] mb-2 text-[#121212] font-[Montserrat]">
                         Attributes*
                       </p>
                       {selectedAgentService && (
@@ -868,16 +868,18 @@ const Page = () => {
                             </div>
                           ))}
                           {!showAddCapability && (
-                            <button
-                              type="button"
-                              className="flex items-center gap-1 text-[#f94d27] font-bold text-[12px]"
-                              onClick={() => setShowAddCapability(true)}
-                            >
-                              <span className="text-[18px] font-bold text-primary">
-                                +
-                              </span>
-                              Add capability
-                            </button>
+                            <div className="w-full">
+                              <button
+                                type="button"
+                                className="flex items-center gap-1 text-[#f94d27] font-bold text-[12px]"
+                                onClick={() => setShowAddCapability(true)}
+                              >
+                                <span className="text-[18px] font-bold text-primary">
+                                  +
+                                </span>
+                                Add capability
+                              </button>
+                            </div>
                           )}
                           {showAddCapability && (
                             <div className="flex items-center gap-2 mb-2">
@@ -946,7 +948,7 @@ const Page = () => {
                       }}
                     />
                     <div>
-                      <p className="font-medium leading-[21.6px] text-[#121212] mb-2">
+                      <p className="font-medium leading-[21.6px] text-[#121212] mb-2 font-[Montserrat]">
                         Communication Protocol
                       </p>
                       <div className="flex items-center gap-10 mb-6">
@@ -1023,7 +1025,7 @@ const Page = () => {
                       }}
                     /> */}
                     <div className="space-y-2">
-                      <p className="font-medium leading-[21.6px] text-[#121212]">
+                      <p className="font-medium leading-[21.6px] text-[#121212] font-[Montserrat]">
                         How to use agent
                       </p>
                       <input
@@ -1127,7 +1129,7 @@ const Page = () => {
                       }}
                     />
                     <div className="space-y-2">
-                      <p className="font-medium leading-[21.6px] text-[#121212]">
+                      <p className="font-medium leading-[21.6px] text-[#121212] font-[Montserrat]">
                         Starter prompts
                       </p>
                       <input
@@ -1242,7 +1244,7 @@ const Page = () => {
               ) : (
                 <div className="w-full">
                   <div className="space-y-4">
-                    <p className="font-medium leading-[21.6px] text-[#121212]">
+                    <p className="font-medium leading-[21.6px] text-[#121212] font-[Montserrat]">
                       Links
                     </p>
                     <div className="flex items-center gap-2">
