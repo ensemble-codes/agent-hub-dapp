@@ -104,7 +104,7 @@ const Page = () => {
   const { push } = useRouter();
 
   const [detailsStep, setDetailsStep] = useState<
-    "identity" | "services" | "links"
+    "identity" | "attributes" | "communication" | "links"
   >("identity");
   const [agentName, setAgentName] = useState("");
   const [agentPfp, setAgentPfp] = useState<File | null>(null);
@@ -317,28 +317,34 @@ const Page = () => {
   const getProgressWidth = useCallback(() => {
     switch (detailsStep) {
       case "identity":
-        return "33%";
-      case "services":
-        return "67%";
+        return "25%";
+      case "attributes":
+        return "50%";
+      case "communication":
+        return "75%";
       case "links":
         return "100%";
       default:
-        return "33%";
+        return "25%";
     }
   }, [detailsStep]);
 
   const canProceedServicesStep =
-    selectedAgentSubServices.length + customCapabilities.length > 0 &&
-    selectedCommunicationProtocol &&
-    (selectedCommunicationProtocol !== "websocket" ||
-      websocketUrl.trim().length > 0);
+    selectedAgentSubServices.length + customCapabilities.length > 0;
 
   const canProceedToNextStep = useMemo(() => {
     if (detailsStep === "identity") {
       return agentName.trim() && agentDescription.trim() && agentAddress.trim();
     }
-    if (detailsStep === "services") {
+    if (detailsStep === "attributes") {
       return canProceedServicesStep;
+    }
+    if (detailsStep === "communication") {
+      return (
+        selectedCommunicationProtocol &&
+        (selectedCommunicationProtocol !== "websocket" ||
+          websocketUrl.trim().length > 0)
+      );
     }
     if (detailsStep === "links") {
       return (
@@ -360,6 +366,8 @@ const Page = () => {
     isValidWebsite,
     agentAddress,
     canProceedServicesStep,
+    selectedCommunicationProtocol,
+    websocketUrl,
     agentGitHub,
     isValidGitHub,
     agentTelegram,
@@ -442,12 +450,16 @@ const Page = () => {
                   REGISTER AGENT
                 </p>
                 <div className="flex items-center gap-4">
-                  {detailsStep === "services" || detailsStep === "links" ? (
+                  {detailsStep !== "identity" ? (
                     <button
                       className="rounded-[20000px] border border-primary w-[120px] py-1 flex items-center justify-center gap-2"
                       onClick={() =>
                         setDetailsStep(
-                          detailsStep === "links" ? "services" : "identity"
+                          detailsStep === "links"
+                            ? "communication"
+                            : detailsStep === "communication"
+                            ? "attributes"
+                            : "identity"
                         )
                       }
                     >
@@ -468,7 +480,11 @@ const Page = () => {
                       }`}
                       onClick={() =>
                         setDetailsStep(
-                          detailsStep === "identity" ? "services" : "links"
+                          detailsStep === "identity"
+                            ? "attributes"
+                            : detailsStep === "attributes"
+                            ? "communication"
+                            : "links"
                         )
                       }
                       disabled={!canProceedToNextStep}
@@ -492,7 +508,7 @@ const Page = () => {
                 }}
               />
               <div className="flex flex-col gap-2 w-full">
-                <div className="w-[90%] flex items-center justify-between">
+                <div className="w-[95%] flex items-center justify-between">
                   <img
                     src={
                       detailsStep === "identity"
@@ -504,11 +520,20 @@ const Page = () => {
                   />
                   <img
                     src={
-                      detailsStep === "services"
+                      detailsStep === "attributes"
                         ? "/assets/services-highlighted-icon.svg"
                         : "/assets/services-icon.svg"
                     }
-                    alt="services"
+                    alt="attributes"
+                    className="w-10 h-10"
+                  />
+                  <img
+                    src={
+                      detailsStep === "communication"
+                        ? "/assets/links-highlighted-icon.svg"
+                        : "/assets/links-icon.svg"
+                    }
+                    alt="communication"
                     className="w-10 h-10"
                   />
                   <img
@@ -527,7 +552,7 @@ const Page = () => {
                     style={{ width: getProgressWidth() }}
                   ></div>
                 </div>
-                <div className="w-[90%] flex items-center justify-between">
+                <div className="w-[95%] flex items-center justify-between">
                   <p
                     className={`text-[14px] font-[Montserrat] ${
                       detailsStep === "identity"
@@ -539,12 +564,21 @@ const Page = () => {
                   </p>
                   <p
                     className={`text-[14px] font-[Montserrat] ${
-                      detailsStep === "services"
+                      detailsStep === "attributes"
                         ? "font-semibold text-primary"
                         : "font-medium text-[#8F95B2]"
                     }`}
                   >
-                    Services
+                    Attributes
+                  </p>
+                  <p
+                    className={`text-[14px] font-[Montserrat] ${
+                      detailsStep === "communication"
+                        ? "font-semibold text-primary"
+                        : "font-medium text-[#8F95B2]"
+                    }`}
+                  >
+                    Communication
                   </p>
                   <p
                     className={`text-[14px] font-[Montserrat] ${
@@ -736,11 +770,11 @@ const Page = () => {
                     </div>
                   </div>
                 </div>
-              ) : detailsStep === "services" ? (
+              ) : detailsStep === "attributes" ? (
                 <div className="w-full">
                   <div className="flex-1">
                     <p className="font-medium leading-[21.6px] mb-2 text-[#121212] font-[Montserrat]">
-                      Service type*
+                      Agent type*
                     </p>
                     <div className="flex items-center gap-2">
                       {services.map((service) => (
@@ -947,64 +981,6 @@ const Page = () => {
                         borderImageSlice: "1",
                       }}
                     />
-                    <div>
-                      <p className="font-medium leading-[21.6px] text-[#121212] mb-2 font-[Montserrat]">
-                        Communication Protocol
-                      </p>
-                      <div className="flex items-center gap-10 mb-6">
-                        {["XMTP", "Websocket"].map((p) => (
-                          <div key={p} className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id={`checkbox-protocol-${p.toLowerCase()}`}
-                              checked={
-                                selectedCommunicationProtocol ===
-                                p.toLowerCase()
-                              }
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setSelectedCommunicationProtocol(
-                                    p.toLowerCase()
-                                  );
-                                } else if (
-                                  selectedCommunicationProtocol ===
-                                  p.toLowerCase()
-                                ) {
-                                  setSelectedCommunicationProtocol("");
-                                }
-                              }}
-                              className="w-4 h-4 text-primary bg-white rounded-[8px] outline-none border-none cursor-pointer"
-                              style={{
-                                accentColor: "#f94d27",
-                              }}
-                            />
-                            <label
-                              htmlFor={`checkbox-protocol-${p}`}
-                              className="font-bold text-text-color text-[14px] cursor-pointer"
-                            >
-                              {p}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                      {selectedCommunicationProtocol === "websocket" && (
-                        <input
-                          type="url"
-                          className="mb-2 w-full outline-none placeholder:text-primary/70 text-primary"
-                          placeholder="Enter Websocket Url"
-                          value={websocketUrl}
-                          onChange={(e) => setWebsocketUrl(e.target.value)}
-                        />
-                      )}
-                    </div>
-                    <hr
-                      className="mb-6 border-[0.5px] border-[#8F95B2] w-[70%]"
-                      style={{
-                        borderImageSource:
-                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
-                        borderImageSlice: "1",
-                      }}
-                    />
                     {/* <div className="space-y-2">
                       <p className="font-medium leading-[21.6px] text-[#121212]">
                         Opening greeting
@@ -1026,7 +1002,7 @@ const Page = () => {
                     /> */}
                     <div className="space-y-2">
                       <p className="font-medium leading-[21.6px] text-[#121212] font-[Montserrat]">
-                        How to use agent
+                        Agent Use Case
                       </p>
                       <input
                         className="w-full border-none outline-none focus:outline-none placeholder:text-primary/70 text-primary"
@@ -1233,6 +1209,92 @@ const Page = () => {
                     </div>
                     <hr
                       className="mt-4 mb-6 border-[0.5px] border-[#8F95B2] w-[70%]"
+                      style={{
+                        borderImageSource:
+                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                        borderImageSlice: "1",
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : detailsStep === "communication" ? (
+                <div className="w-full">
+                  <div className="flex-1">
+                    <p className="font-[Montserrat] text-[16px] font-medium leading-[20px]">
+                      Choose the communication system you prefer for your agent.
+                    </p>
+                    <p className="font-[Montserrat] text-[16px] font-medium leading-[20px]">
+                      Check out the{" "}
+                      <Link
+                        href={`https://docs.ensemble.codes/ensemble-stack/communication`}
+                        className="text-primary font-bold"
+                        target="_blank"
+                        rel="noreferrer noopener nofollower"
+                      >
+                        Docs
+                      </Link>{" "}
+                      here to know more.
+                    </p>
+                    <hr
+                      className="border-[0.5px] my-6 border-[#8F95B2] w-[50%]"
+                      style={{
+                        borderImageSource:
+                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                        borderImageSlice: "1",
+                      }}
+                    />
+                    <div>
+                      <p className="font-medium leading-[21.6px] text-[#121212] mb-2 font-[Montserrat]">
+                        Communication Protocol
+                      </p>
+                      <div className="flex items-center gap-10 mb-6">
+                        {["XMTP", "Websocket"].map((p) => (
+                          <div key={p} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              id={`checkbox-protocol-${p.toLowerCase()}`}
+                              checked={
+                                selectedCommunicationProtocol ===
+                                p.toLowerCase()
+                              }
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedCommunicationProtocol(
+                                    p.toLowerCase()
+                                  );
+                                } else if (
+                                  selectedCommunicationProtocol ===
+                                  p.toLowerCase()
+                                ) {
+                                  setSelectedCommunicationProtocol("");
+                                }
+                              }}
+                              className="w-4 h-4 text-primary bg-white rounded-[8px] outline-none border-none cursor-pointer"
+                              style={{
+                                accentColor: "#f94d27",
+                              }}
+                            />
+                            <label
+                              htmlFor={`checkbox-protocol-${p}`}
+                              className="font-bold text-text-color text-[14px] cursor-pointer"
+                            >
+                              {p}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      {selectedCommunicationProtocol === "websocket" && (
+                        <input
+                          type="url"
+                          className="mb-2 w-full outline-none placeholder:text-primary/70 text-primary"
+                          placeholder="Enter Websocket Url"
+                          value={websocketUrl}
+                          onChange={(e) => setWebsocketUrl(e.target.value)}
+                        />
+                      )}
+                    </div>
+                    <hr
+                      className="mb-6 border-[0.5px] border-[#8F95B2] w-[70%]"
                       style={{
                         borderImageSource:
                           "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
