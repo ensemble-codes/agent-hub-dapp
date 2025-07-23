@@ -124,6 +124,7 @@ const Page = () => {
   const [selectedCommunicationProtocol, setSelectedCommunicationProtocol] =
     useState<string>("xmtp");
   const [websocketUrl, setWebsocketUrl] = useState<string>("");
+  const [communicationParams, setCommunicationParams] = useState<string>("");
   const [loadingRegister, setLoadingRegister] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [registerFailure, setRegisterFailure] = useState(false);
@@ -256,6 +257,7 @@ const Page = () => {
         prompts: finalPrompts,
         attributes: allAttributes,
         agentCategory: selectedAgentService,
+        communicationParams: communicationParams,
         ...(selectedCommunicationProtocol === "websocket"
           ? { communicationURL: websocketUrl }
           : {}),
@@ -312,6 +314,7 @@ const Page = () => {
     address,
     websocketUrl,
     selectedCommunicationProtocol,
+    communicationParams,
   ]);
 
   const getProgressWidth = useCallback(() => {
@@ -1300,6 +1303,16 @@ const Page = () => {
                           "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
                         borderImageSlice: "1",
                       }}
+                    />
+                    <p className="font-medium leading-[21.6px] text-[#121212] mb-2 font-[Montserrat]">
+                      Communication params (optional)
+                    </p>
+                    <input
+                      type="url"
+                      className="mb-2 w-full outline-none placeholder:text-primary/70 text-primary"
+                      placeholder={'Example: {"agentId": "xyz"}'}
+                      value={communicationParams}
+                      onChange={(e) => setCommunicationParams(e.target.value)}
                     />
                   </div>
                 </div>
