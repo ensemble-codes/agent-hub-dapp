@@ -104,7 +104,7 @@ const Page = () => {
   const { push } = useRouter();
 
   const [detailsStep, setDetailsStep] = useState<
-    "identity" | "services" | "links"
+    "identity" | "attributes" | "communication" | "links"
   >("identity");
   const [agentName, setAgentName] = useState("");
   const [agentPfp, setAgentPfp] = useState<File | null>(null);
@@ -124,6 +124,7 @@ const Page = () => {
   const [selectedCommunicationProtocol, setSelectedCommunicationProtocol] =
     useState<string>("xmtp");
   const [websocketUrl, setWebsocketUrl] = useState<string>("");
+  const [communicationParams, setCommunicationParams] = useState<string>("");
   const [loadingRegister, setLoadingRegister] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [registerFailure, setRegisterFailure] = useState(false);
@@ -256,6 +257,7 @@ const Page = () => {
         prompts: finalPrompts,
         attributes: allAttributes,
         agentCategory: selectedAgentService,
+        communicationParams: communicationParams,
         ...(selectedCommunicationProtocol === "websocket"
           ? { communicationURL: websocketUrl }
           : {}),
@@ -312,33 +314,40 @@ const Page = () => {
     address,
     websocketUrl,
     selectedCommunicationProtocol,
+    communicationParams,
   ]);
 
   const getProgressWidth = useCallback(() => {
     switch (detailsStep) {
       case "identity":
-        return "33%";
-      case "services":
-        return "67%";
+        return "25%";
+      case "attributes":
+        return "50%";
+      case "communication":
+        return "75%";
       case "links":
         return "100%";
       default:
-        return "33%";
+        return "25%";
     }
   }, [detailsStep]);
 
   const canProceedServicesStep =
-    selectedAgentSubServices.length + customCapabilities.length > 0 &&
-    selectedCommunicationProtocol &&
-    (selectedCommunicationProtocol !== "websocket" ||
-      websocketUrl.trim().length > 0);
+    selectedAgentSubServices.length + customCapabilities.length > 0;
 
   const canProceedToNextStep = useMemo(() => {
     if (detailsStep === "identity") {
       return agentName.trim() && agentDescription.trim() && agentAddress.trim();
     }
-    if (detailsStep === "services") {
+    if (detailsStep === "attributes") {
       return canProceedServicesStep;
+    }
+    if (detailsStep === "communication") {
+      return (
+        selectedCommunicationProtocol &&
+        (selectedCommunicationProtocol !== "websocket" ||
+          websocketUrl.trim().length > 0)
+      );
     }
     if (detailsStep === "links") {
       return (
@@ -360,6 +369,8 @@ const Page = () => {
     isValidWebsite,
     agentAddress,
     canProceedServicesStep,
+    selectedCommunicationProtocol,
+    websocketUrl,
     agentGitHub,
     isValidGitHub,
     agentTelegram,
@@ -438,16 +449,20 @@ const Page = () => {
           <div className="flex items-start gap-10 w-full bg-white py-6 px-4 rounded-[16px]">
             <div className="grow py-4 w-full">
               <div className="flex w-full justify-between items-center">
-                <p className="text-primary font-semibold text-[20px] leading-[auto]">
+                <p className="text-primary font-semibold text-[20px] leading-[auto] font-[Montserrat]">
                   REGISTER AGENT
                 </p>
                 <div className="flex items-center gap-4">
-                  {detailsStep === "services" || detailsStep === "links" ? (
+                  {detailsStep !== "identity" ? (
                     <button
                       className="rounded-[20000px] border border-primary w-[120px] py-1 flex items-center justify-center gap-2"
                       onClick={() =>
                         setDetailsStep(
-                          detailsStep === "links" ? "services" : "identity"
+                          detailsStep === "links"
+                            ? "communication"
+                            : detailsStep === "communication"
+                            ? "attributes"
+                            : "identity"
                         )
                       }
                     >
@@ -468,7 +483,11 @@ const Page = () => {
                       }`}
                       onClick={() =>
                         setDetailsStep(
-                          detailsStep === "identity" ? "services" : "links"
+                          detailsStep === "identity"
+                            ? "attributes"
+                            : detailsStep === "attributes"
+                            ? "communication"
+                            : "links"
                         )
                       }
                       disabled={!canProceedToNextStep}
@@ -492,7 +511,7 @@ const Page = () => {
                 }}
               />
               <div className="flex flex-col gap-2 w-full">
-                <div className="w-[90%] flex items-center justify-between">
+                <div className="w-[95%] flex items-center justify-between">
                   <img
                     src={
                       detailsStep === "identity"
@@ -504,11 +523,20 @@ const Page = () => {
                   />
                   <img
                     src={
-                      detailsStep === "services"
+                      detailsStep === "attributes"
                         ? "/assets/services-highlighted-icon.svg"
                         : "/assets/services-icon.svg"
                     }
-                    alt="services"
+                    alt="attributes"
+                    className="w-10 h-10"
+                  />
+                  <img
+                    src={
+                      detailsStep === "communication"
+                        ? "/assets/links-highlighted-icon.svg"
+                        : "/assets/links-icon.svg"
+                    }
+                    alt="communication"
                     className="w-10 h-10"
                   />
                   <img
@@ -527,9 +555,9 @@ const Page = () => {
                     style={{ width: getProgressWidth() }}
                   ></div>
                 </div>
-                <div className="w-[90%] flex items-center justify-between">
+                <div className="w-[95%] flex items-center justify-between">
                   <p
-                    className={`text-[14px] ${
+                    className={`text-[14px] font-[Montserrat] ${
                       detailsStep === "identity"
                         ? "font-semibold text-primary"
                         : "font-medium text-[#8F95B2]"
@@ -538,16 +566,25 @@ const Page = () => {
                     Identity
                   </p>
                   <p
-                    className={`text-[14px] ${
-                      detailsStep === "services"
+                    className={`text-[14px] font-[Montserrat] ${
+                      detailsStep === "attributes"
                         ? "font-semibold text-primary"
                         : "font-medium text-[#8F95B2]"
                     }`}
                   >
-                    Services
+                    Attributes
                   </p>
                   <p
-                    className={`text-[14px] ${
+                    className={`text-[14px] font-[Montserrat] ${
+                      detailsStep === "communication"
+                        ? "font-semibold text-primary"
+                        : "font-medium text-[#8F95B2]"
+                    }`}
+                  >
+                    Communication
+                  </p>
+                  <p
+                    className={`text-[14px] font-[Montserrat] ${
                       detailsStep === "links"
                         ? "font-semibold text-primary"
                         : "font-medium text-[#8F95B2]"
@@ -568,7 +605,7 @@ const Page = () => {
               {detailsStep === "identity" ? (
                 <div className="w-full">
                   <div className="space-y-2">
-                    <p className="font-medium leading-[20px] text-[#121212]">
+                    <p className="font-medium leading-[20px] text-[#121212] font-[Montserrat]">
                       Name*
                     </p>
                     <input
@@ -622,7 +659,7 @@ const Page = () => {
                       </label>
                     </div> */}
                   <div className="max-w-[616px] space-y-2">
-                    <p className="font-medium leading-[20px] text-[#121212]">
+                    <p className="font-medium leading-[20px] text-[#121212] font-[Montserrat]">
                       Description*
                     </p>
                     <textarea
@@ -644,7 +681,7 @@ const Page = () => {
                   <div className="flex items-center gap-4">
                     <div className="flex-1 w-[176px]">
                       <div className="space-y-2">
-                        <p className="font-medium leading-[20px] text-[#121212]">
+                        <p className="font-medium leading-[20px] text-[#121212 font-[Montserrat]">
                           Agent Address*
                         </p>
                         <input
@@ -667,7 +704,7 @@ const Page = () => {
                     </div>
                     <div className="flex-1 w-[176px]">
                       <div className="space-y-2">
-                        <p className="font-medium leading-[20px] text-[#121212]">
+                        <p className="font-medium leading-[20px] text-[#121212] font-[Montserrat]">
                           Your Address*
                         </p>
                         <input
@@ -688,7 +725,7 @@ const Page = () => {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <p className="font-medium leading-[20px] text-[#121212]">
+                    <p className="font-medium leading-[20px] text-[#121212] font-[Montserrat]">
                       Photo
                     </p>
                     <div className="flex items-start gap-4">
@@ -729,18 +766,18 @@ const Page = () => {
                             className="w-[56px] h-[56px]"
                           />
                         </div>
-                        <p className="text-[#8F95B2] text-[12px] font-medium text-center">
+                        <p className="text-[#8F95B2] text-[12px] font-medium text-center font-[Montserrat]">
                           Default
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-              ) : detailsStep === "services" ? (
+              ) : detailsStep === "attributes" ? (
                 <div className="w-full">
                   <div className="flex-1">
-                    <p className="font-medium leading-[21.6px] mb-2 text-[#121212]">
-                      Service type*
+                    <p className="font-medium leading-[21.6px] mb-2 text-[#121212] font-[Montserrat]">
+                      Agent type*
                     </p>
                     <div className="flex items-center gap-2">
                       {services.map((service) => (
@@ -796,7 +833,7 @@ const Page = () => {
                       }}
                     />
                     <div className="space-y-2">
-                      <p className="font-medium leading-[21.6px] mb-2 text-[#121212]">
+                      <p className="font-medium leading-[21.6px] mb-2 text-[#121212] font-[Montserrat]">
                         Attributes*
                       </p>
                       {selectedAgentService && (
@@ -868,16 +905,18 @@ const Page = () => {
                             </div>
                           ))}
                           {!showAddCapability && (
-                            <button
-                              type="button"
-                              className="flex items-center gap-1 text-[#f94d27] font-bold text-[12px]"
-                              onClick={() => setShowAddCapability(true)}
-                            >
-                              <span className="text-[18px] font-bold text-primary">
-                                +
-                              </span>
-                              Add capability
-                            </button>
+                            <div className="w-full">
+                              <button
+                                type="button"
+                                className="flex items-center gap-1 text-[#f94d27] font-bold text-[12px]"
+                                onClick={() => setShowAddCapability(true)}
+                              >
+                                <span className="text-[18px] font-bold text-primary">
+                                  +
+                                </span>
+                                Add capability
+                              </button>
+                            </div>
                           )}
                           {showAddCapability && (
                             <div className="flex items-center gap-2 mb-2">
@@ -945,64 +984,6 @@ const Page = () => {
                         borderImageSlice: "1",
                       }}
                     />
-                    <div>
-                      <p className="font-medium leading-[21.6px] text-[#121212] mb-2">
-                        Communication Protocol
-                      </p>
-                      <div className="flex items-center gap-10 mb-6">
-                        {["XMTP", "Websocket"].map((p) => (
-                          <div key={p} className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id={`checkbox-protocol-${p.toLowerCase()}`}
-                              checked={
-                                selectedCommunicationProtocol ===
-                                p.toLowerCase()
-                              }
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setSelectedCommunicationProtocol(
-                                    p.toLowerCase()
-                                  );
-                                } else if (
-                                  selectedCommunicationProtocol ===
-                                  p.toLowerCase()
-                                ) {
-                                  setSelectedCommunicationProtocol("");
-                                }
-                              }}
-                              className="w-4 h-4 text-primary bg-white rounded-[8px] outline-none border-none cursor-pointer"
-                              style={{
-                                accentColor: "#f94d27",
-                              }}
-                            />
-                            <label
-                              htmlFor={`checkbox-protocol-${p}`}
-                              className="font-bold text-text-color text-[14px] cursor-pointer"
-                            >
-                              {p}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                      {selectedCommunicationProtocol === "websocket" && (
-                        <input
-                          type="url"
-                          className="mb-2 w-full outline-none placeholder:text-primary/70 text-primary"
-                          placeholder="Enter Websocket Url"
-                          value={websocketUrl}
-                          onChange={(e) => setWebsocketUrl(e.target.value)}
-                        />
-                      )}
-                    </div>
-                    <hr
-                      className="mb-6 border-[0.5px] border-[#8F95B2] w-[70%]"
-                      style={{
-                        borderImageSource:
-                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
-                        borderImageSlice: "1",
-                      }}
-                    />
                     {/* <div className="space-y-2">
                       <p className="font-medium leading-[21.6px] text-[#121212]">
                         Opening greeting
@@ -1023,8 +1004,8 @@ const Page = () => {
                       }}
                     /> */}
                     <div className="space-y-2">
-                      <p className="font-medium leading-[21.6px] text-[#121212]">
-                        How to use agent
+                      <p className="font-medium leading-[21.6px] text-[#121212] font-[Montserrat]">
+                        Agent Use Case
                       </p>
                       <input
                         className="w-full border-none outline-none focus:outline-none placeholder:text-primary/70 text-primary"
@@ -1127,7 +1108,7 @@ const Page = () => {
                       }}
                     />
                     <div className="space-y-2">
-                      <p className="font-medium leading-[21.6px] text-[#121212]">
+                      <p className="font-medium leading-[21.6px] text-[#121212] font-[Montserrat]">
                         Starter prompts
                       </p>
                       <input
@@ -1239,10 +1220,106 @@ const Page = () => {
                     />
                   </div>
                 </div>
+              ) : detailsStep === "communication" ? (
+                <div className="w-full">
+                  <div className="flex-1">
+                    <p className="font-[Montserrat] text-[16px] font-medium leading-[20px]">
+                      Choose the communication system you prefer for your agent.
+                    </p>
+                    <p className="font-[Montserrat] text-[16px] font-medium leading-[20px]">
+                      Check out the{" "}
+                      <Link
+                        href={`https://docs.ensemble.codes/ensemble-stack/communication`}
+                        className="text-primary font-bold"
+                        target="_blank"
+                        rel="noreferrer noopener nofollower"
+                      >
+                        Docs
+                      </Link>{" "}
+                      here to know more.
+                    </p>
+                    <hr
+                      className="border-[0.5px] my-6 border-[#8F95B2] w-[50%]"
+                      style={{
+                        borderImageSource:
+                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                        borderImageSlice: "1",
+                      }}
+                    />
+                    <div>
+                      <p className="font-medium leading-[21.6px] text-[#121212] mb-2 font-[Montserrat]">
+                        Communication Protocol
+                      </p>
+                      <div className="flex items-center gap-10 mb-6">
+                        {["XMTP", "Websocket"].map((p) => (
+                          <div key={p} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              id={`checkbox-protocol-${p.toLowerCase()}`}
+                              checked={
+                                selectedCommunicationProtocol ===
+                                p.toLowerCase()
+                              }
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedCommunicationProtocol(
+                                    p.toLowerCase()
+                                  );
+                                } else if (
+                                  selectedCommunicationProtocol ===
+                                  p.toLowerCase()
+                                ) {
+                                  setSelectedCommunicationProtocol("");
+                                }
+                              }}
+                              className="w-4 h-4 text-primary bg-white rounded-[8px] outline-none border-none cursor-pointer"
+                              style={{
+                                accentColor: "#f94d27",
+                              }}
+                            />
+                            <label
+                              htmlFor={`checkbox-protocol-${p}`}
+                              className="font-bold text-text-color text-[14px] cursor-pointer"
+                            >
+                              {p}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      {selectedCommunicationProtocol === "websocket" && (
+                        <input
+                          type="url"
+                          className="mb-2 w-full outline-none placeholder:text-primary/70 text-primary"
+                          placeholder="Enter Websocket Url"
+                          value={websocketUrl}
+                          onChange={(e) => setWebsocketUrl(e.target.value)}
+                        />
+                      )}
+                    </div>
+                    <hr
+                      className="mb-6 border-[0.5px] border-[#8F95B2] w-[70%]"
+                      style={{
+                        borderImageSource:
+                          "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+                        borderImageSlice: "1",
+                      }}
+                    />
+                    <p className="font-medium leading-[21.6px] text-[#121212] mb-2 font-[Montserrat]">
+                      Communication params (optional)
+                    </p>
+                    <input
+                      type="url"
+                      className="mb-2 w-full outline-none placeholder:text-primary/70 text-primary"
+                      placeholder={'Example: {"agentId": "xyz"}'}
+                      value={communicationParams}
+                      onChange={(e) => setCommunicationParams(e.target.value)}
+                    />
+                  </div>
+                </div>
               ) : (
                 <div className="w-full">
                   <div className="space-y-4">
-                    <p className="font-medium leading-[21.6px] text-[#121212]">
+                    <p className="font-medium leading-[21.6px] text-[#121212] font-[Montserrat]">
                       Links
                     </p>
                     <div className="flex items-center gap-2">
@@ -1403,7 +1480,7 @@ const Page = () => {
 
                     {registerSuccess ? (
                       <Link
-                        href={`/agents/${agentAddress}`}
+                        href={`/agents/${getAddress(agentAddress)}`}
                         className="w-fit space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD] cursor-pointer"
                       >
                         <span className="text-white text-[16px] font-[700] leading-[24px]">

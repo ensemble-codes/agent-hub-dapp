@@ -68,7 +68,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   `;
 
   const { data: agent, loading } = useQuery(GET_AGENT);
-  
+
   return (
     <div>
       <div className="flex items-start gap-4">
@@ -383,7 +383,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                   </div>
                 </div>
                 <div className="flex-shrink-0 flex flex-col lg:gap-12 gap-4 lg:w-[368px]">
-                {agent?.agent?.metadata?.instructions?.length ? (
+                  {agent?.agent?.metadata?.instructions?.length ? (
                     <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
                       <p className="p-4 text-primary text-[16px] font-medium">
                         How agent works
@@ -617,7 +617,32 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                 </div>
               </>
             </>
-          ) : null}
+          ) : (
+            <>
+              <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
+                <div className="w-full h-full flex flex-col items-center justify-center gap-8">
+                  <img
+                    src={"/assets/agent-indexing-icon.svg"}
+                    alt="indexing"
+                    className="w-[140px] h-[140px] z-[1]"
+                  />
+                  <div className="text-center z-[1]">
+                    <p className="text-primary font-medium text-[24px]">
+                      Could not find Agent Record
+                    </p>
+                    <p className="text-primary font-normal text-[16px]">
+                      Need a few mins to index
+                    </p>
+                  </div>
+                </div>
+                <img
+                  src={"/assets/orchestrator-pattern-bg.svg"}
+                  alt="pattern"
+                  className="absolute bottom-0 left-0 w-full opacity-60 lg:block hidden"
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

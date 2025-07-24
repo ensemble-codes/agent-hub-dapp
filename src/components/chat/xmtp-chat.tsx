@@ -30,18 +30,22 @@ import { useContext } from "react";
 import { AppContext } from "@/context/app";
 import { getAddress } from "ethers";
 
-export const XmtpChat: FC<{ agent: {
-  id: string
-  metadata: {
-    imageUri: string
-    prompts: string[]
-    name: string
-  }
-}}> = ({ agent }) => {
-  
+export const XmtpChat: FC<{
+  agent: {
+    id: string;
+    metadata: {
+      imageUri: string;
+      prompts: string[];
+      name: string;
+    };
+  };
+}> = ({ agent }) => {
   const { user, authenticated } = usePrivy();
   const [state] = useContext(AppContext);
-  const account = { isConnected: authenticated, address: state.embeddedWallet?.address };
+  const account = {
+    isConnected: authenticated,
+    address: state.embeddedWallet?.address,
+  };
   const signMessageAsync = async ({ message }: { message: string }) => {
     if (!state.embeddedWallet) {
       throw new Error("No embedded wallet available");
@@ -78,8 +82,9 @@ export const XmtpChat: FC<{ agent: {
         setIsInitializing(true);
         try {
           await initialize({
-            signer: createEOASigner(state.embeddedWallet?.address as `0x${string}`, (message: string) =>
-              signMessageAsync({ message })
+            signer: createEOASigner(
+              state.embeddedWallet?.address as `0x${string}`,
+              (message: string) => signMessageAsync({ message })
             ),
             env: "production",
             loggingLevel: "off",
@@ -335,8 +340,7 @@ export const XmtpChat: FC<{ agent: {
                       <>
                         <Link
                           href={`/agents/${
-                            (getAddress(agent &&
-                              agent.id)) ||
+                            getAddress(agent && agent.id) ||
                             "0x5C02b4685492D36a40107B6eC48A91ab3f8875cb"
                           }`}
                         >
@@ -363,9 +367,7 @@ export const XmtpChat: FC<{ agent: {
                         </Link>
                         <div>
                           <p className="text-primary text-[16px] font-medium">
-                            {agent
-                              ? agent?.metadata?.name
-                              : "Orchestrator"}
+                            {agent ? agent?.metadata?.name : "Orchestrator"}
                           </p>
                           <p className="text-[#8F95B2] text-[14px] font-normal">
                             always online
@@ -528,7 +530,11 @@ export const XmtpChat: FC<{ agent: {
                                     }
                                   />
                                 ) : (
-                                  <Loader />
+                                  <img
+                                    src="/assets/ensemble-highlighted-icon.svg"
+                                    alt="loading"
+                                    className="w-5 h-5 animate-spin-slow ease-in-out"
+                                  />
                                 )}
                               </div>
                             </TooltipTrigger>
@@ -546,9 +552,7 @@ export const XmtpChat: FC<{ agent: {
                       <img
                         src={
                           agent
-                            ? agent?.metadata?.imageUri?.startsWith(
-                                "https://"
-                              )
+                            ? agent?.metadata?.imageUri?.startsWith("https://")
                               ? agent?.metadata?.imageUri
                               : `https://${agent?.metadata?.imageUri}`
                             : "/assets/orchestrator-mascot-icon.svg"
@@ -746,5 +750,3 @@ export const XmtpChat: FC<{ agent: {
     </>
   );
 };
-
-
