@@ -1,3 +1,4 @@
 export const SET_TASK_PROMPT = 'SET_TASK_PROMPT';
 export const SET_IS_WHITELISTED = 'SET_IS_WHITELISTED';
 export const SET_EMBEDDED_WALLET = 'SET_EMBEDDED_WALLET';
+export const SET_USER = 'SET_USER';

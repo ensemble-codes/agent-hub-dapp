@@ -7,12 +7,14 @@ import Modal from "../modal";
 import { baseSepolia } from "viem/chains";
 import { createWalletClient, custom, parseEther } from "viem";
 import { AppContext } from "@/context/app";
+import { useAuth } from "@/hooks/useAuth";
 
 const MobileHeader = () => {
   const [state] = useContext(AppContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { login, authenticated, user, logout, ready } = usePrivy();
+  const { login, authenticated, user: privyUser, logout, ready } = usePrivy();
   const { wallets } = useWallets();
+  const { signOut } = useAuth();
   const { fundWallet } = useFundWallet();
 
   // Wallet modal states
@@ -57,10 +59,20 @@ const MobileHeader = () => {
     setWithdrawSuccess("");
   };
 
-  const handleDisconnect = () => {
-    logout();
-    setShowWalletModal(false);
-    resetWithdrawStates();
+  const handleDisconnect = async () => {
+    try {
+      // Sign out from both Privy and Supabase
+      await signOut();
+      logout();
+      setShowWalletModal(false);
+      resetWithdrawStates();
+    } catch (error) {
+      console.error("Error during disconnect:", error);
+      // Still logout from Privy even if Supabase logout fails
+      logout();
+      setShowWalletModal(false);
+      resetWithdrawStates();
+    }
   };
 
   const fund = useCallback(async () => {

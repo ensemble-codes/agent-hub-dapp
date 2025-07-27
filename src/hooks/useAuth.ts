@@ -1,0 +1,234 @@
+import { useState, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
+import { User } from '@/interface/user'
+
+interface AuthState {
+  user: User | null
+  loading: boolean
+  error: string | null
+}
+
+export const useAuth = () => {
+  const [authState, setAuthState] = useState<AuthState>({
+    user: null,
+    loading: false,
+    error: null
+  })
+
+  const sendOTP = useCallback(async (email: string) => {
+    setAuthState(prev => ({ ...prev, loading: true, error: null }))
+    
+    try {
+      // First register the user via API (bypasses RLS)
+      const registerResponse = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+      })
+
+      const registerData = await registerResponse.json()
+      
+      if (!registerResponse.ok) {
+        throw new Error(registerData.error || 'Failed to register user')
+      }
+
+      // Send OTP via Supabase
+      const { data, error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/register-user`
+        }
+      })
+
+      if (error) {
+        throw error
+      }
+
+      return { success: true, data }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send OTP'
+      setAuthState(prev => ({ ...prev, error: errorMessage }))
+      return { success: false, error: errorMessage }
+    } finally {
+      setAuthState(prev => ({ ...prev, loading: false }))
+    }
+  }, [])
+
+  const verifyOTP = useCallback(async (email: string, token: string) => {
+    setAuthState(prev => ({ ...prev, loading: true, error: null }))
+    
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'email'
+      })
+
+      if (error) {
+        throw error
+      }
+
+      // If verification successful, update user verification status via API
+      if (data.user) {
+        const updateResponse = await fetch('/api/auth/verify-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            email: data.user.email,
+            otp_verified_at: new Date().toISOString()
+          })
+        })
+
+        if (!updateResponse.ok) {
+          const updateData = await updateResponse.json()
+          throw new Error(updateData.error || 'Failed to update user verification')
+        }
+
+        const userData = await updateResponse.json()
+        setAuthState(prev => ({ ...prev, user: userData.user }))
+      }
+
+      // Check if session was set
+      const { data: { session } } = await supabase.auth.getSession()
+
+      return { success: true, data }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to verify OTP'
+      setAuthState(prev => ({ ...prev, error: errorMessage }))
+      return { success: false, error: errorMessage }
+    } finally {
+      setAuthState(prev => ({ ...prev, loading: false }))
+    }
+  }, [])
+
+  const updateWalletAddress = useCallback(async (walletAddress: string) => {
+    console.log({walletAddress});
+    if (!authState.user) {
+      return { success: false, error: 'No authenticated user' }
+    }
+
+    setAuthState(prev => ({ ...prev, loading: true, error: null }))
+    
+    try {
+      const response = await fetch('/api/auth/update-wallet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          email: authState.user.email,
+          walletAddress 
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update wallet address')
+      }
+
+      // Update local state
+      setAuthState(prev => ({
+        ...prev,
+        user: data.user
+      }))
+
+      return { success: true }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update wallet address'
+      setAuthState(prev => ({ ...prev, error: errorMessage }))
+      return { success: false, error: errorMessage }
+    } finally {
+      setAuthState(prev => ({ ...prev, loading: false }))
+    }
+  }, [authState.user])
+
+  const signOut = useCallback(async () => {
+    setAuthState(prev => ({ ...prev, loading: true, error: null }))
+    
+    try {
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        throw error
+      }
+
+      setAuthState({ user: null, loading: false, error: null })
+      return { success: true }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign out'
+      setAuthState(prev => ({ ...prev, error: errorMessage }))
+      return { success: false, error: errorMessage }
+    } finally {
+      setAuthState(prev => ({ ...prev, loading: false }))
+    }
+  }, [])
+
+    const checkUser = useCallback(async () => {
+    setAuthState(prev => ({ ...prev, loading: true, error: null }))
+    
+    try {
+      // First check if there's an active session
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session?.user?.email) {
+        setAuthState(prev => ({ ...prev, user: null }))
+        return
+      }
+
+      // Use API route to check user (bypasses RLS)
+      const response = await fetch('/api/auth/check-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: session.user.email })
+      })
+      
+      const data = await response.json()
+      setAuthState(prev => ({ ...prev, user: data.user }))
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to check user'
+      setAuthState(prev => ({ ...prev, error: errorMessage }))
+    } finally {
+      setAuthState(prev => ({ ...prev, loading: false }))
+    }
+  }, [])
+
+  const checkWalletExists = useCallback(async (walletAddress: string) => {
+    try {
+      const response = await fetch('/api/auth/check-wallet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ walletAddress })
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to check wallet')
+      }
+
+      return { success: true, user: data.user }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to check wallet'
+      return { success: false, error: errorMessage }
+    }
+  }, [])
+
+  return {
+    ...authState,
+    sendOTP,
+    verifyOTP,
+    updateWalletAddress,
+    signOut,
+    checkUser,
+    checkWalletExists
+  }
+} 
