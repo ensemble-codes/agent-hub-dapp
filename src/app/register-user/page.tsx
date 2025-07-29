@@ -26,6 +26,7 @@ const Register = () => {
 
     const result = await verifyOTP(email, otp);
     if (result.success) {
+      // Redirect to main page after successful authentication
       const timeout = setTimeout(() => {
         push("/");
       }, 1500);

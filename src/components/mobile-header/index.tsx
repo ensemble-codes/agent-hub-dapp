@@ -61,8 +61,6 @@ const MobileHeader = () => {
 
   const handleDisconnect = async () => {
     try {
-      // Sign out from both Privy and Supabase
-      await signOut();
       logout();
       setShowWalletModal(false);
       resetWithdrawStates();

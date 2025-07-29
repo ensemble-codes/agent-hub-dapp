@@ -105,48 +105,6 @@ export const useAuth = () => {
     }
   }, [])
 
-  const updateWalletAddress = useCallback(async (walletAddress: string) => {
-    console.log({walletAddress});
-    if (!authState.user) {
-      return { success: false, error: 'No authenticated user' }
-    }
-
-    setAuthState(prev => ({ ...prev, loading: true, error: null }))
-    
-    try {
-      const response = await fetch('/api/auth/update-wallet', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          email: authState.user.email,
-          walletAddress 
-        })
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to update wallet address')
-      }
-
-      // Update local state
-      setAuthState(prev => ({
-        ...prev,
-        user: data.user
-      }))
-
-      return { success: true }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update wallet address'
-      setAuthState(prev => ({ ...prev, error: errorMessage }))
-      return { success: false, error: errorMessage }
-    } finally {
-      setAuthState(prev => ({ ...prev, loading: false }))
-    }
-  }, [authState.user])
-
   const signOut = useCallback(async () => {
     setAuthState(prev => ({ ...prev, loading: true, error: null }))
     
@@ -226,7 +184,6 @@ export const useAuth = () => {
     ...authState,
     sendOTP,
     verifyOTP,
-    updateWalletAddress,
     signOut,
     checkUser,
     checkWalletExists

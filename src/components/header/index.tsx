@@ -56,8 +56,6 @@ const AppHeader = () => {
 
   const handleDisconnect = async () => {
     try {
-      // Sign out from both Privy and Supabase
-      await signOut();
       logout();
       setShowWalletModal(false);
       resetWithdrawStates();
@@ -272,7 +270,7 @@ const AppHeader = () => {
                   />
                 </Link>
               </>
-            ) : ready && authenticated && state.embeddedWallet ? (
+            ) : ready && state.user && state.embeddedWallet ? (
               <button
                 className="py-1 px-4 text-[16px] text-[#000] border border-[#000] rounded-[20000px] font-normal flex items-center gap-2"
                 style={{
@@ -283,7 +281,7 @@ const AppHeader = () => {
                 {state.embeddedWallet.address.slice(0, 4)}...
                 {state.embeddedWallet.address.slice(-4)}
               </button>
-            ) : (
+            ) : ready && state.user ? (
               <button
                 className="w-auto space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                 onClick={login}
@@ -296,7 +294,7 @@ const AppHeader = () => {
                   Connect Wallet
                 </span>
               </button>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

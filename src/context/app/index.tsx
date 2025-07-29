@@ -21,7 +21,27 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { authenticated } = usePrivy();
   const { wallets } = useWallets();
-  const { user, updateWalletAddress, checkUser } = useAuth();
+  const { user, checkUser } = useAuth();
+
+  // Function to silently track wallet connection
+  const trackWalletConnection = async (walletAddress: string) => {
+    if (!user?.email) return;
+
+    try {
+      await fetch('/api/auth/update-wallet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          email: user.email,
+          walletAddress 
+        })
+      });
+    } catch (error) {
+      console.error('Failed to track wallet connection:', error);
+    }
+  };
 
   // Listen to auth state changes
   useEffect(() => {
@@ -61,7 +81,7 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
     });
   }, [user]);
 
-  // Handle wallet connection and updates
+  // Handle wallet connection (separate from Supabase auth)
   useEffect(() => {
     if (authenticated && wallets && wallets.length) {
       // Use the first available wallet (could be embedded or connected)
@@ -72,16 +92,18 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
         payload: connectedWallet,
       });
 
-      // Update wallet address if user exists and wallet is different
-      if (
-        user &&
-        connectedWallet &&
-        connectedWallet.address !== user.wallet_address
-      ) {
-        updateWalletAddress(connectedWallet.address);
+      // Silently track wallet connection if user is authenticated
+      if (user?.email && connectedWallet?.address) {
+        trackWalletConnection(connectedWallet.address);
       }
+    } else {
+      // Clear wallet when disconnected
+      dispatch({
+        type: SET_EMBEDDED_WALLET,
+        payload: undefined,
+      });
     }
-  }, [authenticated, wallets, user, updateWalletAddress]);
+  }, [authenticated, wallets, user]);
 
   return (
     <AppContext.Provider value={[state, dispatch]}>
