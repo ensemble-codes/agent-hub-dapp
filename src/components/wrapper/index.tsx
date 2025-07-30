@@ -17,7 +17,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [state] = useContext(AppContext);
-  const { loading: authLoading } = useAuth();
+  const { loading: authLoading, user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
 
   // Auto-switch to Base Sepolia when embedded wallet is available
@@ -34,8 +34,8 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
     if (!authLoading) {
       setIsLoading(false);
       
-      // Redirect to register-user page if not authenticated and not already there
-      if (state.user === null && pathname !== '/register-user') {
+      // Only redirect if we're not already on register-user page and user is not authenticated
+      if (user === null && !pathname.includes('/register-user')) {
         router.push('/register-user');
       }
     }
@@ -45,7 +45,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
   const shouldShowLoadingModal = isLoading && pathname !== '/register-user';
 
   // Show wallet connection modal if user is authenticated but no wallet is connected
-  const shouldShowWalletModal = !isLoading && ready && state.user !== null && state.embeddedWallet === undefined && pathname !== '/register-user';
+  const shouldShowWalletModal = !isLoading && ready && user !== null && state.embeddedWallet === undefined && pathname !== '/register-user';
 
   return (
     <>

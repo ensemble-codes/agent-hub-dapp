@@ -58,7 +58,7 @@ const ChatLayoutContent: FC<{
                 agent?.id === ORCHESTRATOR_AGENT_ADDRESS ? null : (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Link href="/agents/0x5C02b4685492D36a40107B6eC48A91ab3f8875cb">
+                      <Link href={`/agents/${agent?.id}`}>
                         <div className="relative">
                           <img
                             src={
