@@ -21,7 +21,7 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { authenticated } = usePrivy();
   const { wallets } = useWallets();
-  const { user, checkUser } = useAuth();
+  const { user } = useAuth();
 
   // Function to silently track wallet connection
   const trackWalletConnection = async (walletAddress: string) => {
@@ -42,36 +42,6 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
       console.error('Failed to track wallet connection:', error);
     }
   };
-
-  // Listen to auth state changes
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user?.email) {
-          // User signed in, check user data
-          await checkUser();
-        } else if (event === 'SIGNED_OUT') {
-          // User signed out, clear user state
-          dispatch({
-            type: SET_USER,
-            payload: null
-          });
-        }
-      }
-    );
-
-    // Initial check for existing session
-    const checkInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.email) {
-        await checkUser();
-      }
-    };
-    
-    checkInitialSession();
-
-    return () => subscription.unsubscribe();
-  }, [checkUser]);
 
   // Sync user state to context
   useEffect(() => {

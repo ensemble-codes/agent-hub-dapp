@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { User } from '@/interface/user'
 
 interface AuthState {
   user: User | null
   loading: boolean
+  authLoading: boolean
   error: string | null
 }
 
@@ -12,6 +13,7 @@ export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     loading: false,
+    authLoading: true,
     error: null
   })
 
@@ -60,18 +62,21 @@ export const useAuth = () => {
     setAuthState(prev => ({ ...prev, loading: true, error: null }))
     
     try {
+      
       const { data, error } = await supabase.auth.verifyOtp({
         email,
         token,
         type: 'email'
-      })
+      });
 
       if (error) {
+        console.log('Supabase error:', error);
         throw error
       }
 
       // If verification successful, update user verification status via API
       if (data.user) {
+        
         const updateResponse = await fetch('/api/auth/verify-user', {
           method: 'POST',
           headers: {
@@ -85,19 +90,22 @@ export const useAuth = () => {
 
         if (!updateResponse.ok) {
           const updateData = await updateResponse.json()
+          console.log('verify-user API error:', updateData);
           throw new Error(updateData.error || 'Failed to update user verification')
         }
 
         const userData = await updateResponse.json()
         setAuthState(prev => ({ ...prev, user: userData.user }))
+      } else {
+        console.log('No user data in Supabase response');
       }
 
       // Check if session was set
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session } } = await supabase.auth.getSession();
 
       return { success: true, data }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to verify OTP'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to verify OTP';
       setAuthState(prev => ({ ...prev, error: errorMessage }))
       return { success: false, error: errorMessage }
     } finally {
@@ -115,19 +123,19 @@ export const useAuth = () => {
         throw error
       }
 
-      setAuthState({ user: null, loading: false, error: null })
+      setAuthState({ user: null, loading: false, authLoading: false, error: null })
       return { success: true }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to sign out'
       setAuthState(prev => ({ ...prev, error: errorMessage }))
       return { success: false, error: errorMessage }
     } finally {
-      setAuthState(prev => ({ ...prev, loading: false }))
+      setAuthState(prev => ({ ...prev, authLoading: false, loading: false }))
     }
   }, [])
 
     const checkUser = useCallback(async () => {
-    setAuthState(prev => ({ ...prev, loading: true, error: null }))
+    setAuthState(prev => ({ ...prev, authLoading: true, error: null }))
     
     try {
       // First check if there's an active session
@@ -153,7 +161,7 @@ export const useAuth = () => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to check user'
       setAuthState(prev => ({ ...prev, error: errorMessage }))
     } finally {
-      setAuthState(prev => ({ ...prev, loading: false }))
+      setAuthState(prev => ({ ...prev, authLoading: false }))
     }
   }, [])
 
@@ -179,6 +187,11 @@ export const useAuth = () => {
       return { success: false, error: errorMessage }
     }
   }, [])
+
+  // Check for existing session on mount
+  useEffect(() => {
+    checkUser()
+  }, []);
 
   return {
     ...authState,
