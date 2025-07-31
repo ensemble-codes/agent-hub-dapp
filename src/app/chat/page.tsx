@@ -39,6 +39,7 @@ const PageContent: FC = () => {
       telegram
       twitter
       website
+      communicationParams
     }
     proposals {
       id
@@ -87,7 +88,7 @@ const PageContent: FC = () => {
     return (
       <WebsocketChat
         agent={{
-          id: ORCHESTRATOR_AGENT_ADDRESS,
+          id: CHAT_DATA[ORCHESTRATOR_AGENT_ADDRESS].agentId,
           metadata: { communicationURL: agent?.metadata?.communicationURL ?? "" },
         }}
       />
@@ -98,7 +99,7 @@ const PageContent: FC = () => {
     return (
       <WebsocketChat
         agent={{
-          id: agentAddress,
+          id: CHAT_DATA[agentAddress].agentId,
           metadata: { communicationURL: chatData.communicationURL },
         }}
       />
@@ -109,7 +110,7 @@ const PageContent: FC = () => {
         return (
           <WebsocketChat
             agent={{
-              id: agent?.id ?? "",
+              id: JSON.parse(agent?.metadata?.communicationParams)?.agentId,
               metadata: {
                 communicationURL: agent?.metadata?.communicationURL ?? "",
               },

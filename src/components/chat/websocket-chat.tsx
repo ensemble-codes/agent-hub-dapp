@@ -9,14 +9,14 @@ import { Content } from "@elizaos/core";
 import { CHAT_DATA, CHAT_SOURCE } from "@/constants";
 
 export const WebsocketChat: FC<{
-  agent: { id: string; metadata: { communicationURL: string } };
+  agent: { id: `${string}-${string}-${string}-${string}-${string}`; metadata: { communicationURL: string } };
 }> = ({ agent }) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
 
   const entityId = getEntityId();
-  const agentId = CHAT_DATA[agent.id]?.agentId;
+  const agentId = agent.id;
   const roomId = WorldManager.generateRoomId(agentId);
 
   const formatMessage = useCallback(
