@@ -8,17 +8,60 @@ import { useSearchParams } from "next/navigation";
 import { ensembleClient } from "@/graphql/clients";
 import { Loader } from "@/components";
 import { CHAT_DATA, ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
+import { gql, useQuery } from "@apollo/client";
 
 const PageContent: FC = () => {
   const searchParams = useSearchParams();
   const agentAddress = searchParams.get("agent");
 
-  const { data, loading, error } = useAgentQuery({
-    variables: {
-      id: agentAddress || ORCHESTRATOR_AGENT_ADDRESS,
-    },
-    client: ensembleClient,
-  });
+  const GET_AGENT = gql`
+    query MyQuery {
+  agent(id: "${agentAddress || ORCHESTRATOR_AGENT_ADDRESS}") {
+    agentUri
+    id
+    name
+    owner
+    reputation
+    metadata {
+      agentCategory
+      attributes
+      communicationType
+      communicationURL
+      description
+      dexscreener
+      github
+      id
+      imageUri
+      instructions
+      name
+      openingGreeting
+      prompts
+      telegram
+      twitter
+      website
+    }
+    proposals {
+      id
+      isRemoved
+      price
+      service
+      tokenAddress
+    }
+    tasks {
+      id
+      prompt
+      issuer
+      proposalId
+      rating
+      result
+      status
+      taskId
+    }
+  }
+}
+  `;
+
+  const { data, loading } = useQuery(GET_AGENT);
 
   const agent = useMemo(() => {
     if (data?.agent) {
