@@ -11,7 +11,7 @@ import { AppContext } from "@/context/app";
 const MobileHeader = () => {
   const [state] = useContext(AppContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { login, authenticated, user, logout, ready } = usePrivy();
+  const { login, authenticated, user: privyUser, logout, ready } = usePrivy();
   const { wallets } = useWallets();
   const { fundWallet } = useFundWallet();
 
@@ -57,10 +57,18 @@ const MobileHeader = () => {
     setWithdrawSuccess("");
   };
 
-  const handleDisconnect = () => {
-    logout();
-    setShowWalletModal(false);
-    resetWithdrawStates();
+  const handleDisconnect = async () => {
+    try {
+      logout();
+      setShowWalletModal(false);
+      resetWithdrawStates();
+    } catch (error) {
+      console.error("Error during disconnect:", error);
+      // Still logout from Privy even if Supabase logout fails
+      logout();
+      setShowWalletModal(false);
+      resetWithdrawStates();
+    }
   };
 
   const fund = useCallback(async () => {

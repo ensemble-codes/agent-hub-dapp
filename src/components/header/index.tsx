@@ -1,16 +1,26 @@
 "use client";
 import { useFundWallet, usePrivy, useWallets } from "@privy-io/react-auth";
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef, useMemo, useContext } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  useContext,
+} from "react";
 import Modal from "../modal";
 import { ethers } from "ethers";
 import { baseSepolia } from "viem/chains";
 import { createWalletClient, custom, parseEther } from "viem";
 import { AppContext } from "@/context/app";
+import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const AppHeader = () => {
   const [state] = useContext(AppContext);
-  const { login, authenticated, user, logout, ready } = usePrivy();
+  const pathname = usePathname();
+  const { login, logout, ready } = usePrivy();
   const { wallets } = useWallets();
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
@@ -42,10 +52,18 @@ const AppHeader = () => {
     setWithdrawSuccess("");
   };
 
-  const handleDisconnect = () => {
-    logout();
-    setShowWalletModal(false);
-    resetWithdrawStates();
+  const handleDisconnect = async () => {
+    try {
+      logout();
+      setShowWalletModal(false);
+      resetWithdrawStates();
+    } catch (error) {
+      console.error("Error during disconnect:", error);
+      // Still logout from Privy even if Supabase logout fails
+      logout();
+      setShowWalletModal(false);
+      resetWithdrawStates();
+    }
   };
 
   const fund = useCallback(async () => {
@@ -93,37 +111,39 @@ const AppHeader = () => {
     setWithdrawLoading(true);
     try {
       // Get the Privy wallet
-      const wallet = wallets.find(w => w.walletClientType === 'privy');
+      const wallet = wallets.find((w) => w.walletClientType === "privy");
       if (!wallet) {
-        throw new Error('Privy wallet not found');
+        throw new Error("Privy wallet not found");
       }
-      
+
       // Switch to Base Sepolia chain first
       await wallet.switchChain(baseSepolia.id);
-      
+
       // Get the Ethereum provider from the wallet
       const ethereumProvider = await wallet.getEthereumProvider();
-      
+
       // Create Viem wallet client
       const walletClient = createWalletClient({
         account: wallet.address as `0x${string}`,
         chain: baseSepolia,
         transport: custom(ethereumProvider),
       });
-      
+
       // Convert to Viem transaction format
       const transactionRequest = {
         to: withdrawAddress as `0x${string}`,
         value: parseEther(withdrawAmount),
       };
-      
+
       // Send transaction using Viem
       const hash = await walletClient.sendTransaction(transactionRequest);
-      
+
       // Wait for transaction to be mined
-      const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL!);
+      const provider = new ethers.JsonRpcProvider(
+        process.env.NEXT_PUBLIC_RPC_URL!
+      );
       await provider.waitForTransaction(hash);
-      
+
       setWithdrawSuccess("Transaction sent!");
       setWithdrawAddress("");
       setWithdrawAmount("");
@@ -145,7 +165,9 @@ const AppHeader = () => {
       const provider = new ethers.JsonRpcProvider(
         process.env.NEXT_PUBLIC_RPC_URL!
       );
-      const balanceWei = await provider.getBalance(state.embeddedWallet.address);
+      const balanceWei = await provider.getBalance(
+        state.embeddedWallet.address
+      );
       const balanceEth = ethers.formatEther(balanceWei);
       setBalance(balanceEth);
     } catch (error) {
@@ -181,49 +203,97 @@ const AppHeader = () => {
   return (
     <>
       <div className="hidden w-full lg:flex items-center justify-end py-2 px-4 bg-white rounded-[16px] lg:mb-8">
-        <div className="flex items-center justify-end gap-6">
-          <Link
-            href={"/register-agent"}
-            rel="noreferrer noopener"
-            className="text-[14px] font-normal leading-[100%] text-[#121212]"
-          >
-            REGISTER AGENT
-          </Link>
-          <Link
-            href={"https://ensemble.codes"}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="text-[14px] font-normal leading-[100%] text-[#121212]"
-          >
-            ENSEMBLE
-          </Link>
-          <Link
-            href={"https://docs.ensemble.codes/"}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="text-[14px] font-normal leading-[100%] text-[#121212]"
-          >
-            DOCS
-          </Link>
-          {ready && authenticated && state.embeddedWallet ? (
-            <button
-              className="py-1 px-4 text-[16px] text-[#000] border border-[#000] rounded-[20000px] font-normal flex items-center gap-2"
-              style={{ boxShadow: "0px 4px 12px 0px rgba(249, 77, 39, 0.24)" }}
-              onClick={() => setShowWalletModal(true)}
-            >
-              {state.embeddedWallet.address.slice(0, 4)}...{state.embeddedWallet.address.slice(-4)}
-            </button>
+        <div className="flex items-center justify-between w-full">
+          {pathname === "/register-user" ? (
+            <Link href={"/"}>
+              <Image
+                src={"/assets/logo-icon.svg"}
+                alt="logo"
+                width={68}
+                height={88}
+                className="lg:block hidden"
+              />
+            </Link>
           ) : (
-            <button
-              className="w-auto space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
-              onClick={login}
-            >
-              <img src="/assets/connect-wallet-icon.svg" alt="connect-wallet" />
-              <span className="text-white text-[16px] font-[700] leading-[24px]">
-                Connect Wallet
-              </span>
-            </button>
+            <div />
           )}
+          <div className="flex items-center justify-end gap-6">
+            <Link
+              href={"/register-agent"}
+              rel="noreferrer noopener"
+              className="text-[14px] font-normal leading-[100%] text-[#121212]"
+            >
+              REGISTER AGENT
+            </Link>
+            <Link
+              href={"https://ensemble.codes"}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="text-[14px] font-normal leading-[100%] text-[#121212]"
+            >
+              ENSEMBLE
+            </Link>
+            <Link
+              href={"https://docs.ensemble.codes/"}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="text-[14px] font-normal leading-[100%] text-[#121212]"
+            >
+              DOCS
+            </Link>
+            {pathname === "/register-user" ? (
+              <>
+                <Link
+                  href={`https://t.me/+V2yQK15ZYLw3YWU0`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="w-7 h-7 flex items-center justify-center rounded-full border border-black"
+                >
+                  <img
+                    src={"/assets/telegram-footer-icon.svg"}
+                    alt="telegram"
+                    className="w-5 h-5"
+                  />
+                </Link>
+                <Link
+                  href={`https://x.com/EnsembleCodes`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="w-7 h-7 flex items-center justify-center rounded-full border border-black"
+                >
+                  <img
+                    src={"/assets/x-footer-icon.svg"}
+                    alt="x"
+                    className="w-5 h-5"
+                  />
+                </Link>
+              </>
+            ) : ready && state.user && state.embeddedWallet ? (
+              <button
+                className="py-1 px-4 text-[16px] text-[#000] border border-[#000] rounded-[20000px] font-normal flex items-center gap-2"
+                style={{
+                  boxShadow: "0px 4px 12px 0px rgba(249, 77, 39, 0.24)",
+                }}
+                onClick={() => setShowWalletModal(true)}
+              >
+                {state.embeddedWallet.address.slice(0, 4)}...
+                {state.embeddedWallet.address.slice(-4)}
+              </button>
+            ) : ready && state.user ? (
+              <button
+                className="w-auto space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                onClick={login}
+              >
+                <img
+                  src="/assets/connect-wallet-icon.svg"
+                  alt="connect-wallet"
+                />
+                <span className="text-white text-[16px] font-[700] leading-[24px]">
+                  Connect Wallet
+                </span>
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
 

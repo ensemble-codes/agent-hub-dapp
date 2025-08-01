@@ -4,6 +4,7 @@ import Modal from "../modal";
 import { usePrivy } from "@privy-io/react-auth";
 import { baseSepolia } from "viem/chains";
 import { AppContext } from "@/context/app";
+import { usePathname } from "next/navigation";
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ interface WrapperProps {
 
 const Wrapper: FC<WrapperProps> = ({ children }) => {
   const { login, authenticated, ready } = usePrivy();
+  const pathname = usePathname();
   const [state] = useContext(AppContext);
 
   // Auto-switch to Base Sepolia when embedded wallet is available
@@ -18,18 +20,23 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
     if (ready && authenticated && state.embeddedWallet) {
       state.embeddedWallet.switchChain(baseSepolia.id).catch((error: any) => {
         console.log("Chain switch failed:", error);
-        // This is normal if user rejects the switch
       });
     }
   }, [ready, authenticated, state.embeddedWallet]);
 
-  // Don't show modal until Privy is ready
-  const shouldShowModal = ready && !authenticated;
+  // Show wallet connection modal if user is authenticated but no wallet is connected
+  const shouldShowWalletModal =
+    ready &&
+    state.user !== null &&
+    state.embeddedWallet === undefined &&
+    pathname !== "/register-user";
 
   return (
     <>
       {children}
-      <Modal isOpen={shouldShowModal} overlayClassName="bg-black/90">
+
+      {/* Wallet Connection Modal */}
+      <Modal isOpen={shouldShowWalletModal} overlayClassName="bg-black/90">
         <div className="p-12 relative overflow-hidden w-[600px] h-[400px] flex flex-col items-center justify-between">
           <img
             className="absolute top-0 left-0 object-cover w-full h-full z-[-1]"
@@ -43,7 +50,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
               className="mb-6"
             />
             <p className="font-bold text-primary text-[28px] leading-[24px] mb-4">
-              Welcome to the Ensemble Beta
+              Connect Your Wallet
             </p>
             <p className="font-medium text-text-color text-[18px] leading-[24px]">
               Please connect your wallet to continue
