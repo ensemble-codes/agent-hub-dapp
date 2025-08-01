@@ -22,6 +22,7 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   const { authenticated } = usePrivy();
   const { wallets } = useWallets();
   const { push } = useRouter();
+  const [redirecting, setRedirecting] = useState(true);
 
   // Expose refreshUser function
   const refreshUser = async () => {
@@ -67,8 +68,8 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
       }
       dispatch({
         type: SET_AUTH_LOADING,
-        payload: false
-      })
+        payload: false,
+      });
     });
 
     return () => subscription.unsubscribe();
@@ -119,13 +120,29 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   }, [authenticated, wallets, state.user]);
 
   useEffect(() => {
-    if (!state.authLoading && !state.user) push('/register-user')
-  }, [state.authLoading, state.user])
+    if (!state.authLoading) {
+      if (!state.user) {
+        push("/register-user");
+        const timeout = setTimeout(() => setRedirecting(false), 2000);
+        return () => clearTimeout(timeout);
+      } else {
+        setRedirecting(false);
+      }
+    }
+  }, [state.authLoading, state.user]);
 
-  if (state.authLoading)
+  if (redirecting)
     return (
       <div className="fixed inset-0 bg-white z-[999] flex items-center justify-center">
-        <div className="relative max-w-[420px] max-h-[420px] w-[90%] h-[90%]">
+        <div
+          className="relative"
+          style={{
+            maxWidth: "420px",
+            maxHeight: "420px",
+            width: "90%",
+            height: "90%",
+          }}
+        >
           {/* Background image that spins */}
           <div
             className="absolute inset-0 animate-spin"
