@@ -56,6 +56,7 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log({ event, session });
       const email = session?.user?.email;
       if (event === "SIGNED_OUT") {
         dispatch({ type: SET_USER, payload: null });
@@ -74,6 +75,21 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    console.log('Auth state changed:', { authLoading: state.authLoading, user: state.user, redirecting });
+    if (!state.authLoading) {
+      if (!state.user) {
+        console.log('Redirecting to register-user...');
+        push("/register-user");
+      }
+      const timeout = setTimeout(() => {
+        console.log('Setting redirecting to false');
+        setRedirecting(false);
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [state.authLoading, state.user]);
 
   // Function to silently track wallet connection
   const trackWalletConnection = async (walletAddress: string) => {
@@ -119,13 +135,14 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
     }
   }, [authenticated, wallets, state.user]);
 
+  // Fallback timeout to prevent infinite loading
   useEffect(() => {
-    if (!state.authLoading) {
-      if (!state.user) push("/register-user");
-      const timeout = setTimeout(() => setRedirecting(false), 2000);
-      return () => clearTimeout(timeout);
-    }
-  }, [state.authLoading, state.user]);
+    const fallbackTimeout = setTimeout(() => {
+      setRedirecting(false);
+    }, 5000); // 5 second fallback
+
+    return () => clearTimeout(fallbackTimeout);
+  }, []);
 
   if (redirecting)
     return (
