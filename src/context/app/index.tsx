@@ -121,13 +121,9 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
 
   useEffect(() => {
     if (!state.authLoading) {
-      if (!state.user) {
-        push("/register-user");
-        const timeout = setTimeout(() => setRedirecting(false), 2000);
-        return () => clearTimeout(timeout);
-      } else {
-        setRedirecting(false);
-      }
+      if (!state.user) push("/register-user");
+      const timeout = setTimeout(() => setRedirecting(false), 2000);
+      return () => clearTimeout(timeout);
     }
   }, [state.authLoading, state.user]);
 
@@ -152,8 +148,12 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
         </div>
         <style jsx>{`
           @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
           }
           .animate-fade-in {
             animation: fadeIn 0.8s ease-out forwards;
