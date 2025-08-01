@@ -45,6 +45,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
       telegram
       twitter
       website
+      communicationParams
     }
     proposals {
       id

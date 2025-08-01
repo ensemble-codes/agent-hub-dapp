@@ -12,6 +12,7 @@ import { useAgentQuery } from "@/graphql/generated/ensemble";
 import { useSearchParams } from "next/navigation";
 import { ensembleClient } from "@/graphql/clients";
 import { ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
+import { gql, useQuery } from "@apollo/client";
 
 const ChatLayoutContent: FC<{
   messages: any[];
@@ -30,12 +31,55 @@ const ChatLayoutContent: FC<{
 }) => {
   const searchParams = useSearchParams();
   const agentAddress = searchParams.get("agent");
-  const { data, loading, error } = useAgentQuery({
-    variables: {
-      id: agentAddress || ORCHESTRATOR_AGENT_ADDRESS,
-    },
-    client: ensembleClient,
-  });
+  const GET_AGENT = gql`
+    query MyQuery {
+  agent(id: "${agentAddress || ORCHESTRATOR_AGENT_ADDRESS}") {
+    agentUri
+    id
+    name
+    owner
+    reputation
+    metadata {
+      agentCategory
+      attributes
+      communicationType
+      communicationURL
+      description
+      dexscreener
+      github
+      id
+      imageUri
+      instructions
+      name
+      openingGreeting
+      prompts
+      telegram
+      twitter
+      website
+      communicationParams
+    }
+    proposals {
+      id
+      isRemoved
+      price
+      service
+      tokenAddress
+    }
+    tasks {
+      id
+      prompt
+      issuer
+      proposalId
+      rating
+      result
+      status
+      taskId
+    }
+  }
+}
+  `;
+
+  const { data, loading } = useQuery(GET_AGENT);
 
   const agent = useMemo(() => {
     if (data?.agent) {
@@ -55,7 +99,7 @@ const ChatLayoutContent: FC<{
             <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
               <div className="flex flex-col w-full h-full">
                 {messages.length === 0 && !agentAddress &&
-                agent?.id === ORCHESTRATOR_AGENT_ADDRESS ? null : (
+                agent?.id?.toLowerCase() === ORCHESTRATOR_AGENT_ADDRESS.toLowerCase() ? null : (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Link href={`/agents/${agent?.id}`}>
@@ -205,7 +249,7 @@ const ChatLayoutContent: FC<{
                                 agent?.metadata?.prompts?.length > 0 && (
                                   <div className="flex flex-wrap gap-2 max-w-[680px]">
                                     {agent.metadata.prompts.map(
-                                      (prompt, idx) => (
+                                      (prompt:string, idx: number) => (
                                         <button
                                           key={idx}
                                           className="cursor-pointer px-2 py-[0.5px] text-[14px] font-normal rounded-[20000px] border bg-white text-primary/90 hover:border-primary hover:text-primary transition"
@@ -271,7 +315,7 @@ const ChatLayoutContent: FC<{
                         agent?.metadata?.prompts &&
                         agent?.metadata?.prompts?.length > 0 && (
                           <div className="flex flex-wrap gap-2">
-                            {agent.metadata.prompts.map((prompt, idx) => (
+                            {agent.metadata.prompts.map((prompt:string, idx: number) => (
                               <button
                                 key={idx}
                                 className="cursor-pointer px-2 py-[0.5px] text-[16px] font-normal rounded-[20000px] border bg-white text-primary/90 hover:border-primary hover:text-primary transition"
