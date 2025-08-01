@@ -25,19 +25,17 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   const [redirecting, setRedirecting] = useState(true);
 
   // Expose refreshUser function
-  const refreshUser = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const email = session?.user?.email;
-    if (session?.user && typeof email === "string") {
+  const refreshUser = async (email: string) => {
+    if (email) {
       const response = await fetch("/api/auth/check-user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: session.user.email }),
+        body: JSON.stringify({ email: email }),
       });
+
+      console.log({response});
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -45,6 +43,7 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
       }
 
       const data = await response.json();
+      console.log({data})
       dispatch({ type: SET_USER, payload: data.user });
     } else {
       dispatch({ type: SET_USER, payload: null });
@@ -52,19 +51,22 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log({ event, session });
       const email = session?.user?.email;
+      console.log({ email, user: session?.user, flag: session?.user && typeof email === "string" })
       if (event === "SIGNED_OUT") {
+        console.log('sign out');
         dispatch({ type: SET_USER, payload: null });
-        return;
       }
       if (session?.user && typeof email === "string") {
-        await refreshUser();
+        console.log('refresh');
+        await refreshUser(email);
+        console.log('wait');
       } else {
+        console.log('set null');
         dispatch({ type: SET_USER, payload: null });
       }
       dispatch({
@@ -75,21 +77,6 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  useEffect(() => {
-    console.log('Auth state changed:', { authLoading: state.authLoading, user: state.user, redirecting });
-    if (!state.authLoading) {
-      if (!state.user) {
-        console.log('Redirecting to register-user...');
-        push("/register-user");
-      }
-      const timeout = setTimeout(() => {
-        console.log('Setting redirecting to false');
-        setRedirecting(false);
-      }, 2000);
-      return () => clearTimeout(timeout);
-    }
-  }, [state.authLoading, state.user]);
 
   // Function to silently track wallet connection
   const trackWalletConnection = async (walletAddress: string) => {
@@ -135,14 +122,19 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
     }
   }, [authenticated, wallets, state.user]);
 
-  // Fallback timeout to prevent infinite loading
   useEffect(() => {
-    const fallbackTimeout = setTimeout(() => {
-      setRedirecting(false);
-    }, 5000); // 5 second fallback
-
-    return () => clearTimeout(fallbackTimeout);
-  }, []);
+    if (!state.authLoading) {
+      if (!state.user) {
+        console.log('Redirecting to register-user...');
+        push("/register-user");
+      }
+      const timeout = setTimeout(() => {
+        console.log('Setting redirecting to false');
+        setRedirecting(false);
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [state.authLoading, state.user]);
 
   if (redirecting)
     return (
