@@ -1,5 +1,5 @@
 import { Action } from "./action";
-import { SET_EMBEDDED_WALLET, SET_IS_WHITELISTED, SET_TASK_PROMPT, SET_USER } from "./actions";
+import { SET_AUTH_LOADING, SET_EMBEDDED_WALLET, SET_IS_WHITELISTED, SET_TASK_PROMPT, SET_USER } from "./actions";
 import { AppState } from "./state";
 
 const reducer = (state: AppState, action: Action): AppState => {
@@ -23,6 +23,11 @@ const reducer = (state: AppState, action: Action): AppState => {
         return {
           ...state,
           user: action.payload
+        }
+      case SET_AUTH_LOADING:
+        return {
+          ...state,
+          authLoading: action.payload
         }
     default:
       return state;

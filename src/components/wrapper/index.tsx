@@ -1,12 +1,10 @@
 "use client";
-import { FC, useEffect, useContext, useState } from "react";
+import { FC, useEffect, useContext } from "react";
 import Modal from "../modal";
 import { usePrivy } from "@privy-io/react-auth";
 import { baseSepolia } from "viem/chains";
 import { AppContext } from "@/context/app";
-import { usePathname, useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
-import Loader from "../loader";
+import { usePathname } from "next/navigation";
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -15,10 +13,7 @@ interface WrapperProps {
 const Wrapper: FC<WrapperProps> = ({ children }) => {
   const { login, authenticated, ready } = usePrivy();
   const pathname = usePathname();
-  const router = useRouter();
   const [state] = useContext(AppContext);
-  const { user, sessionChecked } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
 
   // Auto-switch to Base Sepolia when embedded wallet is available
   useEffect(() => {
@@ -29,68 +24,12 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
     }
   }, [ready, authenticated, state.embeddedWallet]);
 
-  // Track loading state and handle redirects
-  useEffect(() => {
-    // Only proceed if session check is complete
-    if (sessionChecked) {
-      // Redirect to register-user if user is not authenticated and not already there
-      if (user === null && !pathname.includes("/register-user")) {
-        router.push("/register-user");
-        // Don't set isLoading to false yet - wait for pathname to change
-        return;
-      }
-      
-      // Set loading to false for all other cases
-      setIsLoading(false);
-    }
-  }, [sessionChecked, user, pathname, router]);
-
-  // Show splash screen while loading
-  const shouldShowSplash = isLoading && pathname !== "/register-user";
-
   // Show wallet connection modal if user is authenticated but no wallet is connected
   const shouldShowWalletModal =
-    !isLoading &&
     ready &&
-    user !== null &&
+    state.user !== null &&
     state.embeddedWallet === undefined &&
     pathname !== "/register-user";
-
-  // Show splash screen
-  if (shouldShowSplash) {
-    return (
-      <div className="fixed inset-0 bg-white z-[999] flex items-center justify-center">
-        <div className="relative max-w-[420px] max-h-[420px] w-[90%] h-[90%]">
-          {/* Background image that spins */}
-          <div
-            className="absolute inset-0 animate-spin"
-            style={{
-              animation: "spin 15s linear infinite",
-              transformOrigin: "center center",
-            }}
-          >
-            <img
-              src={"/assets/splash-screen-vector-icon.svg"}
-              alt="splash vector"
-              className="w-full h-full object-contain"
-            />
-          </div>
-        </div>
-        {/* Static overlay content - counter-rotates to stay upright */}
-        <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-5">
-          <img
-            src={"/assets/logo-icon.svg"}
-            alt="agent hub"
-            className="w-[75px] h-[68px]"
-          />
-          <p className="text-[28px] text-center font-[Montserrat] font-bold leading-[120%] bg-gradient-to-r from-[#F94D27] to-[#FF886D] bg-clip-text text-transparent">
-            entering portal
-          </p>
-        </div>
-        <img className="absolute bottom-0 w-full" alt="pattern" src={"/assets/orchestrator-pattern-bg.svg"} />
-      </div>
-    );
-  }
 
   return (
     <>

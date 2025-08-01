@@ -16,14 +16,12 @@ import { createWalletClient, custom, parseEther } from "viem";
 import { AppContext } from "@/context/app";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { useAuth } from "@/hooks/useAuth";
 
 const AppHeader = () => {
   const [state] = useContext(AppContext);
   const pathname = usePathname();
-  const { login, authenticated, user: privyUser, logout, ready } = usePrivy();
+  const { login, logout, ready } = usePrivy();
   const { wallets } = useWallets();
-  const { signOut } = useAuth();
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [balance, setBalance] = useState<string>("0");

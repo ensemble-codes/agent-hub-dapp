@@ -1,29 +1,43 @@
 "use client";
 
 import { AppHeader } from "@/components";
-import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { AppContext } from "@/context/app";
 
 const Register = () => {
+  const [state] = useContext(AppContext);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
-  const { sendOTP, verifyOTP, signOut, loading, authLoading, error, user } =
-    useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { push } = useRouter();
 
   const handleSendOTP = async () => {
     if (!email) return;
-
-    const result = await sendOTP(email);
-    if (result.success) {
+    setIsLoading(true);
+    try {
+      const result = await supabase.auth.signInWithOtp({
+        email,
+      });
+      if (result.error) {
+        throw error;
+      }
       setShowOtpInput(true);
       // Start 5-minute countdown for resend
       setResendDisabled(true);
       setResendCountdown(300); // 5 minutes = 300 seconds
+    } catch (error) {
+      console.log(error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to send OTP";
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -31,7 +45,7 @@ const Register = () => {
   useEffect(() => {
     if (resendCountdown > 0) {
       const timer = setTimeout(() => {
-        setResendCountdown(prev => prev - 1);
+        setResendCountdown((prev) => prev - 1);
       }, 1000);
       return () => clearTimeout(timer);
     } else {
@@ -41,18 +55,50 @@ const Register = () => {
 
   const handleVerifyOTP = async () => {
     if (!email || !otp) return;
-
-    const result = await verifyOTP(email, otp);
-    if (result.success) {
-      push("/");
+    setIsLoading(true);
+    try {
+      const result = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: "email",
+      });
+      if (result.error) {
+        throw error;
+      }
+        push("/");
+    } catch (error) {
+      console.log(error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to verify OTP";
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const handleSignOut = async () => {
+    if (!state.user) return;
+    setIsLoading(true);
+    try {
+      const result = await supabase.auth.signOut();
+      if (result.error) {
+        throw error;
+      }
+    } catch (error) {
+      console.log(error);
+      const errorMessage =
+        error instanceof Error ? error.message : "An unexpected error occurred during sign out.";
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <>
       <div className="grow w-full ">
         <AppHeader />
-        {authLoading ? (
+        {state.authLoading ? (
           <div className="flex items-center justify-center h-[calc(100dvh-200px)]">
             <div className="text-center flex items-center gap-3">
               <img
@@ -65,7 +111,7 @@ const Register = () => {
               </p>
             </div>
           </div>
-        ) : user ? (
+        ) : state.user ? (
           <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
             <div className="max-w-[570px] mx-auto flex flex-col items-center justify-center h-full">
               <div className="text-center mb-8">
@@ -74,14 +120,14 @@ const Register = () => {
                 </h1>
                 <p className="text-[18px] font-[Montserrat] font-medium text-[#121212] mb-4">
                   You are logged in as:{" "}
-                  <span className="text-primary">{user.email}</span>
+                  <span className="text-primary">{state.user.email}</span>
                 </p>
                 <button
-                  onClick={signOut}
-                  disabled={loading}
+                  onClick={handleSignOut}
+                  disabled={isLoading}
                   className="py-2 px-6 bg-red-500 text-white rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed font-[Montserrat] font-semibold"
                 >
-                  {loading ? "Signing out..." : "Sign Out"}
+                  {isLoading ? "Signing out..." : "Sign Out"}
                 </button>
               </div>
             </div>
@@ -149,7 +195,7 @@ const Register = () => {
                     <hr className="my-4 border-[0.5px] border-[#AEAEAE]" />
                     <button
                       onClick={handleSendOTP}
-                      disabled={loading || !email}
+                      disabled={isLoading || !email}
                       className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-primary rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <img
@@ -158,7 +204,7 @@ const Register = () => {
                         className="w-6 h-6"
                       />
                       <p className="text-white font-[Montserrat] font-semibold text-[16px] leading-[120%]">
-                        {loading ? "Sending OTP..." : "Verify"}
+                        {isLoading ? "Sending OTP..." : "Verify"}
                       </p>
                     </button>
                   </>
@@ -248,7 +294,7 @@ const Register = () => {
                     <hr className="my-4 border-[0.5px] border-[#AEAEAE]" />
                     <button
                       onClick={handleVerifyOTP}
-                      disabled={loading || otp.length !== 6}
+                      disabled={isLoading || otp.length !== 6}
                       className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-primary rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed mb-3"
                     >
                       <img
@@ -257,22 +303,25 @@ const Register = () => {
                         className="w-6 h-6"
                       />
                       <p className="text-white font-[Montserrat] font-semibold text-[16px] leading-[120%]">
-                        {loading ? "Verifying..." : "Verify OTP"}
+                        {isLoading ? "Verifying..." : "Verify OTP"}
                       </p>
                     </button>
-                                      <div className="w-full text-center text-[14px] text-[#8F95B2] font-[Montserrat] font-normal">
-                    Didn't receive the code?{" "}
-                    <button
-                      onClick={handleSendOTP}
-                      disabled={loading || resendDisabled}
-                      className="text-primary hover:underline transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
-                    >
-                      {resendDisabled 
-                        ? `Resend in ${Math.floor(resendCountdown / 60)}:${(resendCountdown % 60).toString().padStart(2, '0')}`
-                        : "Resend"
-                      }
-                    </button>
-                  </div>
+                    <div className="w-full text-center text-[14px] text-[#8F95B2] font-[Montserrat] font-normal">
+                      Didn't receive the code?{" "}
+                      <button
+                        onClick={handleSendOTP}
+                        disabled={isLoading || resendDisabled}
+                        className="text-primary hover:underline transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                      >
+                        {resendDisabled
+                          ? `Resend in ${Math.floor(resendCountdown / 60)}:${(
+                              resendCountdown % 60
+                            )
+                              .toString()
+                              .padStart(2, "0")}`
+                          : "Resend"}
+                      </button>
+                    </div>
                   </>
                 )}
                 {error && (

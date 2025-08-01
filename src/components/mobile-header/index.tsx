@@ -7,14 +7,12 @@ import Modal from "../modal";
 import { baseSepolia } from "viem/chains";
 import { createWalletClient, custom, parseEther } from "viem";
 import { AppContext } from "@/context/app";
-import { useAuth } from "@/hooks/useAuth";
 
 const MobileHeader = () => {
   const [state] = useContext(AppContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { login, authenticated, user: privyUser, logout, ready } = usePrivy();
   const { wallets } = useWallets();
-  const { signOut } = useAuth();
   const { fundWallet } = useFundWallet();
 
   // Wallet modal states
