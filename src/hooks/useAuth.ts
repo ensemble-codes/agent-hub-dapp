@@ -6,6 +6,7 @@ interface AuthState {
   user: User | null
   loading: boolean
   authLoading: boolean
+  sessionChecked: boolean
   error: string | null
 }
 
@@ -14,6 +15,7 @@ export const useAuth = () => {
     user: null,
     loading: false,
     authLoading: true,
+    sessionChecked: false,
     error: null
   })
 
@@ -95,7 +97,11 @@ export const useAuth = () => {
         }
 
         const userData = await updateResponse.json()
-        setAuthState(prev => ({ ...prev, user: userData.user }))
+        setAuthState(prev => ({ 
+          ...prev, 
+          user: userData.user, 
+          sessionChecked: true 
+        }))
       } else {
         console.log('No user data in Supabase response');
       }
@@ -123,7 +129,7 @@ export const useAuth = () => {
         throw error
       }
 
-      setAuthState({ user: null, loading: false, authLoading: false, error: null })
+      setAuthState({ user: null, loading: false, authLoading: false, sessionChecked: true, error: null })
       return { success: true }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to sign out'
@@ -134,19 +140,30 @@ export const useAuth = () => {
     }
   }, [])
 
-    const checkUser = useCallback(async () => {
+  const checkUser = useCallback(async () => {
     setAuthState(prev => ({ ...prev, authLoading: true, error: null }))
     
     try {
       // First check if there's an active session
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      if (sessionError) {
+        console.error('Session check error:', sessionError)
+        throw sessionError
+      }
       
       if (!session?.user?.email) {
-        setAuthState(prev => ({ ...prev, user: null }))
+        // No session found - user is not authenticated
+        setAuthState(prev => ({ 
+          ...prev, 
+          user: null, 
+          authLoading: false, 
+          sessionChecked: true 
+        }))
         return
       }
 
-      // Use API route to check user (bypasses RLS)
+      // Session exists - load user data via API
       const response = await fetch('/api/auth/check-user', {
         method: 'POST',
         headers: {
@@ -155,13 +172,27 @@ export const useAuth = () => {
         body: JSON.stringify({ email: session.user.email })
       })
       
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to load user data')
+      }
+      
       const data = await response.json()
-      setAuthState(prev => ({ ...prev, user: data.user }))
+      setAuthState(prev => ({ 
+        ...prev, 
+        user: data.user, 
+        authLoading: false, 
+        sessionChecked: true 
+      }))
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to check user'
-      setAuthState(prev => ({ ...prev, error: errorMessage }))
-    } finally {
-      setAuthState(prev => ({ ...prev, authLoading: false }))
+      console.error('Auth check error:', error)
+      setAuthState(prev => ({ 
+        ...prev, 
+        error: errorMessage, 
+        authLoading: false, 
+        sessionChecked: true 
+      }))
     }
   }, [])
 

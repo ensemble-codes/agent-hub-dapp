@@ -21,7 +21,7 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { authenticated } = usePrivy();
   const { wallets } = useWallets();
-  const { user } = useAuth();
+  const { user, sessionChecked } = useAuth();
 
   // Function to silently track wallet connection
   const trackWalletConnection = async (walletAddress: string) => {
@@ -43,13 +43,15 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
     }
   };
 
-  // Sync user state to context
+  // Sync user state to context only after session check is complete
   useEffect(() => {
-    dispatch({
-      type: SET_USER,
-      payload: user
-    });
-  }, [user]);
+    if (sessionChecked) {
+      dispatch({
+        type: SET_USER,
+        payload: user
+      });
+    }
+  }, [user, sessionChecked]);
 
   // Handle wallet connection (separate from Supabase auth)
   useEffect(() => {
