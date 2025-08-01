@@ -134,30 +134,6 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   if (redirecting)
     return (
       <div className="fixed inset-0 bg-white z-[999] flex items-center justify-center">
-        <div
-          className="relative"
-          style={{
-            maxWidth: "420px",
-            maxHeight: "420px",
-            width: "90%",
-            height: "90%",
-          }}
-        >
-          {/* Background image that spins */}
-          <div
-            className="absolute inset-0 animate-spin"
-            style={{
-              animation: "spin 15s linear infinite",
-              transformOrigin: "center center",
-            }}
-          >
-            <img
-              src={"/assets/splash-screen-vector-icon.svg"}
-              alt="splash vector"
-              className="w-full h-full object-contain"
-            />
-          </div>
-        </div>
         {/* Static overlay content - counter-rotates to stay upright */}
         <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-5">
           <img
@@ -165,15 +141,24 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
             alt="agent hub"
             className="w-[75px] h-[68px]"
           />
-          <p className="text-[28px] text-center font-[Montserrat] font-bold leading-[120%] bg-gradient-to-r from-[#F94D27] to-[#FF886D] bg-clip-text text-transparent">
-            entering portal
-          </p>
+          <div className="space-y-1 animate-pulse">
+            <p className="text-[28px] text-center font-[Montserrat] font-bold leading-[120%] bg-gradient-to-r from-[#F94D27] to-[#FF886D] bg-clip-text text-transparent animate-fade-in">
+              Agent Hub
+            </p>
+            <p className="text-primary text-lg font-medium leading-[120%] animate-fade-in">
+              Powered by Ensemble
+            </p>
+          </div>
         </div>
-        <img
-          className="absolute bottom-0 w-full"
-          alt="pattern"
-          src={"/assets/orchestrator-pattern-bg.svg"}
-        />
+        <style jsx>{`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+          }
+        `}</style>
       </div>
     );
 
