@@ -5,9 +5,10 @@ import { useState, useEffect, useContext, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { AppContext } from "@/context/app";
+import { SET_USER } from "@/context/app/actions";
 
 const Register = () => {
-  const [state] = useContext(AppContext);
+  const [state, dispatch] = useContext(AppContext);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
@@ -40,6 +41,10 @@ const Register = () => {
       }
       const data = await response.json();
       if (!data.success) throw "Failed to register user";
+      dispatch({
+        type: SET_USER,
+        payload: data.user
+      });
       setShowOtpInput(true);
       // Start 5-minute countdown for resend
       setResendDisabled(true);
@@ -90,6 +95,10 @@ const Register = () => {
       }
       const data = await response.json();
       if (!data.success) throw "Failed to register user";
+      dispatch({
+        type: SET_USER,
+        payload: data.user
+      });
       push("/");
     } catch (error) {
       console.log(error);
