@@ -1,20 +1,23 @@
 "use client";
 
 import { AppHeader } from "@/components";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { AppContext } from "@/context/app";
+import { SET_USER } from "@/context/app/actions";
 
 const Register = () => {
-  const [state] = useContext(AppContext);
+  const [state, dispatch] = useContext(AppContext);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { push } = useRouter();
 
   const handleSendOTP = async () => {
@@ -25,8 +28,20 @@ const Register = () => {
         email,
       });
       if (result.error) {
-        throw error;
+        throw result.error;
       }
+      const response = await fetch(`/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email }),
+      });
+      if (!response.ok) {
+        throw "Failed to register user";
+      }
+      const data = await response.json();
+      if (!data.success) throw "Failed to register user";
       setShowOtpInput(true);
       // Start 5-minute countdown for resend
       setResendDisabled(true);
@@ -65,7 +80,23 @@ const Register = () => {
       if (result.error) {
         throw error;
       }
-        push("/");
+      const response = await fetch(`/api/auth/verify-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email }),
+      });
+      if (!response.ok) {
+        throw "Failed to register user";
+      }
+      const data = await response.json();
+      if (!data.success) throw "Failed to register user";
+      dispatch({
+        type: SET_USER,
+        payload: data.user
+      });
+      push("/");
     } catch (error) {
       console.log(error);
       const errorMessage =
@@ -78,7 +109,7 @@ const Register = () => {
 
   const handleSignOut = async () => {
     if (!state.user) return;
-    setIsLoading(true);
+    setSigningOut(true);
     try {
       const result = await supabase.auth.signOut();
       if (result.error) {
@@ -87,12 +118,14 @@ const Register = () => {
     } catch (error) {
       console.log(error);
       const errorMessage =
-        error instanceof Error ? error.message : "An unexpected error occurred during sign out.";
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred during sign out.";
       setError(errorMessage);
     } finally {
-      setIsLoading(false);
+      setSigningOut(false);
     }
-  }
+  };
 
   return (
     <>
@@ -124,10 +157,10 @@ const Register = () => {
                 </p>
                 <button
                   onClick={handleSignOut}
-                  disabled={isLoading}
+                  disabled={signingOut}
                   className="py-2 px-6 bg-red-500 text-white rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed font-[Montserrat] font-semibold"
                 >
-                  {isLoading ? "Signing out..." : "Sign Out"}
+                  {signingOut ? "Signing out..." : "Sign Out"}
                 </button>
               </div>
             </div>
@@ -214,6 +247,9 @@ const Register = () => {
                       {[0, 1, 2, 3, 4, 5].map((index) => (
                         <input
                           key={index}
+                          ref={(el) => {
+                            otpRefs.current[index] = el;
+                          }}
                           type="text"
                           maxLength={1}
                           className="w-12 h-12 text-center rounded border border-[#121212] outline-none focus:outline-none text-[20px] font-[Montserrat] font-medium text-[#121212] focus:border-primary"
@@ -227,12 +263,10 @@ const Register = () => {
 
                               // Auto-focus next input
                               if (value && index < 5) {
-                                const nextInput = (
-                                  e.target as HTMLInputElement
-                                ).parentElement?.nextElementSibling?.querySelector(
-                                  "input"
-                                ) as HTMLInputElement;
-                                if (nextInput) nextInput.focus();
+                                const nextInput = otpRefs.current[index + 1];
+                                if (nextInput) {
+                                  nextInput.focus();
+                                }
                               }
                             }
                           }}
@@ -249,12 +283,9 @@ const Register = () => {
                               if (cleanData.length === 6) {
                                 setOtp(cleanData);
                                 // Focus the last input
-                                const inputs =
-                                  document.querySelectorAll(
-                                    'input[type="text"]'
-                                  );
-                                if (inputs[5]) {
-                                  (inputs[5] as HTMLInputElement).focus();
+                                const lastInput = otpRefs.current[5];
+                                if (lastInput) {
+                                  lastInput.focus();
                                 }
                               }
                             }
@@ -268,14 +299,9 @@ const Register = () => {
                                 newOtp[index - 1] = "";
                                 setOtp(newOtp.join(""));
                                 // Focus previous input
-                                const inputs =
-                                  document.querySelectorAll(
-                                    'input[type="text"]'
-                                  );
-                                if (inputs[index - 1]) {
-                                  (
-                                    inputs[index - 1] as HTMLInputElement
-                                  ).focus();
+                                const prevInput = otpRefs.current[index - 1];
+                                if (prevInput) {
+                                  prevInput.focus();
                                 }
                               } else if (otp[index]) {
                                 // If current box has value, clear it
