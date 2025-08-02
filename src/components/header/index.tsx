@@ -374,11 +374,14 @@ const AppHeader = () => {
                 >
                   Withdraw
                 </div>
+              </div>
+
+              <div className="flex items-center justify-center">
                 <div
-                  className="flex-1 py-3 text-center bg-light-text-color/20 cursor-pointer rounded-[12px] hover:scale-[1.05] font-semibold transition-all duration-300 ease-in-out ledaing-[18px] text-[13px] text-[#000]"
+                  className="w-full py-3 text-center bg-light-text-color/20 cursor-pointer rounded-[12px] hover:scale-[1.05] font-semibold transition-all duration-300 ease-in-out ledaing-[18px] text-[13px] text-[#000]"
                   onClick={handleExportWallet}
                 >
-                  Export
+                  Export Wallet
                 </div>
               </div>
 
