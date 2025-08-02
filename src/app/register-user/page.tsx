@@ -15,6 +15,7 @@ const Register = () => {
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { push } = useRouter();
@@ -108,7 +109,7 @@ const Register = () => {
 
   const handleSignOut = async () => {
     if (!state.user) return;
-    setIsLoading(true);
+    setSigningOut(true);
     try {
       const result = await supabase.auth.signOut();
       if (result.error) {
@@ -122,7 +123,7 @@ const Register = () => {
           : "An unexpected error occurred during sign out.";
       setError(errorMessage);
     } finally {
-      setIsLoading(false);
+      setSigningOut(false);
     }
   };
 
@@ -156,10 +157,10 @@ const Register = () => {
                 </p>
                 <button
                   onClick={handleSignOut}
-                  disabled={isLoading}
+                  disabled={signingOut}
                   className="py-2 px-6 bg-red-500 text-white rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed font-[Montserrat] font-semibold"
                 >
-                  {isLoading ? "Signing out..." : "Sign Out"}
+                  {signingOut ? "Signing out..." : "Sign Out"}
                 </button>
               </div>
             </div>
