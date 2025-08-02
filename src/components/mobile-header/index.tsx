@@ -11,7 +11,7 @@ import { AppContext } from "@/context/app";
 const MobileHeader = () => {
   const [state] = useContext(AppContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { login, authenticated, user: privyUser, logout, ready } = usePrivy();
+  const { login, authenticated, user: privyUser, logout, ready, exportWallet } = usePrivy();
   const { wallets } = useWallets();
   const { fundWallet } = useFundWallet();
 
@@ -87,6 +87,19 @@ const MobileHeader = () => {
       }
     }
   }, [state.embeddedWallet, fundWallet]);
+
+  const handleExportWallet = useCallback(async () => {
+    if (!ready || !state.embeddedWallet) {
+      console.warn("Cannot export wallet: not ready or no embedded wallet");
+      return;
+    }
+    
+    try {
+      await exportWallet();
+    } catch (error) {
+      console.error("Export wallet error:", error);
+    }
+  }, [ready, state.embeddedWallet, exportWallet]);
 
   // Fetch wallet balance
   const fetchBalance = async () => {
@@ -386,6 +399,15 @@ const MobileHeader = () => {
                   onClick={() => setShowWithdraw((v) => !v)}
                 >
                   Withdraw
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center">
+                <div
+                  className="w-full py-3 text-center bg-light-text-color/20 cursor-pointer rounded-[12px] hover:scale-[1.05] font-semibold transition-all duration-300 ease-in-out ledaing-[18px] text-[13px] text-[#000]"
+                  onClick={handleExportWallet}
+                >
+                  Export Wallet
                 </div>
               </div>
 
