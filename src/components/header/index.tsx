@@ -20,7 +20,7 @@ import Image from "next/image";
 const AppHeader = () => {
   const [state] = useContext(AppContext);
   const pathname = usePathname();
-  const { login, logout, ready } = usePrivy();
+  const { login, logout, ready, exportWallet } = usePrivy();
   const { wallets } = useWallets();
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
@@ -83,6 +83,19 @@ const AppHeader = () => {
       }
     }
   }, [state.embeddedWallet, fundWallet]);
+
+  const handleExportWallet = useCallback(async () => {
+    if (!ready || !state.embeddedWallet) {
+      console.warn("Cannot export wallet: not ready or no embedded wallet");
+      return;
+    }
+    
+    try {
+      await exportWallet();
+    } catch (error) {
+      console.error("Export wallet error:", error);
+    }
+  }, [ready, state.embeddedWallet, exportWallet]);
 
   const validateAddress = (address: string): boolean => {
     // Check if it's a valid Ethereum address format
@@ -360,6 +373,12 @@ const AppHeader = () => {
                   onClick={() => setShowWithdraw((v) => !v)}
                 >
                   Withdraw
+                </div>
+                <div
+                  className="flex-1 py-3 text-center bg-light-text-color/20 cursor-pointer rounded-[12px] hover:scale-[1.05] font-semibold transition-all duration-300 ease-in-out ledaing-[18px] text-[13px] text-[#000]"
+                  onClick={handleExportWallet}
+                >
+                  Export
                 </div>
               </div>
 
