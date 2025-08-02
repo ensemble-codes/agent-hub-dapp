@@ -258,7 +258,7 @@ const MobileHeader = () => {
                 {state.embeddedWallet.address.slice(0, 4)}...
                 {state.embeddedWallet.address.slice(-4)}
               </button>
-            ) : (
+            ) : ready && state.user ? (
               <button
                 className="w-fit space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                 onClick={() => {
@@ -274,7 +274,7 @@ const MobileHeader = () => {
                   Connect Wallet
                 </span>
               </button>
-            )}
+            ) : null}
           </div>
 
           <div className="flex-1 overflow-y-auto">
