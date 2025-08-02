@@ -41,10 +41,6 @@ const Register = () => {
       }
       const data = await response.json();
       if (!data.success) throw "Failed to register user";
-      dispatch({
-        type: SET_USER,
-        payload: data.user
-      });
       setShowOtpInput(true);
       // Start 5-minute countdown for resend
       setResendDisabled(true);
