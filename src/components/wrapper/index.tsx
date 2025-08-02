@@ -37,7 +37,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
 
       {/* Wallet Connection Modal */}
       <Modal isOpen={shouldShowWalletModal} overlayClassName="bg-black/90">
-        <div className="p-12 relative overflow-hidden lg:w-[600px] lg:h-[400px] w-[95%] h-auto flex flex-col items-center justify-between">
+        <div className="p-12 relative overflow-hidden lg:w-[600px] lg:h-[400px] w-full h-full flex flex-col items-center justify-between">
           <img
             className="absolute top-0 left-0 object-cover w-full h-full z-[-1]"
             alt="modal-bg"
