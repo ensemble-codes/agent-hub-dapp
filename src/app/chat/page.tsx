@@ -3,9 +3,7 @@
 import { XmtpChat } from "@/components/chat/xmtp-chat";
 import { WebsocketChat } from "@/components/chat/websocket-chat";
 import { FC, Suspense, useMemo } from "react";
-import { useAgentQuery } from "@/graphql/generated/ensemble";
 import { useSearchParams } from "next/navigation";
-import { ensembleClient } from "@/graphql/clients";
 import { Loader } from "@/components";
 import { CHAT_DATA, ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
 import { gql, useQuery } from "@apollo/client";

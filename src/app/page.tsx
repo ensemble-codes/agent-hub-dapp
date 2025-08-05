@@ -1,5 +1,6 @@
 "use client";
 import { AppHeader, Loader, SideMenu } from "@/components";
+import { ScrollingText } from "@/components/ui/scrolling-text";
 import { gql, useQuery } from "@apollo/client";
 import { convertRatingToStars } from "@/utils";
 import Link from "next/link";
@@ -343,17 +344,17 @@ export default function Home() {
               {loading ? (
                 <Loader size="xl" />
               ) : (
-                <div className="flex items-stretch justify-start gap-8 flex-wrap">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                   {agents.map((a: any) => (
                     <div
                       key={a.id}
-                      className="bg-white w-[304px] rounded-[16px] border-[0.5px] border-[#8F95B2] overflow-hidden"
+                      className="bg-white rounded-[16px] border-[0.5px] border-[#8F95B2] overflow-hidden w-full"
                     >
-                      <div className="md:min-w-[282px] w-full p-3 rounded-[8px] flex flex-col h-full justify-between">
+                      <div className="w-full p-3 rounded-[8px] flex flex-col h-full justify-between">
                         <div>
                           <div className="flex items-start justify-between gap-6">
                             {a.metadata && (
-                              <div className="flex items-start justify-start gap-2">
+                              <div className="flex items-start justify-start gap-2 w-[60%] overflow-hidden pr-1">
                                 <Link
                                   className="cursor-pointer"
                                   href={`/agents/${getAddress(a.id)}`}
@@ -382,26 +383,24 @@ export default function Home() {
                                     ) : null}
                                   </div>
                                 </Link>
-                                <div>
-                                  <p className="font-bold text-[16px] leading-[19px] text-text-color mb-2">
-                                    {a.metadata.name}
-                                  </p>
+                                <div className="w-full">
+                                  <ScrollingText 
+                                    text={a.metadata.name}
+                                    className="font-bold text-[16px] leading-[19px] text-text-color mb-2"
+                                    speed={12}
+                                    delay={1000}
+                                  />
                                   <p
-                                    className={`font-bold text-[14px] leading-[19px] text-light-text-color cursor-pointer transition-opacity duration-100 ${
-                                      copiedAddress === a.id
-                                        ? "opacity-50"
-                                        : "opacity-100"
-                                    }`}
+                                    className={`font-bold text-[14px] leading-[19px] text-light-text-color cursor-pointer transition-all duration-200`}
                                     onClick={() => copyToClipboard(a.id)}
                                   >
-                                    {a.id.slice(0, 4)}...
-                                    {a.id.slice(-4)}
+                                    {copiedAddress === a.id ? "Copied!" : `${a.id.slice(0, 4)}...${a.id.slice(-4)}`}
                                   </p>
                                 </div>
                               </div>
                             )}
                             <div
-                              className={`p-2 rounded-[200px] flex items-center gap-1 max-w-[12ch] overflow-hidden whitespace-nowrap text-ellipsis ${
+                              className={`p-2 flex-shrink-0 rounded-[200px] flex items-center gap-1 max-w-[12ch] overflow-hidden whitespace-nowrap text-ellipsis ${
                                 a.metadata.agentCategory === "DeFi"
                                   ? "bg-[#FFC8F9]"
                                   : a.metadata.agentCategory === "Social"
@@ -446,16 +445,16 @@ export default function Home() {
                                 borderImageSlice: "1",
                               }}
                             />
-                            <div className="flex items-center gap-2 flex-wrap mb-2">
+                            <div className="flex items-center justify-start gap-2 overflow-x-auto mb-2">
                               {a?.metadata?.attributes?.map((up: string) => (
-                                <div className="p-[2px] px-2 border-[0.5px] border-primary rounded-[2000px]" key={up}>
+                                <div className="w-fit flex-shrink-0 p-[2px] px-2 border-[0.5px] border-primary rounded-[2000px]" key={up}>
                                   <p className="text-[12px] text-primary font-semibold">
                                     {up}
                                   </p>
                                 </div>
                               ))}
                             </div>
-                            <p className="font-normal text-[14px] leading-[19px] text-[#3D3D3D] line-clamp-2">
+                            <p className="h-[38px] font-normal text-[14px] leading-[19px] text-[#3D3D3D] line-clamp-2">
                               {a.metadata.description}
                             </p>
                             <hr

@@ -460,7 +460,7 @@ export const XmtpChat: FC<{
                             {agent.metadata.prompts.map((prompt, idx) => (
                               <button
                                 key={idx}
-                                className="cursor-pointer px-2 py-[0.5px] text-[14px] font-normal rounded-[20000px] border bg-white text-primary/90 hover:border-primary hover:text-primary transition"
+                                className="cursor-pointer px-3 py-[2px] text-[14px] font-normal rounded-[20000px] border border-primary bg-white text-primary transition"
                                 onClick={() => onSendMessage(prompt)}
                               >
                                 {prompt}
@@ -609,58 +609,6 @@ export const XmtpChat: FC<{
                           <Loader />
                         )}
                       </div>
-                    </div>
-                    <div className="flex items-center gap-6 mb-8 lg:flex-nowrap flex-wrap">
-                      <button className="p-2 flex items-center gap-2 border border-[#8F95B2] rounded-[20000px]">
-                        <img
-                          src="/assets/agenthub-gray-icon.svg"
-                          alt="agenthub"
-                          className="w-[14px] h-[12px]"
-                        />
-                        <span className="text-[14px] font-normal text-[#8F95B2] leading-[100%]">
-                          Agent Hub
-                        </span>
-                      </button>
-                      <button className="p-2 flex items-center gap-2 border border-[#8F95B2] rounded-[20000px]">
-                        <img
-                          src="/assets/social-service-icon.svg"
-                          alt="agenthub"
-                          className="w-4 h-4"
-                        />
-                        <span className="text-[14px] font-normal text-[#8F95B2] leading-[100%]">
-                          Social
-                        </span>
-                      </button>
-                      <button className="p-2 flex items-center gap-2 border border-[#8F95B2] rounded-[20000px]">
-                        <img
-                          src="/assets/active-service-icon.svg"
-                          alt="agenthub"
-                          className="w-4 h-4"
-                        />
-                        <span className="text-[14px] font-normal text-[#8F95B2] leading-[100%]">
-                          DeFi
-                        </span>
-                      </button>
-                      <button className="p-2 flex items-center gap-2 border border-[#8F95B2] rounded-[20000px]">
-                        <img
-                          src="/assets/security-service-icon.svg"
-                          alt="agenthub"
-                          className="w-4 h-4"
-                        />
-                        <span className="text-[14px] font-normal text-[#8F95B2] leading-[100%]">
-                          Security
-                        </span>
-                      </button>
-                      <button className="p-2 flex items-center gap-2 border border-[#8F95B2] rounded-[20000px]">
-                        <img
-                          src="/assets/research-service-icon.svg"
-                          alt="agenthub"
-                          className="w-4 h-4"
-                        />
-                        <span className="text-[14px] font-normal text-[#8F95B2] leading-[100%]">
-                          Research
-                        </span>
-                      </button>
                     </div>
                     <div className="flex flex-col items-center justify-center gap-4">
                       <p className="text-[16px] font-normal text-[#8F95B2] leading-[100%]">
