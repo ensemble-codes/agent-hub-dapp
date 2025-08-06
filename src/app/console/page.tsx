@@ -7,14 +7,13 @@ import Console from "@/components/chat/console";
 import { ORCHESTRATOR_AGENT_ADDRESS, CHAT_DATA, CHAT_SOURCE } from "@/constants";
 import { getEntityId, WorldManager } from "@/lib/world-manager";
 import SocketIOManager from "@/lib/socket-io-manager";
-import { Content } from "@elizaos/core";
 import { useAgent } from "@/hooks/useAgent";
 
 const ConsolePageContent: FC = () => {
   const router = useRouter();
   const [input, setInput] = useState("");
   const [messages] = useState<any[]>([]);
-  const [messageProcessing, setMessageProcessing] = useState(false);
+  const [messageProcessing] = useState(false);
   
   const entityId = getEntityId();
   const agentId = CHAT_DATA[ORCHESTRATOR_AGENT_ADDRESS].agentId;
@@ -35,40 +34,58 @@ const ConsolePageContent: FC = () => {
     
     socketIOManager.joinRoom(roomId);
     
-    const handleMessageComplete = (data: Content) => {
-      if (data.roomId === roomId) {
-        setMessageProcessing(false);
-        // Redirect to chat page after first message
-        router.push(`/agent/${ORCHESTRATOR_AGENT_ADDRESS}/chat`);
-      }
-    };
-    
-    const completeHandler = socketIOManager.evtMessageComplete.attach(
-      (data) => [data as unknown as Content]
-    );
-    
-    completeHandler.attach(handleMessageComplete);
-    
     return () => {
       socketIOManager.leaveRoom(roomId);
-      completeHandler.detach();
     };
-  }, [roomId, agentId, entityId, router, socketIOManager]);
+  }, [roomId, agentId, entityId, socketIOManager]);
   
   const handleSend = useCallback(() => {
     if (!input || messageProcessing) return;
     
+    // Store message with sending status in sessionStorage
+    const newMessage = {
+      content: input,
+      user: 'user',
+      timestamp: Date.now(),
+      status: 'sending'
+    };
+    
+    const storedKey = `orchestrator_messages_${roomId}`;
+    const existingMessages = sessionStorage.getItem(storedKey);
+    const messages = existingMessages ? JSON.parse(existingMessages) : [];
+    messages.push(newMessage);
+    sessionStorage.setItem(storedKey, JSON.stringify(messages));
+    
+    // Send message
     socketIOManager.sendMessage(input, roomId, CHAT_SOURCE);
-    setMessageProcessing(true);
-    setInput("");
-  }, [roomId, input, socketIOManager, messageProcessing]);
+    
+    // Redirect immediately to chat page
+    router.push(`/agent/${ORCHESTRATOR_AGENT_ADDRESS}/chat`);
+  }, [roomId, input, socketIOManager, messageProcessing, router]);
   
   const handleTaskSend = useCallback(
     (msg: string) => {
+      // Store message with sending status in sessionStorage
+      const newMessage = {
+        content: msg,
+        user: 'user',
+        timestamp: Date.now(),
+        status: 'sending'
+      };
+      
+      const storedKey = `orchestrator_messages_${roomId}`;
+      const existingMessages = sessionStorage.getItem(storedKey);
+      const messages = existingMessages ? JSON.parse(existingMessages) : [];
+      messages.push(newMessage);
+      sessionStorage.setItem(storedKey, JSON.stringify(messages));
+      
+      // Send message
       socketIOManager.sendMessage(msg, roomId, CHAT_SOURCE);
-      setMessageProcessing(true);
+      
+      // Redirect immediately to chat page
+      router.push(`/agent/${ORCHESTRATOR_AGENT_ADDRESS}/chat`);
     },
-    [roomId, socketIOManager]
+    [roomId, socketIOManager, router]
   );
   
   if (loading) return <Loader />;
