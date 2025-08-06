@@ -279,17 +279,22 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           />
                           <div className="space-y-2">
                             <p className="text-primary font-medium leading-[100%]">
-                              Attributes
+                              Capabilities
                             </p>
-                            <div className="flex items-center gap-2 flex-wrap">
+                            <div className="flex items-center gap-4 flex-wrap">
                               {agent.agent.metadata.attributes.map(
-                                (attr: string, index: number) => (
+                                (capability: string, index: number) => (
                                   <div
                                     key={index}
-                                    className="p-[2px] px-2 border-[0.5px] border-primary rounded-[2000px]"
+                                    className="flex items-center gap-1"
                                   >
-                                    <p className="text-[12px] text-primary font-semibold">
-                                      {attr}
+                                    <img
+                                      src="/assets/check-icon.svg"
+                                      alt="check"
+                                      className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0"
+                                    />
+                                    <p className="text-[14px] md:text-[16px] lg:text-[18px] leading-tight text-[#3D3D3D] font-medium">
+                                      {capability}
                                     </p>
                                   </div>
                                 )

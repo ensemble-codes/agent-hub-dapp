@@ -18,6 +18,13 @@ const MemoizedMessage = memo(
     }: any) => {
       const isPreviousFromSameSender =
         index > 0 && messages[index - 1].isReceived === message.isReceived;
+      
+      // Check if this is a back-to-back message from the agent
+      const isBackToBack = 
+        message.isReceived && 
+        index > 0 && 
+        messages[index - 1].isReceived === true &&
+        messages[index - 1].isReceived === message.isReceived;
 
       return (
         <div
@@ -49,12 +56,14 @@ const MemoizedMessage = memo(
               <MessageContent
                 content={message.content}
                 isReceived={message.isReceived}
+                isBackToBack={isBackToBack}
               />
             )
           ) : (
             <MessageContent
               content={message.content}
               isReceived={message.isReceived}
+              isBackToBack={isBackToBack}
             />
           )}
         </div>

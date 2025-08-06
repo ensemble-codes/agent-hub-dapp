@@ -86,3 +86,25 @@ body {
     --chart-5: 340 75% 55%;
   }
 }
+
+@keyframes scroll-text {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(-1 * var(--scroll-distance, 0px)));
+  }
+  80% {
+    transform: translateX(calc(-1 * var(--scroll-distance, 0px)));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-scroll-text {
+  animation: scroll-text linear infinite;
+}

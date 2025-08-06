@@ -2,8 +2,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { captureError, addBreadcrumb } from "@/utils/sentry";
+import { usePathname } from "next/navigation";
 
 const Footer = () => {
+  const pathname = usePathname();
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
@@ -75,6 +77,8 @@ const Footer = () => {
       });
     }
   };
+
+  if (pathname.includes('/chat')) return;
 
   return (
     <>

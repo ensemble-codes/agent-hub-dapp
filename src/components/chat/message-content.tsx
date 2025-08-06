@@ -5,16 +5,17 @@ import remarkGfm from 'remark-gfm';
 interface MessageContentProps {
   content: string;
   isReceived: boolean;
+  isBackToBack?: boolean;
 }
 
-export const MessageContent: FC<MessageContentProps> = ({ content, isReceived }) => {
+export const MessageContent: FC<MessageContentProps> = ({ content, isReceived, isBackToBack = false }) => {
   const [displayedContent, setDisplayedContent] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (isReceived && !hasAnimated.current) {
-      // Only animate if this is a new received message
+    if (isReceived && !hasAnimated.current && !isBackToBack) {
+      // Only animate if this is a new received message and NOT back-to-back
       setIsTyping(true);
       setDisplayedContent('');
       
@@ -31,8 +32,8 @@ export const MessageContent: FC<MessageContentProps> = ({ content, isReceived })
       }, 30); // Adjust speed here (lower = faster)
 
       return () => clearInterval(typeInterval);
-    } else if (isReceived && hasAnimated.current) {
-      // For past received messages, show content immediately
+    } else if (isReceived && (hasAnimated.current || isBackToBack)) {
+      // For past received messages or back-to-back messages, show content immediately
       setDisplayedContent(content);
       setIsTyping(false);
     } else {
@@ -40,7 +41,7 @@ export const MessageContent: FC<MessageContentProps> = ({ content, isReceived })
       setDisplayedContent(content);
       setIsTyping(false);
     }
-  }, [content, isReceived]);
+  }, [content, isReceived, isBackToBack]);
 
   return (
     <div className={`max-w-[70%] text-[#121212] rounded-[2000px] z-[2] ${
