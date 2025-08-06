@@ -5,7 +5,6 @@ import { WebsocketChat } from "@/components/chat/websocket-chat";
 import { FC, Suspense, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { Loader } from "@/components";
-// import { CHAT_DATA } from "@/constants";
 import { useAgent } from "@/hooks/useAgent";
 
 const PageContent: FC = () => {
@@ -18,36 +17,8 @@ const PageContent: FC = () => {
     () => agent?.metadata?.communicationType ?? "",
     [agent]
   );
-  
-  // Check CHAT_DATA with case-insensitive comparison
-  // const chatData = useMemo(() => {
-  //   if (!agentAddress) return null;
-  //   // Try exact match first
-  //   if (CHAT_DATA[agentAddress]) return CHAT_DATA[agentAddress];
-  //   // Try case-insensitive match
-  //   const lowerAddress = agentAddress.toLowerCase();
-  //   for (const [key, value] of Object.entries(CHAT_DATA)) {
-  //     if (key.toLowerCase() === lowerAddress) {
-  //       return value;
-  //     }
-  //   }
-  //   return null;
-  // }, [agentAddress]);
 
   if (loading) return <Loader />;
-
-  // Check if we have chat data for this agent
-  // if (chatData) {
-  //   return (
-  //     <WebsocketChat
-  //       agent={{
-  //         id: chatData.agentId,
-  //         metadata: { communicationURL: chatData.communicationURL },
-  //       }}
-  //       agentAddress={agentAddress}
-  //     />
-  //   );
-  // }
   
   // Fallback to using agent metadata
   if (agent) {
