@@ -6,11 +6,12 @@ import ChatLayout from "./chat-layout";
 import { getEntityId, WorldManager } from "@/lib/world-manager";
 import SocketIOManager from "@/lib/socket-io-manager";
 import { Content } from "@elizaos/core";
-import { CHAT_DATA, CHAT_SOURCE } from "@/constants";
+import { CHAT_SOURCE } from "@/constants";
 
 export const WebsocketChat: FC<{
   agent: { id: `${string}-${string}-${string}-${string}-${string}`; metadata: { communicationURL: string } };
-}> = ({ agent }) => {
+  agentAddress?: string;
+}> = ({ agent, agentAddress }) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
@@ -82,6 +83,30 @@ export const WebsocketChat: FC<{
 
     console.log("joined room", roomId);
 
+    // Load messages from sessionStorage if available
+    if (agentAddress) {
+      const storedKey = `orchestrator_messages_${roomId}`;
+      const storedMessages = sessionStorage.getItem(storedKey);
+      if (storedMessages) {
+        const parsedMessages = JSON.parse(storedMessages);
+        const formattedStoredMessages = parsedMessages.map((msg: any) => ({
+          id: `stored-${msg.timestamp}`,
+          content: msg.content,
+          contentType: "string" as const,
+          isReceived: false,
+          timestamp: msg.timestamp,
+          status: msg.status || 'sending'
+        }));
+        setMessages(formattedStoredMessages);
+        // Set messageProcessing to true if there are pending messages
+        const hasPendingMessages = formattedStoredMessages.some((msg: any) => msg.status === 'sending');
+        if (hasPendingMessages) {
+          setMessageProcessing(true);
+        }
+        sessionStorage.removeItem(storedKey);
+      }
+    }
+
     const handleMessageBroadcasting = (data: Content) => {
       console.log("message received", data, agent.id);
 
@@ -104,6 +129,10 @@ export const WebsocketChat: FC<{
     const handleMessageComplete = (data: Content) => {
       if (data.roomId === roomId) {
         setMessageProcessing(false);
+        // Update status of pending messages to 'sent'
+        setMessages(prev => prev.map(msg => 
+          msg.status === 'sending' ? { ...msg, status: 'sent' } : msg
+        ));
       }
     };
 
@@ -150,6 +179,7 @@ export const WebsocketChat: FC<{
       setInput={setInput}
       input={input}
       messageProcessing={messageProcessing}
+      agentAddress={agentAddress}
     />
   );
 };

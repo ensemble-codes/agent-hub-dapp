@@ -2,12 +2,12 @@
 import { AppHeader, Loader, SideMenu } from "@/components";
 import { TaskStatus } from "@/enum/taskstatus";
 import { convertRatingToStars, getTaskStatusText } from "@/utils";
-import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FC, use, useState } from "react";
 import { formatEther } from "viem";
 import AGENTS_INFO from "@/data/agentsinfo.json";
+import { useAgent } from "@/hooks/useAgent";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
@@ -20,55 +20,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     setTimeout(() => setCopiedPrompt(null), 1000);
   };
 
-  const GET_AGENT = gql`
-    query MyQuery {
-  agent(id: "${id.toLowerCase()}") {
-    agentUri
-    id
-    name
-    owner
-    reputation
-    metadata {
-      agentCategory
-      attributes
-      communicationType
-      communicationURL
-      description
-      dexscreener
-      github
-      id
-      imageUri
-      instructions
-      name
-      openingGreeting
-      prompts
-      telegram
-      twitter
-      website
-      communicationParams
-    }
-    proposals {
-      id
-      isRemoved
-      price
-      service
-      tokenAddress
-    }
-    tasks {
-      id
-      prompt
-      issuer
-      proposalId
-      rating
-      result
-      status
-      taskId
-    }
-  }
-}
-  `;
-
-  const { data: agent, loading } = useQuery(GET_AGENT);
+  const { agent, loading } = useAgent(id?.toLowerCase());
 
   return (
     <div>
@@ -78,7 +30,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
           <AppHeader />
           {loading ? (
             <Loader size="xl" />
-          ) : agent && agent.agent ? (
+          ) : agent ? (
             <>
               <div className="flex lg:flex-row flex-col items-stretch gap-6 w-full">
                 <div className="grow rounded-[10px]">
@@ -88,9 +40,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         AGENT PROFILE
                       </p>
                       <div className="lg:flex items-center gap-1 hidden">
-                        {agent.agent.metadata?.telegram ? (
+                        {agent.metadata?.telegram ? (
                           <Link
-                            href={agent.agent.metadata?.telegram}
+                            href={agent.metadata?.telegram}
                             target="_blank"
                             rel="noreferrer noopener"
                           >
@@ -101,9 +53,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             />
                           </Link>
                         ) : null}
-                        {agent.agent.metadata?.twitter ? (
+                        {agent.metadata?.twitter ? (
                           <Link
-                            href={agent.agent.metadata?.twitter}
+                            href={agent.metadata?.twitter}
                             target="_blank"
                             rel="noreferrer noopener"
                           >
@@ -114,9 +66,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             />
                           </Link>
                         ) : null}
-                        {agent.agent.metadata?.github ? (
+                        {agent.metadata?.github ? (
                           <Link
-                            href={agent.agent.metadata?.github}
+                            href={agent.metadata?.github}
                             target="_blank"
                             rel="noreferrer noopener"
                           >
@@ -127,9 +79,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             />
                           </Link>
                         ) : null}
-                        {agent.agent.metadata?.website ? (
+                        {agent.metadata?.website ? (
                           <Link
-                            href={agent.agent.metadata?.website}
+                            href={agent.metadata?.website}
                             target="_blank"
                             rel="noreferrer noopener"
                           >
@@ -140,9 +92,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                             />
                           </Link>
                         ) : null}
-                        {agent.agent.metadata?.dexscreener ? (
+                        {agent.metadata?.dexscreener ? (
                           <Link
-                            href={agent.agent.metadata?.dexscreener}
+                            href={agent.metadata?.dexscreener}
                             target="_blank"
                             rel="noreferrer noopener"
                           >
@@ -168,29 +120,29 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         <img
                           className="w-[120px] h-[120px] rounded-full object-cover"
                           src={
-                            agent.agent.metadata?.imageUri.startsWith(
+                            agent.metadata?.imageUri.startsWith(
                               "https://"
                             )
-                              ? agent.agent.metadata?.imageUri
-                              : `https://${agent.agent.metadata?.imageUri}`
+                              ? agent.metadata?.imageUri
+                              : `https://${agent.metadata?.imageUri}`
                           }
-                          alt={agent.agent.metadata?.name}
+                          alt={agent.metadata?.name}
                         />
                         <div className="flex flex-col items-start gap-2">
                           <p className="font-bold text-[#3d3d3d] text-[20px] leading-[auto] z-[1]">
-                            {agent.agent.metadata?.name}
+                            {agent.metadata?.name}
                           </p>
                           <p
                             className="font-bold text-light-text-color text-[16px] leading-[auto] cursor-pointer flex items-center gap-1 z-[1]"
-                            onClick={() => copyToClipboard(agent.agent.id)}
+                            onClick={() => copyToClipboard(agent.id)}
                             style={{
                               transition: "all 0.3s ease",
                               opacity:
-                                copiedPrompt === agent.agent.id ? 0.6 : 1,
+                                copiedPrompt === agent.id ? 0.6 : 1,
                             }}
                           >
-                            {agent.agent.id?.slice(0, 4)}...
-                            {agent.agent.id?.slice(-4)}
+                            {agent.id?.slice(0, 4)}...
+                            {agent.id?.slice(-4)}
                           </p>
                           {id ===
                           "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
@@ -204,49 +156,49 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                                 Vibes
                               </p>
                             </div>
-                          ) : agent.agent.metadata?.agentCategory ? (
+                          ) : agent.metadata?.agentCategory ? (
                             <div
                               className={`py-1 px-4 rounded-[2000px] flex items-center gap-2 ${
-                                agent.agent.metadata.agentCategory === "DeFi"
+                                agent.metadata.agentCategory === "DeFi"
                                   ? "bg-[#FFC8F9]"
-                                  : agent.agent.metadata.agentCategory ===
+                                  : agent.metadata.agentCategory ===
                                     "Social"
                                   ? "bg-[#FBFFC8]"
-                                  : agent.agent.metadata.agentCategory ===
+                                  : agent.metadata.agentCategory ===
                                     "Research"
                                   ? "bg-[#C8FFCE]"
                                   : "bg-[#C8E6FF]"
                               } z-[1]`}
                             >
-                              {agent.agent.metadata.agentCategory === "DeFi" ? (
+                              {agent.metadata.agentCategory === "DeFi" ? (
                                 <img
                                   src="/assets/defi-service-black-icon.svg"
-                                  alt={agent.agent.metadata.agentCategory}
+                                  alt={agent.metadata.agentCategory}
                                   className="w-[18px] h-[18px] z-[1]"
                                 />
-                              ) : agent.agent.metadata.agentCategory ===
+                              ) : agent.metadata.agentCategory ===
                                 "Social" ? (
                                 <img
                                   src="/assets/social-service-black-icon.svg"
-                                  alt={agent.agent.metadata.agentCategory}
+                                  alt={agent.metadata.agentCategory}
                                   className="w-[18px] h-[18px] z-[1]"
                                 />
-                              ) : agent.agent.metadata.agentCategory ===
+                              ) : agent.metadata.agentCategory ===
                                 "Research" ? (
                                 <img
                                   src="/assets/research-service-black-icon.svg"
-                                  alt={agent.agent.metadata.agentCategory}
+                                  alt={agent.metadata.agentCategory}
                                   className="w-[18px] h-[18px] z-[1]"
                                 />
                               ) : (
                                 <img
                                   src="/assets/security-service-black-icon.svg"
-                                  alt={agent.agent.metadata.agentCategory}
+                                  alt={agent.metadata.agentCategory}
                                   className="w-[18px] h-[18px] z-[1]"
                                 />
                               )}
                               <p className="text-[#3d3d3d] text-[14px] font-medium leading-[18px]">
-                                {agent.agent.metadata.agentCategory}
+                                {agent.metadata.agentCategory}
                               </p>
                             </div>
                           ) : null}
@@ -263,11 +215,11 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         About
                       </p>
                       <p className="text-[16px] font-medium text-[#121212]">
-                        {agent.agent.metadata?.description}
+                        {agent.metadata?.description}
                       </p>
                     </div>
-                    {agent.agent.metadata?.attributes &&
-                      agent.agent.metadata.attributes.length > 0 && (
+                    {agent.metadata?.attributes &&
+                      agent.metadata.attributes.length > 0 && (
                         <>
                           <hr
                             className="my-5 border-[1px] border-[#8F95B2]"
@@ -279,10 +231,10 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           />
                           <div className="space-y-2">
                             <p className="text-primary font-medium leading-[100%]">
-                              Capabilities
+                              Attributes
                             </p>
                             <div className="flex items-center gap-4 flex-wrap">
-                              {agent.agent.metadata.attributes.map(
+                              {agent.metadata.attributes.map(
                                 (capability: string, index: number) => (
                                   <div
                                     key={index}
@@ -342,7 +294,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                               Tasks
                             </span>
                             <p className="font-bold leading-[19px] text-text-color">
-                              {agent.agent.tasks.length}
+                              {agent.tasks.length}
                             </p>
                           </div>
                         </div>
@@ -357,7 +309,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                               Rating
                             </span>
                             <p className="font-bold leading-[19px] text-text-color">
-                              {convertRatingToStars(agent.agent.reputation)}
+                              {convertRatingToStars(agent.reputation)}
                             </p>
                           </div>
                         </div>
@@ -374,7 +326,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                     <div className="w-full flex lg:flex-row flex-col items-center gap-4">
                       <button
                         className="lg:w-fit w-full space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#121212]"
-                        onClick={() => push(`/chat?agent=${agent.agent.id}`)}
+                        onClick={() => push(`/agent/${agent.id}/chat`)}
                       >
                         <img
                           src="/assets/chat-icon.svg"
@@ -402,7 +354,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           borderImageSlice: "1",
                         }}
                       />
-                      {agent.agent.metadata.instructions.map(
+                      {agent.metadata.instructions.map(
                         (ins: string, i: number, arr: string[]) => (
                           <div
                             className={`p-4 flex items-center justify-start gap-2 ${
@@ -438,7 +390,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           borderImageSlice: "1",
                         }}
                       />
-                      {agent.agent.metadata.prompts.map(
+                      {agent.metadata.prompts.map(
                         (p: string, i: number, arr: string[]) => (
                           <div
                             className={`p-4 flex items-center justify-between gap-2 ${
@@ -555,7 +507,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           borderImageSlice: "1",
                         }}
                       />
-                      {agent.agent.metadata.instructions.map(
+                      {agent.metadata.instructions.map(
                         (ins: string, i: number, arr: string[]) => (
                           <div
                             className={`p-4 flex items-center justify-start gap-2 ${
@@ -591,7 +543,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           borderImageSlice: "1",
                         }}
                       />
-                      {agent.agent.metadata.prompts.map(
+                      {agent.metadata.prompts.map(
                         (p: string, i: number, arr: string[]) => (
                           <div
                             className={`p-4 flex items-center justify-between gap-2 ${

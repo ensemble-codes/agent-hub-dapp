@@ -141,6 +141,9 @@ export type MessageBroadcastData = {
       this.socket = io(fullURL, {
         autoConnect: true,
         reconnection: true,
+        extraHeaders: {
+          'ngrok-skip-browser-warning': 'true'
+        }
       });
   
       // Set up connection promise for async operations that depend on connection

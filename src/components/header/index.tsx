@@ -232,11 +232,12 @@ const AppHeader = () => {
           )}
           <div className="flex items-center justify-end gap-6">
             <Link
-              href={"/register-agent"}
+              href={"https://hub.ensemble.codes"}
+              target="_blank"
               rel="noreferrer noopener"
               className="text-[14px] font-normal leading-[100%] text-[#121212]"
             >
-              REGISTER AGENT
+              WEBSITE
             </Link>
             <Link
               href={"https://ensemble.codes"}

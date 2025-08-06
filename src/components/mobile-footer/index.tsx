@@ -8,14 +8,14 @@ const MobileFooter = () => {
   return (
     <div className="lg:hidden fixed z-[20] bottom-0 left-0 right-0 bg-white border-t-[0.5px] border-t-[#8F95B2] p-4">
       <div className="flex items-center justify-around">
-        <Link href={"/chat"} className="flex flex-col items-center">
+        <Link href={"/console"} className="flex flex-col items-center">
           <img
             src={
-              pathname === "/chat"
+              pathname === "/console"
                 ? "/assets/ensemble-highlighted-icon.svg"
                 : "/assets/ensemble-icon.svg"
             }
-            alt="chat"
+            alt="console"
             className="w-6 h-6"
           />
         </Link>
