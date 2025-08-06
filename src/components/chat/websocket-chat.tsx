@@ -7,6 +7,7 @@ import { getEntityId, WorldManager } from "@/lib/world-manager";
 import SocketIOManager from "@/lib/socket-io-manager";
 import { Content } from "@elizaos/core";
 import { CHAT_DATA, CHAT_SOURCE } from "@/constants";
+import { usePrivy } from "@privy-io/react-auth";
 
 export const WebsocketChat: FC<{
   agent: { id: `${string}-${string}-${string}-${string}-${string}`; metadata: { communicationURL: string } };
@@ -14,7 +15,7 @@ export const WebsocketChat: FC<{
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
-
+  const { authenticated, login } = usePrivy();
   const entityId = getEntityId();
   const agentId = agent.id;
   const roomId = WorldManager.generateRoomId(agentId);
@@ -145,8 +146,8 @@ export const WebsocketChat: FC<{
   return (
     <ChatLayout
       messages={messages}
-      handleSend={handleSend}
-      handleTaskSend={handleTaskSend}
+      handleSend={authenticated ? () => handleSend() : () => login()}
+      handleTaskSend={authenticated ? (msg: string) => handleTaskSend(msg) : () => login()}
       setInput={setInput}
       input={input}
       messageProcessing={messageProcessing}

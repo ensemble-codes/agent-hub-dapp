@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 
 const MobileFooter = () => {
   const pathname = usePathname();
+  if (pathname === "/register-user") return null;
 
   return (
     <div className="lg:hidden fixed z-[20] bottom-0 left-0 right-0 bg-white border-t-[0.5px] border-t-[#8F95B2] p-4">

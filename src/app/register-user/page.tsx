@@ -16,6 +16,7 @@ const Register = () => {
   const [resendCountdown, setResendCountdown] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [grantingAccess, setGrantingAccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { push } = useRouter();
@@ -80,6 +81,7 @@ const Register = () => {
       if (result.error) {
         throw error;
       }
+      setGrantingAccess(true);
       const response = await fetch(`/api/auth/verify-user`, {
         method: "POST",
         headers: {
@@ -94,7 +96,7 @@ const Register = () => {
       if (!data.success) throw "Failed to register user";
       dispatch({
         type: SET_USER,
-        payload: data.user
+        payload: data.user,
       });
       push("/");
     } catch (error) {
@@ -144,7 +146,7 @@ const Register = () => {
               </p>
             </div>
           </div>
-        ) : state.user ? (
+        ) : state.user && !grantingAccess ? (
           <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
             <div className="max-w-[570px] mx-auto flex flex-col items-center justify-center h-full">
               <div className="text-center mb-8">
@@ -318,20 +320,35 @@ const Register = () => {
                       Please enter the invite code sent to your email.
                     </p>
                     <hr className="my-4 border-[0.5px] border-[#AEAEAE]" />
-                    <button
-                      onClick={handleVerifyOTP}
-                      disabled={isLoading || otp.length !== 6}
-                      className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-primary rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed mb-3"
-                    >
-                      <img
-                        src={"/assets/inverted-check-icon.svg"}
-                        alt="check"
-                        className="w-6 h-6"
-                      />
-                      <p className="text-white font-[Montserrat] font-semibold text-[16px] leading-[120%]">
-                        {isLoading ? "Verifying..." : "Verify OTP"}
-                      </p>
-                    </button>
+                    {grantingAccess ? (
+                      <>
+                        <button className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-[#07AD44] rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed mb-3">
+                          <img
+                            src={"/assets/inverted-check-icon.svg"}
+                            alt="check"
+                            className="w-6 h-6"
+                          />
+                          <p className="text-white font-[Montserrat] font-semibold text-[16px] leading-[120%]">
+                            Granting access...
+                          </p>
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={handleVerifyOTP}
+                        disabled={isLoading || otp.length !== 6}
+                        className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-primary rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed mb-3"
+                      >
+                        <img
+                          src={"/assets/inverted-check-icon.svg"}
+                          alt="check"
+                          className="w-6 h-6"
+                        />
+                        <p className="text-white font-[Montserrat] font-semibold text-[16px] leading-[120%]">
+                          {isLoading ? "Verifying..." : "Verify OTP"}
+                        </p>
+                      </button>
+                    )}
                     <div className="w-full text-center text-[14px] text-[#8F95B2] font-[Montserrat] font-normal">
                       Didn't receive the code?{" "}
                       <button

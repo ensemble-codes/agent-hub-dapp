@@ -1,20 +1,35 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef, useMemo, useContext } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  useContext,
+} from "react";
 import { usePrivy, useFundWallet, useWallets } from "@privy-io/react-auth";
 import { ethers } from "ethers";
 import Modal from "../modal";
 import { baseSepolia } from "viem/chains";
 import { createWalletClient, custom, parseEther } from "viem";
 import { AppContext } from "@/context/app";
+import { usePathname } from "next/navigation";
 
 const MobileHeader = () => {
   const [state] = useContext(AppContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { login, authenticated, user: privyUser, logout, ready, exportWallet } = usePrivy();
+  const {
+    login,
+    authenticated,
+    user: privyUser,
+    logout,
+    ready,
+    exportWallet,
+  } = usePrivy();
   const { wallets } = useWallets();
   const { fundWallet } = useFundWallet();
-
+  const pathname = usePathname();
   // Wallet modal states
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
@@ -93,7 +108,7 @@ const MobileHeader = () => {
       console.warn("Cannot export wallet: not ready or no embedded wallet");
       return;
     }
-    
+
     try {
       await exportWallet();
     } catch (error) {
@@ -110,7 +125,9 @@ const MobileHeader = () => {
       const provider = new ethers.JsonRpcProvider(
         process.env.NEXT_PUBLIC_RPC_URL!
       );
-      const balanceWei = await provider.getBalance(state.embeddedWallet.address);
+      const balanceWei = await provider.getBalance(
+        state.embeddedWallet.address
+      );
       const balanceEth = ethers.formatEther(balanceWei);
       setBalance(balanceEth);
     } catch (error) {
@@ -154,37 +171,39 @@ const MobileHeader = () => {
     setWithdrawLoading(true);
     try {
       // Get the Privy wallet
-      const wallet = wallets.find(w => w.walletClientType === 'privy');
+      const wallet = wallets.find((w) => w.walletClientType === "privy");
       if (!wallet) {
-        throw new Error('Privy wallet not found');
+        throw new Error("Privy wallet not found");
       }
-      
+
       // Switch to Base Sepolia chain first
       await wallet.switchChain(baseSepolia.id);
-      
+
       // Get the Ethereum provider from the wallet
       const ethereumProvider = await wallet.getEthereumProvider();
-      
+
       // Create Viem wallet client
       const walletClient = createWalletClient({
         account: wallet.address as `0x${string}`,
         chain: baseSepolia,
         transport: custom(ethereumProvider),
       });
-      
+
       // Convert to Viem transaction format
       const transactionRequest = {
         to: withdrawAddress as `0x${string}`,
         value: parseEther(withdrawAmount),
       };
-      
+
       // Send transaction using Viem
       const hash = await walletClient.sendTransaction(transactionRequest);
-      
+
       // Wait for transaction to be mined
-      const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL!);
+      const provider = new ethers.JsonRpcProvider(
+        process.env.NEXT_PUBLIC_RPC_URL!
+      );
       await provider.waitForTransaction(hash);
-      
+
       setWithdrawSuccess("Transaction sent!");
       setWithdrawAddress("");
       setWithdrawAmount("");
@@ -215,13 +234,21 @@ const MobileHeader = () => {
   return (
     <>
       <div className="lg:hidden sticky top-0 bg-[#F9F9F9] z-[10] w-full p-4 flex items-center justify-between border-b-[0.5px] border-b-[#8F95B2]">
-        <Link href={"/"}>
+        {pathname === "/register-user" ? (
           <img
             src="/assets/logo-icon.svg"
             alt="logo"
             className="w-[40px] h-[36px]"
           />
-        </Link>
+        ) : (
+          <Link href={"/"}>
+            <img
+              src="/assets/logo-icon.svg"
+              alt="logo"
+              className="w-[40px] h-[36px]"
+            />
+          </Link>
+        )}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="w-6 h-6 cursor-pointer"
@@ -271,7 +298,7 @@ const MobileHeader = () => {
                 {state.embeddedWallet.address.slice(0, 4)}...
                 {state.embeddedWallet.address.slice(-4)}
               </button>
-            ) : ready && state.user ? (
+            ) : (
               <button
                 className="w-fit space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                 onClick={() => {
@@ -287,20 +314,20 @@ const MobileHeader = () => {
                   Connect Wallet
                 </span>
               </button>
-            ) : null}
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto">
             <nav className="p-6">
               <ul className="space-y-6">
                 <li>
-                  <Link
+                  {pathname === "/register-user" && !state.user ? null : <Link
                     href="/register-agent"
                     className="text-[16px] font-medium text-[#121212] hover:text-primary transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Register Agent
-                  </Link>
+                  </Link>}
                 </li>
                 <li>
                   <Link

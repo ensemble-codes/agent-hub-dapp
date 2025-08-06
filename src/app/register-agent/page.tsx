@@ -1,7 +1,7 @@
 "use client";
 import { AppHeader, SideMenu } from "@/components";
 import axios from "axios";
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState, useEffect, useContext } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { sendGAEvent } from "@next/third-parties/google";
 import { useSdk } from "@/sdk-config";
@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { logAgentRegistration, logError } from "@/utils/sentry-logging";
 import { AgentCommunicationType } from "@ensemble-ai/sdk/dist/src/types";
 import Link from "next/link";
+import { AppContext } from "@/context/app";
 
 const services = [
   {
@@ -96,9 +97,9 @@ const SUB_SERVICES_LIST = {
 };
 
 const Page = () => {
-  const { user, authenticated } = usePrivy();
+  const [state] = useContext(AppContext);
+  const { user, login } = usePrivy();
   const address = user?.wallet?.address;
-  const isConnected = authenticated;
 
   const sdk = useSdk();
   const { push } = useRouter();
@@ -1498,7 +1499,11 @@ const Page = () => {
                             ? "bg-primary cursor-pointer"
                             : "bg-primary/70 cursor-not-allowed"
                         }`}
-                        onClick={registerAgent}
+                        onClick={
+                          !state.embeddedWallet
+                            ? () => login()
+                            : () => registerAgent()
+                        }
                         disabled={!canRegisterAgent || loadingRegister}
                       >
                         <img src="/assets/bolt-icon.svg" alt="bolt" />

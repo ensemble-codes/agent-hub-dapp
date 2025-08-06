@@ -8,9 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 import { AppHeader, SideMenu } from "@/components";
 import MemoizedMessage from "../memoized-message";
-import { useAgentQuery } from "@/graphql/generated/ensemble";
 import { useSearchParams } from "next/navigation";
-import { ensembleClient } from "@/graphql/clients";
 import { ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
 import { gql, useQuery } from "@apollo/client";
 
