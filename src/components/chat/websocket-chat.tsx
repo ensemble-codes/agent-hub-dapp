@@ -10,7 +10,8 @@ import { CHAT_DATA, CHAT_SOURCE } from "@/constants";
 
 export const WebsocketChat: FC<{
   agent: { id: `${string}-${string}-${string}-${string}-${string}`; metadata: { communicationURL: string } };
-}> = ({ agent }) => {
+  agentAddress?: string;
+}> = ({ agent, agentAddress }) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
@@ -150,6 +151,7 @@ export const WebsocketChat: FC<{
       setInput={setInput}
       input={input}
       messageProcessing={messageProcessing}
+      agentAddress={agentAddress}
     />
   );
 };

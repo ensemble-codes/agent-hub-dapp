@@ -374,7 +374,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                     <div className="w-full flex lg:flex-row flex-col items-center gap-4">
                       <button
                         className="lg:w-fit w-full space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#121212]"
-                        onClick={() => push(`/chat?agent=${agent.agent.id}`)}
+                        onClick={() => push(`/agent/${agent.agent.id}/chat`)}
                       >
                         <img
                           src="/assets/chat-icon.svg"

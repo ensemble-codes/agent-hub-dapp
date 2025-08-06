@@ -39,7 +39,8 @@ export const XmtpChat: FC<{
       name: string;
     };
   };
-}> = ({ agent }) => {
+  agentAddress?: string;
+}> = ({ agent, agentAddress }) => {
   const { user, authenticated } = usePrivy();
   const [state] = useContext(AppContext);
   const account = {

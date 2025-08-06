@@ -19,6 +19,7 @@ const ChatLayoutContent: FC<{
   setInput: (input: string) => void;
   input: string;
   messageProcessing?: boolean;
+  agentAddress?: string;
 }> = ({
   messages,
   handleSend,
@@ -26,9 +27,11 @@ const ChatLayoutContent: FC<{
   setInput,
   input,
   messageProcessing,
+  agentAddress: propAgentAddress,
 }) => {
   const searchParams = useSearchParams();
-  const agentAddress = searchParams.get("agent");
+  const queryAgentAddress = searchParams.get("agent");
+  const agentAddress = propAgentAddress || queryAgentAddress;
   const GET_AGENT = gql`
     query MyQuery {
   agent(id: "${agentAddress || ORCHESTRATOR_AGENT_ADDRESS}") {
@@ -267,6 +270,7 @@ const ChatLayout: FC<{
   setInput: (input: string) => void;
   input: string;
   messageProcessing?: boolean;
+  agentAddress?: string;
 }> = ({
   messages,
   handleSend,
@@ -274,6 +278,7 @@ const ChatLayout: FC<{
   setInput,
   input,
   messageProcessing,
+  agentAddress,
 }) => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -284,6 +289,7 @@ const ChatLayout: FC<{
         setInput={setInput}
         input={input}
         messageProcessing={messageProcessing}
+        agentAddress={agentAddress}
       />
     </Suspense>
   );

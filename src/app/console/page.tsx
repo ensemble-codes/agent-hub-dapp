@@ -63,7 +63,7 @@ const ConsolePageContent: FC = () => {
       if (data.roomId === roomId) {
         setMessageProcessing(false);
         // Redirect to chat page after first message
-        router.push("/chat");
+        router.push(`/agent/${ORCHESTRATOR_AGENT_ADDRESS}/chat`);
       }
     };
     
