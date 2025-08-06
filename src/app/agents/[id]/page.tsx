@@ -2,12 +2,12 @@
 import { AppHeader, Loader, SideMenu } from "@/components";
 import { TaskStatus } from "@/enum/taskstatus";
 import { convertRatingToStars, getTaskStatusText } from "@/utils";
-import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FC, use, useState } from "react";
 import { formatEther } from "viem";
 import AGENTS_INFO from "@/data/agentsinfo.json";
+import { useAgent } from "@/hooks/useAgent";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
@@ -20,55 +20,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     setTimeout(() => setCopiedPrompt(null), 1000);
   };
 
-  const GET_AGENT = gql`
-    query MyQuery {
-  agent(id: "${id.toLowerCase()}") {
-    agentUri
-    id
-    name
-    owner
-    reputation
-    metadata {
-      agentCategory
-      attributes
-      communicationType
-      communicationURL
-      description
-      dexscreener
-      github
-      id
-      imageUri
-      instructions
-      name
-      openingGreeting
-      prompts
-      telegram
-      twitter
-      website
-      communicationParams
-    }
-    proposals {
-      id
-      isRemoved
-      price
-      service
-      tokenAddress
-    }
-    tasks {
-      id
-      prompt
-      issuer
-      proposalId
-      rating
-      result
-      status
-      taskId
-    }
-  }
-}
-  `;
-
-  const { data: agent, loading } = useQuery(GET_AGENT);
+  const { agent, loading } = useAgent(id?.toLowerCase());
 
   return (
     <div>

@@ -1,4 +1,4 @@
-import { FC, Suspense, useMemo } from "react";
+import { FC, Suspense } from "react";
 import Link from "next/link";
 import {
   Tooltip,
@@ -10,7 +10,7 @@ import { AppHeader, SideMenu } from "@/components";
 import MemoizedMessage from "../memoized-message";
 import { useSearchParams } from "next/navigation";
 import { ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
-import { gql, useQuery } from "@apollo/client";
+import { useAgent } from "@/hooks/useAgent";
 
 const ChatLayoutContent: FC<{
   messages: any[];
@@ -32,63 +32,8 @@ const ChatLayoutContent: FC<{
   const searchParams = useSearchParams();
   const queryAgentAddress = searchParams.get("agent");
   const agentAddress = propAgentAddress || queryAgentAddress;
-  const GET_AGENT = gql`
-    query MyQuery {
-  agent(id: "${agentAddress || ORCHESTRATOR_AGENT_ADDRESS}") {
-    agentUri
-    id
-    name
-    owner
-    reputation
-    metadata {
-      agentCategory
-      attributes
-      communicationType
-      communicationURL
-      description
-      dexscreener
-      github
-      id
-      imageUri
-      instructions
-      name
-      openingGreeting
-      prompts
-      telegram
-      twitter
-      website
-      communicationParams
-    }
-    proposals {
-      id
-      isRemoved
-      price
-      service
-      tokenAddress
-    }
-    tasks {
-      id
-      prompt
-      issuer
-      proposalId
-      rating
-      result
-      status
-      taskId
-    }
-  }
-}
-  `;
-
-  const { data, loading } = useQuery(GET_AGENT);
-
-  const agent = useMemo(() => {
-    if (data?.agent) {
-      return data.agent;
-    }
-
-    return null;
-  }, [data]);
+  
+  const { agent, loading } = useAgent(agentAddress || ORCHESTRATOR_AGENT_ADDRESS);
 
   return (
     <>

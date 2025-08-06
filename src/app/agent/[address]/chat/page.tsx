@@ -6,69 +6,13 @@ import { FC, Suspense, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { Loader } from "@/components";
 import { CHAT_DATA, ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
-import { gql, useQuery } from "@apollo/client";
+import { useAgent } from "@/hooks/useAgent";
 
 const PageContent: FC = () => {
   const params = useParams();
   const agentAddress = params.address as string;
 
-  const GET_AGENT = gql`
-    query MyQuery {
-  agent(id: "${agentAddress || ORCHESTRATOR_AGENT_ADDRESS}") {
-    agentUri
-    id
-    name
-    owner
-    reputation
-    metadata {
-      agentCategory
-      attributes
-      communicationType
-      communicationURL
-      description
-      dexscreener
-      github
-      id
-      imageUri
-      instructions
-      name
-      openingGreeting
-      prompts
-      telegram
-      twitter
-      website
-      communicationParams
-    }
-    proposals {
-      id
-      isRemoved
-      price
-      service
-      tokenAddress
-    }
-    tasks {
-      id
-      prompt
-      issuer
-      proposalId
-      rating
-      result
-      status
-      taskId
-    }
-  }
-}
-  `;
-
-  const { data, loading } = useQuery(GET_AGENT);
-
-  const agent = useMemo(() => {
-    if (data?.agent) {
-      return data.agent;
-    }
-
-    return null;
-  }, [data]);
+  const { agent, loading } = useAgent(agentAddress || ORCHESTRATOR_AGENT_ADDRESS);
 
   const communicationType = useMemo(
     () => agent?.metadata?.communicationType ?? "",

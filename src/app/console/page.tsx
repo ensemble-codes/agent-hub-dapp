@@ -1,14 +1,14 @@
 "use client";
 
-import { FC, Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { gql, useQuery } from "@apollo/client";
 import { AppHeader, Loader, SideMenu } from "@/components";
 import Console from "@/components/chat/console";
 import { ORCHESTRATOR_AGENT_ADDRESS, CHAT_DATA, CHAT_SOURCE } from "@/constants";
 import { getEntityId, WorldManager } from "@/lib/world-manager";
 import SocketIOManager from "@/lib/socket-io-manager";
 import { Content } from "@elizaos/core";
+import { useAgent } from "@/hooks/useAgent";
 
 const ConsolePageContent: FC = () => {
   const router = useRouter();
@@ -20,31 +20,7 @@ const ConsolePageContent: FC = () => {
   const agentId = CHAT_DATA[ORCHESTRATOR_AGENT_ADDRESS].agentId;
   const roomId = WorldManager.generateRoomId(agentId);
   
-  const GET_ORCHESTRATOR = gql`
-    query GetOrchestrator {
-      agent(id: "${ORCHESTRATOR_AGENT_ADDRESS}") {
-        id
-        name
-        metadata {
-          name
-          description
-          imageUri
-          prompts
-          communicationURL
-          communicationParams
-        }
-      }
-    }
-  `;
-  
-  const { data, loading } = useQuery(GET_ORCHESTRATOR);
-  
-  const agent = useMemo(() => {
-    if (data?.agent) {
-      return data.agent;
-    }
-    return null;
-  }, [data]);
+  const { agent, loading } = useAgent(ORCHESTRATOR_AGENT_ADDRESS);
   
   const socketIOManager = SocketIOManager.getInstance();
   
