@@ -18,14 +18,16 @@ Sentry.init({
 // Global error listeners to catch console errors
 if (typeof window !== 'undefined') {
 
-  // Initialize PostHog for client-side instrumentation
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-    api_host: "/ingest",
-    ui_host: "https://eu.posthog.com",
-    defaults: '2025-05-24',
-    capture_exceptions: true, // This enables capturing exceptions using Error Tracking, set to false if you don't want this
-    debug: process.env.NODE_ENV === "development",
-  });
+  // Initialize PostHog for client-side instrumentation (only in production)
+  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+      api_host: "/ingest",
+      ui_host: "https://eu.posthog.com",
+      defaults: '2025-05-24',
+      capture_exceptions: true, // This enables capturing exceptions using Error Tracking, set to false if you don't want this
+      debug: false,
+    });
+  }
   
   // Store original console methods before overriding
   const originalConsoleLog = console.log;

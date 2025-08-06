@@ -229,13 +229,14 @@ const AppHeader = () => {
             <div />
           )}
           <div className="flex items-center justify-end gap-6">
-            {pathname === "/register-user" && !state.user ? null : <Link
-              href={"/register-agent"}
+            <Link
+              href={"https://hub.ensemble.codes"}
+              target="_blank"
               rel="noreferrer noopener"
               className="text-[14px] font-normal leading-[100%] text-[#121212]"
             >
-              REGISTER AGENT
-            </Link>}
+              WEBSITE
+            </Link>
             <Link
               href={"https://ensemble.codes"}
               target="_blank"
