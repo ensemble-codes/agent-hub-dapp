@@ -5,7 +5,7 @@ import { WebsocketChat } from "@/components/chat/websocket-chat";
 import { FC, Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Loader } from "@/components";
-import { CHAT_DATA, ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
+import { ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
 import { useAgent } from "@/hooks/useAgent";
 
 const PageContent: FC = () => {
@@ -18,41 +18,41 @@ const PageContent: FC = () => {
     () => agent?.metadata?.communicationType ?? "",
     [agent]
   );
-  const chatData = useMemo(
-    () => agentAddress && CHAT_DATA[agentAddress],
-    [agentAddress]
-  );
+  
+  // Parse agentId from communicationParams
+  const agentId = useMemo(() => {
+    if (!agent?.metadata?.communicationParams) return null;
+    try {
+      const params = JSON.parse(agent.metadata.communicationParams);
+      return params.agentId;
+    } catch (e) {
+      console.error("Failed to parse communicationParams:", e);
+      return null;
+    }
+  }, [agent]);
 
   if (loading) return <Loader />;
 
-  if (!agentAddress) {
+  if (!agentAddress || !agent) {
     // Always use WebsocketChat for orchestrator
+    if (!agentId) return <p>Failed to load agent data</p>;
+    
     return (
       <WebsocketChat
         agent={{
-          id: CHAT_DATA[ORCHESTRATOR_AGENT_ADDRESS].agentId,
+          id: agentId,
           metadata: { communicationURL: agent?.metadata?.communicationURL ?? "" },
-        }}
-      />
-    );
-  }
-
-  if (chatData && (agentAddress)) {
-    return (
-      <WebsocketChat
-        agent={{
-          id: CHAT_DATA[agentAddress].agentId,
-          metadata: { communicationURL: chatData.communicationURL },
         }}
       />
     );
   } else {
     switch (communicationType) {
       case "websocket":
+        if (!agentId) return <p>Failed to load agent data</p>;
         return (
           <WebsocketChat
             agent={{
-              id: JSON.parse(agent?.metadata?.communicationParams)?.agentId,
+              id: agentId,
               metadata: {
                 communicationURL: agent?.metadata?.communicationURL ?? "",
               },

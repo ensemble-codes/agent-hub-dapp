@@ -6,7 +6,7 @@ import ChatLayout from "./chat-layout";
 import { getEntityId, WorldManager } from "@/lib/world-manager";
 import SocketIOManager from "@/lib/socket-io-manager";
 import { Content } from "@elizaos/core";
-import { CHAT_DATA, CHAT_SOURCE } from "@/constants";
+import { CHAT_SOURCE } from "@/constants";
 
 export const WebsocketChat: FC<{
   agent: { id: `${string}-${string}-${string}-${string}-${string}`; metadata: { communicationURL: string } };

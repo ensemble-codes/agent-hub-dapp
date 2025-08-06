@@ -1,10 +1,10 @@
 "use client";
 
-import { FC, Suspense, useCallback, useEffect, useState } from "react";
+import { FC, Suspense, useCallback, useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { AppHeader, Loader, SideMenu } from "@/components";
 import Console from "@/components/chat/console";
-import { ORCHESTRATOR_AGENT_ADDRESS, CHAT_DATA, CHAT_SOURCE } from "@/constants";
+import { ORCHESTRATOR_AGENT_ADDRESS, CHAT_SOURCE } from "@/constants";
 import { getEntityId, WorldManager } from "@/lib/world-manager";
 import SocketIOManager from "@/lib/socket-io-manager";
 import { useAgent } from "@/hooks/useAgent";
@@ -16,15 +16,31 @@ const ConsolePageContent: FC = () => {
   const [messageProcessing] = useState(false);
   
   const entityId = getEntityId();
-  const agentId = CHAT_DATA[ORCHESTRATOR_AGENT_ADDRESS].agentId;
-  const roomId = WorldManager.generateRoomId(agentId);
-  
   const { agent, loading } = useAgent(ORCHESTRATOR_AGENT_ADDRESS);
+  
+  // Parse agentId from communicationParams
+  const agentId = useMemo(() => {
+    if (!agent?.metadata?.communicationParams) return null;
+    try {
+      const params = JSON.parse(agent.metadata.communicationParams);
+      return params.agentId;
+    } catch (e) {
+      console.error("Failed to parse communicationParams:", e);
+      return null;
+    }
+  }, [agent]);
+  
+  const roomId = useMemo(() => {
+    if (!agentId) return null;
+    return WorldManager.generateRoomId(agentId);
+  }, [agentId]);
   
   const socketIOManager = SocketIOManager.getInstance();
   
   useEffect(() => {
-    const communicationURL = CHAT_DATA[ORCHESTRATOR_AGENT_ADDRESS].communicationURL;
+    if (!agentId || !roomId || !agent) return;
+    
+    const communicationURL = agent.metadata?.communicationURL;
     
     socketIOManager.initialize(
       entityId,
@@ -37,10 +53,10 @@ const ConsolePageContent: FC = () => {
     return () => {
       socketIOManager.leaveRoom(roomId);
     };
-  }, [roomId, agentId, entityId, socketIOManager]);
+  }, [roomId, agentId, entityId, socketIOManager, agent]);
   
   const handleSend = useCallback(() => {
-    if (!input || messageProcessing) return;
+    if (!input || messageProcessing || !roomId) return;
     
     // Store message with sending status in sessionStorage
     const newMessage = {
@@ -65,6 +81,8 @@ const ConsolePageContent: FC = () => {
   
   const handleTaskSend = useCallback(
     (msg: string) => {
+      if (!roomId) return;
+      
       // Store message with sending status in sessionStorage
       const newMessage = {
         content: msg,
