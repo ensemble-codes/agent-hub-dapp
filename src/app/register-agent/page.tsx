@@ -338,7 +338,12 @@ const Page = () => {
 
   const canProceedToNextStep = useMemo(() => {
     if (detailsStep === "identity") {
-      return agentName.trim() && agentDescription.trim() && agentAddress.trim();
+      return (
+        agentName.trim() &&
+        agentDescription.trim() &&
+        agentAddress.trim() &&
+        address?.trim()
+      );
     }
     if (detailsStep === "attributes") {
       return canProceedServicesStep;
@@ -378,6 +383,7 @@ const Page = () => {
     isValidTelegram,
     agentDexTools,
     isValidDexTools,
+    address,
   ]);
 
   const canRegisterAgent = useMemo(() => {
@@ -679,7 +685,7 @@ const Page = () => {
                       borderImageSlice: "1",
                     }}
                   />
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-start gap-4">
                     <div className="flex-1 w-[176px]">
                       <div className="space-y-2">
                         <p className="font-medium leading-[20px] text-[#121212 font-[Montserrat]">
@@ -706,23 +712,40 @@ const Page = () => {
                     <div className="flex-1 w-[176px]">
                       <div className="space-y-2">
                         <p className="font-medium leading-[20px] text-[#121212] font-[Montserrat]">
-                          Your Address*
+                          Owner Address*
                         </p>
-                        <input
-                          className="w-full outline-none focus:outline-none placeholder:text-primary/70 text-primary"
-                          placeholder="Receives Payments"
-                          value={address ? getAddress(address) : ""}
-                          disabled
-                        />
+                        {address ? (
+                          <input
+                            className="w-full outline-none focus:outline-none placeholder:text-primary/70 text-primary"
+                            placeholder="Receives Payments"
+                            value={address ? getAddress(address) : ""}
+                            disabled
+                          />
+                        ) : (
+                          <button
+                            className="w-fit space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                            onClick={() => {
+                              login();
+                            }}
+                          >
+                            <img
+                              src="/assets/connect-wallet-icon.svg"
+                              alt="connect-wallet"
+                            />
+                            <span className="text-white text-[16px] font-[700] leading-[24px]">
+                              Connect Wallet
+                            </span>
+                          </button>
+                        )}
                       </div>
-                      <hr
+                      {address && <hr
                         className="mt-4 mb-6 border-[0.5px] border-[#8F95B2] w-[70%]"
                         style={{
                           borderImageSource:
                             "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
                           borderImageSlice: "1",
                         }}
-                      />
+                      />}
                     </div>
                   </div>
                   <div className="space-y-4">

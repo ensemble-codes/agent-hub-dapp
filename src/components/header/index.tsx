@@ -35,6 +35,7 @@ const AppHeader = () => {
   const [withdrawSuccess, setWithdrawSuccess] = useState("");
   const withdrawRef = useRef<HTMLDivElement>(null);
   const [withdrawHeight, setWithdrawHeight] = useState(0);
+  const [isPrivyWallet, setIsPrivyWallet] = useState(false);
 
   const copyAddress = async () => {
     if (state.embeddedWallet) {
@@ -195,6 +196,8 @@ const AppHeader = () => {
   useEffect(() => {
     if (showWalletModal && state.embeddedWallet) {
       fetchBalance();
+      const privyWallet = wallets?.find((w) => w.walletClientType === "privy");
+      setIsPrivyWallet(privyWallet ? privyWallet.address.toLowerCase() === state.embeddedWallet.address.toLowerCase() : false);
     }
   }, [showWalletModal, state.embeddedWallet]);
 
@@ -375,14 +378,14 @@ const AppHeader = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-center">
+              {isPrivyWallet ? <div className="flex items-center justify-center">
                 <div
                   className="w-full py-3 text-center bg-light-text-color/20 cursor-pointer rounded-[12px] hover:scale-[1.05] font-semibold transition-all duration-300 ease-in-out ledaing-[18px] text-[13px] text-[#000]"
                   onClick={handleExportWallet}
                 >
                   Export Wallet
                 </div>
-              </div>
+              </div> : null}
 
               {/* Collapsible Withdraw Section with Animation */}
               <div
