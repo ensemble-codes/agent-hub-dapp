@@ -19,25 +19,25 @@ const SideMenu = () => {
           </p>
         </Link>
         <div className={`px-4 pb-6 border-b-[0.5px] border-b-[#8F95B2] relative`}>
-          <Link href={"/chat"} className="flex items-center gap-2">
+          <Link href={"/console"} className="flex items-center gap-2">
             <img
               src={
-                pathname === "/chat"
+                pathname === "/console"
                   ? "/assets/ensemble-highlighted-icon.svg"
                   : "/assets/ensemble-icon.svg"
               }
-              alt="chat"
+              alt="console"
               className="w-6 h-6"
             />
             <p
               className={`${
-                pathname === "/chat" ? "text-primary" : "text-[#8F95B2]"
+                pathname === "/console" ? "text-primary" : "text-[#8F95B2]"
               } font-semibold`}
             >
               Console
             </p>
           </Link>
-          {pathname === `/chat` ? <div className="w-[8px] h-10 rounded-l-[8px] bg-primary absolute right-0 top-[-10px]" /> : null}
+          {pathname === `/console` ? <div className="w-[8px] h-10 rounded-l-[8px] bg-primary absolute right-0 top-[-10px]" /> : null}
         </div>
         <div
           className={`px-4 py-6 border-b-[0.5px] border-b-[#8F95B2] relative`}
