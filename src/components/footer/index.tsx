@@ -1,7 +1,7 @@
 'use client';
 import Link from "next/link";
 import { useState } from "react";
-import { captureError, addBreadcrumb } from "@/utils/sentry";
+import { captureError, addBreadcrumb } from "@/utils/error-tracking";
 import { usePathname } from "next/navigation";
 
 const Footer = () => {

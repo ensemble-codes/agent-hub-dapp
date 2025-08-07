@@ -12,7 +12,7 @@ import { formatEther } from "ethers";
 
 
 import Link from "next/link";
-import { logTaskCreation, logError } from "@/utils/sentry-logging";
+import { logTaskCreation, logError } from "@/utils/logging";
 
 interface ConfirmAgentProps {
   selectedAgent: number;

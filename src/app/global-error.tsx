@@ -1,25 +1,25 @@
 "use client";
 
-import * as Sentry from "@sentry/nextjs";
+import posthog from "posthog-js";
 import NextError from "next/error";
 import { useEffect } from "react";
 
 export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
   useEffect(() => {
     console.log(error);
-    // Add context to the error for better debugging
-    Sentry.setContext("global_error", {
-      error_name: error.name,
-      error_message: error.message,
-      error_stack: error.stack,
-      digest: error.digest,
-      url: window.location.href,
-      user_agent: navigator.userAgent,
-      timestamp: new Date().toISOString()
-    });
-    
-    // Capture the error with enhanced context
-    Sentry.captureException(error);
+    // Capture the error in PostHog with enhanced context
+    if (typeof window !== 'undefined' && posthog) {
+      posthog.capture('$exception', {
+        $exception_message: error.message,
+        $exception_type: error.name,
+        $exception_stack_trace: error.stack,
+        digest: error.digest,
+        url: window.location.href,
+        user_agent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+        source: 'global_error'
+      });
+    }
   }, [error]);
 
   return (

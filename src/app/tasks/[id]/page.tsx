@@ -11,7 +11,7 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Link from "next/link";
-import { logTaskRating, logError } from "@/utils/sentry-logging";
+import { logTaskRating, logError } from "@/utils/logging";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);

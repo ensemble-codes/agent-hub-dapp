@@ -1,24 +1,24 @@
-import * as Sentry from "@sentry/nextjs";
+import posthog from "posthog-js";
 
-// Enhanced error logging that captures to both console and Sentry
+// Enhanced error logging that captures to both console and PostHog
 export const logError = (error: Error | string, context?: Record<string, any>) => {
   const errorMessage = typeof error === 'string' ? error : error.message;
   const errorObject = typeof error === 'string' ? new Error(error) : error;
 
   // Log to console for immediate debugging
-  console.error('Error logged to Sentry:', errorMessage, context);
+  console.error('Error logged to PostHog:', errorMessage, context);
 
-  // Add context to Sentry
-  if (context) {
-    Sentry.setContext("error_context", {
+  // Capture in PostHog
+  if (typeof window !== 'undefined' && posthog) {
+    posthog.capture('$exception', {
+      $exception_message: errorObject.message,
+      $exception_type: errorObject.name,
+      $exception_stack_trace: errorObject.stack,
       timestamp: new Date().toISOString(),
       url: window.location.href,
       ...context
     });
   }
-
-  // Capture in Sentry
-  Sentry.captureException(errorObject);
 };
 
 // Enhanced console.error replacement
@@ -26,15 +26,17 @@ export const consoleError = (message: string, ...args: any[]) => {
   // Log to console
   console.error(message, ...args);
 
-  // Capture in Sentry
-  Sentry.setContext("console_error", {
-    args: args.map(arg => 
-      typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-    ),
-    timestamp: new Date().toISOString(),
-    url: window.location.href
-  });
-  Sentry.captureMessage(`Console Error: ${message}`, "error");
+  // Capture in PostHog
+  if (typeof window !== 'undefined' && posthog) {
+    posthog.capture('console_error', {
+      message,
+      args: args.map(arg => 
+        typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+      ),
+      timestamp: new Date().toISOString(),
+      url: window.location.href
+    });
+  }
 };
 
 // Enhanced console.warn replacement
@@ -42,15 +44,17 @@ export const consoleWarn = (message: string, ...args: any[]) => {
   // Log to console
   console.warn(message, ...args);
 
-  // Capture in Sentry
-  Sentry.setContext("console_warning", {
-    args: args.map(arg => 
-      typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-    ),
-    timestamp: new Date().toISOString(),
-    url: window.location.href
-  });
-  Sentry.captureMessage(`Console Warning: ${message}`, "warning");
+  // Capture in PostHog
+  if (typeof window !== 'undefined' && posthog) {
+    posthog.capture('console_warning', {
+      message,
+      args: args.map(arg => 
+        typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+      ),
+      timestamp: new Date().toISOString(),
+      url: window.location.href
+    });
+  }
 };
 
 // Utility to wrap async functions and capture errors
@@ -87,4 +91,4 @@ export const withSyncErrorLogging = <T extends any[], R>(
       throw error; // Re-throw to maintain original behavior
     }
   };
-}; 
+};

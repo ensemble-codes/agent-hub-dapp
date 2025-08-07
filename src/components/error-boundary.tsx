@@ -1,6 +1,6 @@
 'use client';
 
-import * as Sentry from "@sentry/nextjs";
+import posthog from "posthog-js";
 import { Component, ReactNode } from "react";
 
 interface Props {
@@ -25,14 +25,16 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    // Log the error to Sentry
-    Sentry.captureException(error, {
-      contexts: {
-        react: {
-          componentStack: errorInfo.componentStack,
-        },
-      },
-    });
+    // Log the error to PostHog
+    if (typeof window !== 'undefined' && posthog) {
+      posthog.capture('$exception', {
+        $exception_message: error.message,
+        $exception_type: error.name,
+        $exception_stack_trace: error.stack,
+        component_stack: errorInfo.componentStack,
+        source: 'error_boundary'
+      });
+    }
   }
 
   render() {
@@ -67,4 +69,4 @@ class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-export default ErrorBoundary; 
+export default ErrorBoundary;
