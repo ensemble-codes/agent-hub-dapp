@@ -20,7 +20,7 @@ import Image from "next/image";
 const AppHeader = () => {
   const [state] = useContext(AppContext);
   const pathname = usePathname();
-  const { login, logout, ready, exportWallet } = usePrivy();
+  const { login, logout, ready, exportWallet, authenticated } = usePrivy();
   const { wallets } = useWallets();
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
@@ -35,6 +35,7 @@ const AppHeader = () => {
   const [withdrawSuccess, setWithdrawSuccess] = useState("");
   const withdrawRef = useRef<HTMLDivElement>(null);
   const [withdrawHeight, setWithdrawHeight] = useState(0);
+  const [isPrivyWallet, setIsPrivyWallet] = useState(false);
 
   const copyAddress = async () => {
     if (state.embeddedWallet) {
@@ -89,7 +90,7 @@ const AppHeader = () => {
       console.warn("Cannot export wallet: not ready or no embedded wallet");
       return;
     }
-    
+
     try {
       await exportWallet();
     } catch (error) {
@@ -195,6 +196,8 @@ const AppHeader = () => {
   useEffect(() => {
     if (showWalletModal && state.embeddedWallet) {
       fetchBalance();
+      const privyWallet = wallets?.find((w) => w.walletClientType === "privy");
+      setIsPrivyWallet(privyWallet ? privyWallet.address.toLowerCase() === state.embeddedWallet.address.toLowerCase() : false);
     }
   }, [showWalletModal, state.embeddedWallet]);
 
@@ -218,15 +221,13 @@ const AppHeader = () => {
       <div className="hidden w-full lg:flex items-center justify-end py-2 px-4 bg-white rounded-[16px] lg:mb-8">
         <div className="flex items-center justify-between w-full">
           {pathname === "/register-user" ? (
-            <Link href={"/"}>
-              <Image
-                src={"/assets/logo-icon.svg"}
-                alt="logo"
-                width={68}
-                height={88}
-                className="lg:block hidden"
-              />
-            </Link>
+            <Image
+              src={"/assets/logo-icon.svg"}
+              alt="logo"
+              width={68}
+              height={88}
+              className="lg:block hidden"
+            />
           ) : (
             <div />
           )}
@@ -282,7 +283,7 @@ const AppHeader = () => {
                   />
                 </Link>
               </>
-            ) : ready && state.user && state.embeddedWallet ? (
+            ) : ready && authenticated && state.embeddedWallet ? (
               <button
                 className="py-1 px-4 text-[16px] text-[#000] border border-[#000] rounded-[20000px] font-normal flex items-center gap-2"
                 style={{
@@ -293,7 +294,7 @@ const AppHeader = () => {
                 {state.embeddedWallet.address.slice(0, 4)}...
                 {state.embeddedWallet.address.slice(-4)}
               </button>
-            ) : ready && state.user ? (
+            ) : (
               <button
                 className="w-auto space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
                 onClick={login}
@@ -306,7 +307,7 @@ const AppHeader = () => {
                   Connect Wallet
                 </span>
               </button>
-            ) : null}
+            )}
           </div>
         </div>
       </div>
@@ -377,14 +378,14 @@ const AppHeader = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-center">
+              {isPrivyWallet ? <div className="flex items-center justify-center">
                 <div
                   className="w-full py-3 text-center bg-light-text-color/20 cursor-pointer rounded-[12px] hover:scale-[1.05] font-semibold transition-all duration-300 ease-in-out ledaing-[18px] text-[13px] text-[#000]"
                   onClick={handleExportWallet}
                 >
                   Export Wallet
                 </div>
-              </div>
+              </div> : null}
 
               {/* Collapsible Withdraw Section with Animation */}
               <div

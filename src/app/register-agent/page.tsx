@@ -1,7 +1,7 @@
 "use client";
 import { AppHeader, SideMenu } from "@/components";
 import axios from "axios";
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState, useEffect, useContext } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { sendGAEvent } from "@next/third-parties/google";
 import { useSdk } from "@/sdk-config";
@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { logAgentRegistration, logError } from "@/utils/sentry-logging";
 import { AgentCommunicationType } from "@ensemble-ai/sdk/dist/src/types";
 import Link from "next/link";
+import { AppContext } from "@/context/app";
 
 const services = [
   {
@@ -96,9 +97,9 @@ const SUB_SERVICES_LIST = {
 };
 
 const Page = () => {
-  const { user, authenticated } = usePrivy();
+  const [state] = useContext(AppContext);
+  const { user, login } = usePrivy();
   const address = user?.wallet?.address;
-  const isConnected = authenticated;
 
   const sdk = useSdk();
   const { push } = useRouter();
@@ -337,7 +338,12 @@ const Page = () => {
 
   const canProceedToNextStep = useMemo(() => {
     if (detailsStep === "identity") {
-      return agentName.trim() && agentDescription.trim() && agentAddress.trim();
+      return (
+        agentName.trim() &&
+        agentDescription.trim() &&
+        agentAddress.trim() &&
+        address?.trim()
+      );
     }
     if (detailsStep === "attributes") {
       return canProceedServicesStep;
@@ -377,6 +383,7 @@ const Page = () => {
     isValidTelegram,
     agentDexTools,
     isValidDexTools,
+    address,
   ]);
 
   const canRegisterAgent = useMemo(() => {
@@ -678,7 +685,7 @@ const Page = () => {
                       borderImageSlice: "1",
                     }}
                   />
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-start gap-4">
                     <div className="flex-1 w-[176px]">
                       <div className="space-y-2">
                         <p className="font-medium leading-[20px] text-[#121212 font-[Montserrat]">
@@ -705,23 +712,40 @@ const Page = () => {
                     <div className="flex-1 w-[176px]">
                       <div className="space-y-2">
                         <p className="font-medium leading-[20px] text-[#121212] font-[Montserrat]">
-                          Your Address*
+                          Owner Address*
                         </p>
-                        <input
-                          className="w-full outline-none focus:outline-none placeholder:text-primary/70 text-primary"
-                          placeholder="Receives Payments"
-                          value={address ? getAddress(address) : ""}
-                          disabled
-                        />
+                        {address ? (
+                          <input
+                            className="w-full outline-none focus:outline-none placeholder:text-primary/70 text-primary"
+                            placeholder="Receives Payments"
+                            value={address ? getAddress(address) : ""}
+                            disabled
+                          />
+                        ) : (
+                          <button
+                            className="w-fit space-x-2 flex items-center justify-between rounded-[50px] bg-primary py-[12px] px-[16px] shadow-[5px_5px_10px_0px_#FE46003D,-5px_-5px_10px_0px_#FAFBFFAD]"
+                            onClick={() => {
+                              login();
+                            }}
+                          >
+                            <img
+                              src="/assets/connect-wallet-icon.svg"
+                              alt="connect-wallet"
+                            />
+                            <span className="text-white text-[16px] font-[700] leading-[24px]">
+                              Connect Wallet
+                            </span>
+                          </button>
+                        )}
                       </div>
-                      <hr
+                      {address && <hr
                         className="mt-4 mb-6 border-[0.5px] border-[#8F95B2] w-[70%]"
                         style={{
                           borderImageSource:
                             "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
                           borderImageSlice: "1",
                         }}
-                      />
+                      />}
                     </div>
                   </div>
                   <div className="space-y-4">
@@ -1498,7 +1522,11 @@ const Page = () => {
                             ? "bg-primary cursor-pointer"
                             : "bg-primary/70 cursor-not-allowed"
                         }`}
-                        onClick={registerAgent}
+                        onClick={
+                          !state.embeddedWallet
+                            ? () => login()
+                            : () => registerAgent()
+                        }
                         disabled={!canRegisterAgent || loadingRegister}
                       >
                         <img src="/assets/bolt-icon.svg" alt="bolt" />

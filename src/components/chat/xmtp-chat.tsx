@@ -39,9 +39,8 @@ export const XmtpChat: FC<{
       name: string;
     };
   };
-  agentAddress?: string;
-}> = ({ agent, agentAddress }) => {
-  const { user, authenticated } = usePrivy();
+}> = ({ agent }) => {
+  const { user, authenticated, login } = usePrivy();
   const [state] = useContext(AppContext);
   const account = {
     isConnected: authenticated,
@@ -248,7 +247,7 @@ export const XmtpChat: FC<{
           client &&
           conversation
         ) {
-          onSendMessage();
+          authenticated ? onSendMessage() : login();
         }
       }
 
@@ -261,7 +260,7 @@ export const XmtpChat: FC<{
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [chatInput, isWaitingForResponse, client, conversation, onSendMessage]);
+  }, [chatInput, isWaitingForResponse, client, conversation, onSendMessage, authenticated, login]);
 
   // Memoized message component for better performance
   const MemoizedMessage = memo(
@@ -288,7 +287,7 @@ export const XmtpChat: FC<{
               <AgentServicesTable
                 services={message.content?.data?.services}
                 onCreateTask={(service) =>
-                  onSendMessage(`I want to enable ${service.name} service`)
+                  authenticated ? onSendMessage(`I want to enable ${service.name} service`) : login()
                 }
               />
             ) : message.contentType === "json" &&
@@ -297,7 +296,9 @@ export const XmtpChat: FC<{
                 service={message.content.data.service}
                 agentAddress={agentAddress || ""}
                 userAddress={account.address!}
-                onCreateTask={(jsonString) => onSendMessage(jsonString)}
+                  onCreateTask={(jsonString) =>
+                  authenticated ? onSendMessage(jsonString) : login()
+                }
               />
             ) : message.contentType === "json" &&
               message.content.type === "agent_list" ? (
@@ -462,7 +463,11 @@ export const XmtpChat: FC<{
                               <button
                                 key={idx}
                                 className="cursor-pointer px-3 py-[2px] text-[14px] font-normal rounded-[20000px] border border-primary bg-white text-primary transition"
-                                onClick={() => onSendMessage(prompt)}
+                                onClick={() =>
+                                  authenticated
+                                    ? onSendMessage(prompt)
+                                    : login()
+                                }
                               >
                                 {prompt}
                               </button>
@@ -485,7 +490,7 @@ export const XmtpChat: FC<{
                               conversation
                             ) {
                               e.preventDefault();
-                              onSendMessage();
+                              authenticated ? onSendMessage() : login();
                             }
                           }}
                           disabled={isWaitingForResponse}
@@ -516,7 +521,7 @@ export const XmtpChat: FC<{
                                   isWaitingForResponse
                                     ? undefined
                                     : () => {
-                                        onSendMessage();
+                                        authenticated ? onSendMessage() : login();
                                       }
                                 }
                               >
@@ -584,7 +589,7 @@ export const XmtpChat: FC<{
                           ) {
                             e.preventDefault();
                             setIsChatOpen(true);
-                            onSendMessage();
+                            authenticated ? onSendMessage() : login();
                           }
                         }}
                       />
@@ -596,7 +601,7 @@ export const XmtpChat: FC<{
                             : () => {
                                 if (chatInput.trim()) {
                                   setIsChatOpen(true);
-                                  onSendMessage();
+                                  authenticated ? onSendMessage() : login();
                                 }
                               }
                         }
@@ -623,9 +628,11 @@ export const XmtpChat: FC<{
                               ? undefined
                               : async () => {
                                   setIsChatOpen(true);
-                                  onSendMessage(
-                                    "Help me to hire an AI KoL for my project. The perfect Hype-man!"
-                                  );
+                                  authenticated
+                                    ? onSendMessage(
+                                        "Help me to hire an AI KoL for my project. The perfect Hype-man!"
+                                      )
+                                    : login();
                                 }
                           }
                           style={{
@@ -647,9 +654,11 @@ export const XmtpChat: FC<{
                               ? undefined
                               : async () => {
                                   setIsChatOpen(true);
-                                  onSendMessage(
-                                    "Help me find an expert security researcher to audit my smart contracts"
-                                  );
+                                  authenticated
+                                    ? onSendMessage(
+                                        "Help me find an expert security researcher to audit my smart contracts"
+                                      )
+                                    : login();
                                 }
                           }
                           style={{
@@ -671,9 +680,11 @@ export const XmtpChat: FC<{
                               ? undefined
                               : async () => {
                                   setIsChatOpen(true);
-                                  onSendMessage(
-                                    "Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents"
-                                  );
+                                  authenticated
+                                    ? onSendMessage(
+                                        "Tell me more on how to Swap/Bridge/Provide LP using DeFi Agents"
+                                      )
+                                    : login();
                                 }
                           }
                           style={{

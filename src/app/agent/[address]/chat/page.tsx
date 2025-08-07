@@ -46,7 +46,6 @@ const PageContent: FC = () => {
                 prompts: agent?.metadata?.prompts ?? []
               },
             }}
-            agentAddress={agentAddress}
           />
         );
       default:
