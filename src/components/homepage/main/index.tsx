@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { logServiceSelection } from "@/utils/sentry-logging";
+import { logServiceSelection } from "@/utils/logging";
 
 interface MainProps {
   selectedService: (service: string) => void;

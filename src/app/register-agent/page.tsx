@@ -9,7 +9,7 @@ import { useSdk } from "@/sdk-config";
 import Loader from "@/components/loader";
 import { getAddress, parseEther } from "ethers";
 import { useRouter } from "next/navigation";
-import { logAgentRegistration, logError } from "@/utils/sentry-logging";
+import { logAgentRegistration, logError } from "@/utils/logging";
 import { AgentCommunicationType } from "@ensemble-ai/sdk/dist/src/types";
 import Link from "next/link";
 import { AppContext } from "@/context/app";
