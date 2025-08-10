@@ -6,7 +6,7 @@ import { AppHeader, Loader, SideMenu } from "@/components";
 import Console from "@/components/chat/console";
 import { ORCHESTRATOR_AGENT_ADDRESS, CHAT_SOURCE } from "@/constants";
 import { getEntityId, WorldManager } from "@/lib/world-manager";
-import SocketIOManager from "@/lib/socket-io-manager";
+import SocketIOManager from "@/lib/eliza/socket-io-manager-v0";
 import { useAgent } from "@/hooks/useAgent";
 
 const ConsolePageContent: FC = () => {

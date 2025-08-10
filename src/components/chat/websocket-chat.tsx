@@ -4,22 +4,68 @@ import { FC, useCallback, useEffect, useState, useMemo } from "react";
 
 import ChatLayout from "./chat-layout";
 import { getEntityId, WorldManager } from "@/lib/world-manager";
-import SocketIOManager from "@/lib/socket-io-manager";
+import SocketIOManagerV0 from "@/lib/eliza/socket-io-manager-v0";
+import SocketIOManagerV1 from "@/lib/eliza/socket-io-manager-v1";
 import { Content } from "@elizaos/core";
 import { CHAT_SOURCE } from "@/constants";
 import { usePrivy } from "@privy-io/react-auth";
 
 export const WebsocketChat: FC<{
-  agent: { id: `${string}-${string}-${string}-${string}-${string}`; metadata: { communicationURL: string } };
+  agentId: `${string}-${string}-${string}-${string}-${string}`;
+  communicationURL: string;
+  elizaV1?: boolean;
   agentAddress?: string;
-}> = ({ agent, agentAddress }) => {
+}> = ({ agentId, communicationURL, elizaV1, agentAddress }) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
   const { authenticated, login } = usePrivy();
   const entityId = getEntityId();
-  const agentId = agent.id;
-  const roomId = WorldManager.generateRoomId(agentId);
+
+  const extractChannelId = (data: Content) => {
+    return data.channelId || data.roomId;
+  };
+
+  // Function to create channel for Eliza v1
+  const createChannelForElizaV1 = async (agentId: string, userId: string): Promise<string> => {
+    try {
+      const apiUrl = communicationURL.replace(/\/$/, ''); // Remove trailing slash if present
+      const response = await fetch(`${apiUrl}/api/messaging/central-channels`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: 'direct-message',
+          type: 'dm',
+          server_id: '00000000-0000-0000-0000-000000000000',
+          metadata: {
+            isDm: true,
+            user1: userId,
+            user2: agentId,
+            forAgent: agentId
+          },
+          participantCentralUserIds: [
+            userId,
+            agentId
+          ]
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create channel: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data?.data?.id || data?.data?.channelId;
+    } catch (error) {
+      console.error('Error creating channel for Eliza v1:', error);
+      // Fallback to generated room ID if API fails
+      return WorldManager.generateRoomId(agentId as `${string}-${string}-${string}-${string}-${string}`);
+    }
+  };
 
   const formatMessage = useCallback(
     (data: Content): any => {
@@ -71,12 +117,35 @@ export const WebsocketChat: FC<{
     [agentId]
   );
 
-  const socketIOManager = SocketIOManager.getInstance();
+  const socketIOManager = elizaV1 ? SocketIOManagerV1.getInstance() : SocketIOManagerV0.getInstance();
+
+  // Initialize room ID
+  useEffect(() => {
+    const initializeRoom = async () => {
+      debugger
+      let channelId: string;
+      
+      if (elizaV1) {
+        // For Eliza v1, create channel via API
+        channelId = await createChannelForElizaV1(agentId, entityId);
+      } else {
+        // For Eliza v0, use generated room ID
+        channelId = WorldManager.generateRoomId(agentId);
+      }
+      
+      setRoomId(channelId);
+      setIsInitializing(false);
+    };
+
+    initializeRoom();
+  }, [agentId, entityId, elizaV1]);
 
   useEffect(() => {
+    if (!roomId) return;
+
     socketIOManager.initialize(
       entityId,
-      agent.metadata?.communicationURL || process.env.NEXT_PUBLIC_SOCKET_URL!,
+      communicationURL || process.env.NEXT_PUBLIC_SOCKET_URL!,
       [agentId]
     );
 
@@ -109,14 +178,14 @@ export const WebsocketChat: FC<{
     }
 
     const handleMessageBroadcasting = (data: Content) => {
-      console.log("message received", data, agent.id);
+      console.log("message received", data, agentId);
 
       if (!data) {
         console.warn("No data received", data);
         return;
       }
 
-      if (data.roomId !== roomId) {
+      if (extractChannelId(data) !== roomId) {
         console.warn("Message received from a different room", data);
         return;
       }
@@ -128,7 +197,7 @@ export const WebsocketChat: FC<{
     };
 
     const handleMessageComplete = (data: Content) => {
-      if (data.roomId === roomId) {
+      if (extractChannelId(data) === roomId) {
         setMessageProcessing(false);
         // Update status of pending messages to 'sent'
         setMessages(prev => prev.map(msg => 
@@ -152,10 +221,10 @@ export const WebsocketChat: FC<{
       msgHandler.detach();
       completeHandler.detach();
     };
-  }, [roomId, agentId, entityId, messages, socketIOManager]);
+  }, [roomId, agentId, entityId, socketIOManager]);
 
   const handleSend = useCallback(() => {
-    if (!input || messageProcessing) return;
+    if (!input || messageProcessing || !roomId) return;
 
     socketIOManager.sendMessage(input, roomId, CHAT_SOURCE);
 
@@ -165,12 +234,25 @@ export const WebsocketChat: FC<{
 
   const handleTaskSend = useCallback(
     (msg: string) => {
+      if (!roomId) return;
+      
       socketIOManager.sendMessage(msg, roomId, CHAT_SOURCE);
 
       setMessageProcessing(true);
     },
-    [roomId]
+    [roomId, socketIOManager]
   );
+
+  if (isInitializing) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Initializing chat...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ChatLayout
