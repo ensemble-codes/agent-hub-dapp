@@ -59,7 +59,7 @@ export const WebsocketChat: FC<{
       }
 
       const data = await response.json();
-      return data?.data?.id || data?.data?.channelId;
+      return data?.data?.id || data.channelId;
     } catch (error) {
       console.error('Error creating channel for Eliza v1:', error);
       // Fallback to generated room ID if API fails
@@ -177,7 +177,7 @@ export const WebsocketChat: FC<{
       }
     }
 
-    const handleMessageBroadcasting = (data: Content) => {
+    const handleMessageBroadcasting = (data: any) => {
       console.log("message received", data, agentId);
 
       if (!data) {
@@ -185,19 +185,21 @@ export const WebsocketChat: FC<{
         return;
       }
 
-      if (extractChannelId(data) !== roomId) {
+      const contentData = data as Content;
+      if (extractChannelId(contentData) !== roomId) {
         console.warn("Message received from a different room", data);
         return;
       }
 
-      const formattedMessage = formatMessage(data);
+      const formattedMessage = formatMessage(contentData);
       if (formattedMessage) {
         setMessages((prev) => [...prev, formattedMessage]);
       }
     };
 
-    const handleMessageComplete = (data: Content) => {
-      if (extractChannelId(data) === roomId) {
+    const handleMessageComplete = (data: any) => {
+      const contentData = data as Content;
+      if (extractChannelId(contentData) === roomId) {
         setMessageProcessing(false);
         // Update status of pending messages to 'sent'
         setMessages(prev => prev.map(msg => 
@@ -206,20 +208,15 @@ export const WebsocketChat: FC<{
       }
     };
 
-    const msgHandler = socketIOManager.evtMessageBroadcast.attach((data) => [
-      data as unknown as Content,
-    ]);
-    const completeHandler = socketIOManager.evtMessageComplete.attach(
-      (data) => [data as unknown as Content]
-    );
-
-    msgHandler.attach(handleMessageBroadcasting);
-    completeHandler.attach(handleMessageComplete);
+    // Use the on method which both managers support
+    socketIOManager.on('messageBroadcast', handleMessageBroadcasting);
+    socketIOManager.on('messageComplete', handleMessageComplete);
 
     return () => {
       socketIOManager.leaveRoom(roomId);
-      msgHandler.detach();
-      completeHandler.detach();
+      // Use the off method to detach handlers
+      socketIOManager.off('messageBroadcast', handleMessageBroadcasting);
+      socketIOManager.off('messageComplete', handleMessageComplete);
     };
   }, [roomId, agentId, entityId, socketIOManager]);
 
