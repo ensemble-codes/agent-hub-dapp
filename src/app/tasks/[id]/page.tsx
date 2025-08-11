@@ -1,7 +1,7 @@
 "use client";
 import { Modal, StarRating } from "@/components";
 import { FC, use, useEffect, useState } from "react";
-import Loader from "@/components/loader";
+import { TaskDetailSkeleton } from "@/components/ui/task-detail-skeleton";
 import { gql, useQuery } from "@apollo/client";
 import ReactMarkdown from "react-markdown";
 import { useSdk } from "@/sdk-config";
@@ -110,11 +110,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center py-8">
-        <Loader size="lg" />
-      </div>
-    );
+    return <TaskDetailSkeleton />;
   }
 
   return (

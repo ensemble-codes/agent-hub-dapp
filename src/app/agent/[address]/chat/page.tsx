@@ -4,7 +4,7 @@ import { XmtpChat } from "@/components/chat/xmtp-chat";
 import { WebsocketChat } from "@/components/chat/websocket-chat";
 import { FC, Suspense, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { Loader } from "@/components";
+import { ChatSkeleton } from "@/components/ui/chat-skeleton";
 import { useAgent } from "@/hooks/useAgent";
 
 const PageContent: FC = () => {
@@ -18,7 +18,7 @@ const PageContent: FC = () => {
     [agent]
   );
 
-  if (loading) return <Loader />;
+  if (loading) return <ChatSkeleton />;
   
   // Fallback to using agent metadata
   if (agent) {

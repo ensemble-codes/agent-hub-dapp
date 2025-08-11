@@ -105,8 +105,7 @@ const ConsolePageContent: FC = () => {
     },
     [roomId, socketIOManager, router]
   );
-  
-  if (loading) return <Loader />;
+
   
   return (
     <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden flex items-center justify-center">
@@ -117,6 +116,7 @@ const ConsolePageContent: FC = () => {
             handleTaskSend={handleTaskSend}
             agent={agent}
             messages={messages}
+            loading={loading}
           />
         </div>
       );

@@ -1,5 +1,5 @@
 "use client";
-import { Loader } from "@/components";
+import { AgentProfileSkeleton } from "@/components/ui/agent-profile-skeleton";
 import { TaskStatus } from "@/enum/taskstatus";
 import { convertRatingToStars, getTaskStatusText } from "@/utils";
 import Link from "next/link";
@@ -25,7 +25,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   return (
     <>
       {loading ? (
-            <Loader size="xl" />
+            <AgentProfileSkeleton />
           ) : agent ? (
             <>
               <div className="flex lg:flex-row flex-col items-stretch gap-6 w-full">

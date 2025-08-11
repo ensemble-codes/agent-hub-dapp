@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ConsoleProps {
   input: string;
@@ -7,6 +8,7 @@ interface ConsoleProps {
   handleTaskSend: (msg: string) => void;
   agent: any;
   messages: any[];
+  loading?: boolean;
 }
 
 const Console: FC<ConsoleProps> = ({
@@ -16,7 +18,32 @@ const Console: FC<ConsoleProps> = ({
   handleTaskSend,
   agent,
   messages,
+  loading = false,
 }) => {
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col gap-2 items-center justify-center mb-8">
+          <Skeleton className="w-[120px] h-[120px] rounded-full" />
+          <Skeleton className="h-6 w-80" />
+          <Skeleton className="h-5 w-48" />
+        </div>
+        <div className="mb-4 flex items-stretch justify-center max-w-[680px] w-full h-full border border-[#8F95B2] rounded-[8px]">
+          <Skeleton className="basis-[80%] grow h-12 rounded-[8px]" />
+          <Skeleton className="basis-[10%] h-12 rounded-r-[8px]" />
+        </div>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <Skeleton className="h-5 w-[400px]" />
+          <div className="flex flex-wrap gap-2 max-w-[680px]">
+            <Skeleton className="h-8 w-24 rounded-[20000px]" />
+            <Skeleton className="h-8 w-32 rounded-[20000px]" />
+            <Skeleton className="h-8 w-28 rounded-[20000px]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="flex flex-col gap-2 items-center justify-center mb-8">
