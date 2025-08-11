@@ -165,7 +165,6 @@ export type MessageBroadcastData = {
       });
   
       this.socket.on('messageBroadcast', (data) => {
-        debugger
         console.info(`[SocketIO] Message broadcast received:`, data);
   
         // Log the full data structure to understand formats
@@ -308,7 +307,6 @@ export type MessageBroadcastData = {
       const worldId = WorldManager.getWorldId();
   
       console.info(`[SocketIO] Sending message to room ${roomId}`);
-      debugger
       // Emit message to server
       this.socket.emit('message', {
         type: SOCKET_MESSAGE_TYPE.SEND_MESSAGE,
