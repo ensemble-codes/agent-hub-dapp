@@ -197,7 +197,12 @@ const AppHeader = () => {
     if (showWalletModal && state.embeddedWallet) {
       fetchBalance();
       const privyWallet = wallets?.find((w) => w.walletClientType === "privy");
-      setIsPrivyWallet(privyWallet ? privyWallet.address.toLowerCase() === state.embeddedWallet.address.toLowerCase() : false);
+      setIsPrivyWallet(
+        privyWallet
+          ? privyWallet.address.toLowerCase() ===
+              state.embeddedWallet.address.toLowerCase()
+          : false
+      );
     }
   }, [showWalletModal, state.embeddedWallet]);
 
@@ -221,25 +226,48 @@ const AppHeader = () => {
       <div className="hidden w-full lg:flex items-center justify-end py-2 px-4 bg-white rounded-[16px] lg:mb-8">
         <div className="flex items-center justify-between w-full">
           {pathname === "/register-user" ? (
-            <Image
-              src={"/assets/logo-icon.svg"}
-              alt="logo"
-              width={68}
-              height={88}
-              className="lg:block hidden"
-            />
+            state.user ? (
+              <Link href={"/"}>
+                <Image
+                  src={"/assets/logo-icon.svg"}
+                  alt="logo"
+                  width={68}
+                  height={88}
+                  className="lg:block hidden"
+                />
+              </Link>
+            ) : (
+              <Image
+                src={"/assets/logo-icon.svg"}
+                alt="logo"
+                width={68}
+                height={88}
+                className="lg:block hidden"
+              />
+            )
           ) : (
             <div />
           )}
           <div className="flex items-center justify-end gap-6">
-            <Link
-              href={"https://hub.ensemble.codes"}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="text-[14px] font-normal leading-[100%] text-[#121212]"
-            >
-              WEBSITE
-            </Link>
+            {pathname === "/register-user" ? (
+              <Link
+                href={"https://hub.ensemble.codes"}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-[14px] font-normal leading-[100%] text-[#121212]"
+              >
+                WEBSITE
+              </Link>
+            ) : (
+              <Link
+                href={"/register-agent"}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-[14px] font-normal leading-[100%] text-[#121212]"
+              >
+                REGISTER AGENT
+              </Link>
+            )}
             <Link
               href={"https://ensemble.codes"}
               target="_blank"
@@ -378,14 +406,16 @@ const AppHeader = () => {
                 </div>
               </div>
 
-              {isPrivyWallet ? <div className="flex items-center justify-center">
-                <div
-                  className="w-full py-3 text-center bg-light-text-color/20 cursor-pointer rounded-[12px] hover:scale-[1.05] font-semibold transition-all duration-300 ease-in-out ledaing-[18px] text-[13px] text-[#000]"
-                  onClick={handleExportWallet}
-                >
-                  Export Wallet
+              {isPrivyWallet ? (
+                <div className="flex items-center justify-center">
+                  <div
+                    className="w-full py-3 text-center bg-light-text-color/20 cursor-pointer rounded-[12px] hover:scale-[1.05] font-semibold transition-all duration-300 ease-in-out ledaing-[18px] text-[13px] text-[#000]"
+                    onClick={handleExportWallet}
+                  >
+                    Export Wallet
+                  </div>
                 </div>
-              </div> : null}
+              ) : null}
 
               {/* Collapsible Withdraw Section with Animation */}
               <div

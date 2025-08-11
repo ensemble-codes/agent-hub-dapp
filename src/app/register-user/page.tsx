@@ -1,6 +1,5 @@
 "use client";
 
-import { AppHeader } from "@/components";
 import { useState, useEffect, useContext, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -131,9 +130,7 @@ const Register = () => {
 
   return (
     <>
-      <div className="grow w-full ">
-        <AppHeader />
-        {state.authLoading ? (
+      {state.authLoading ? (
           <div className="flex items-center justify-center h-[calc(100dvh-200px)]">
             <div className="text-center flex items-center gap-3">
               <img
@@ -376,9 +373,8 @@ const Register = () => {
             </div>
           </div>
         )}
-      </div>
-    </>
-  );
-};
+      </>
+    );
+  };
 
 export default Register;

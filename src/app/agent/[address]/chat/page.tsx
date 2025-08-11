@@ -4,7 +4,7 @@ import { XmtpChat } from "@/components/chat/xmtp-chat";
 import { WebsocketChat } from "@/components/chat/websocket-chat";
 import { FC, Suspense, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { Loader } from "@/components";
+import { ChatSkeleton } from "@/components/ui/chat-skeleton";
 import { useAgent } from "@/hooks/useAgent";
 
 const PageContent: FC = () => {
@@ -22,7 +22,7 @@ const PageContent: FC = () => {
   const communicationParams = JSON.parse(agent?.metadata?.communicationParams || '{}')
   const { agentId, elizaV1 } = communicationParams || {};
 
-  if (loading) return <Loader />;
+  if (loading) return <ChatSkeleton />;
   
   // Fallback to using agent metadata
   if (agent) {

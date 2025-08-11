@@ -2,7 +2,7 @@
 
 import { FC, Suspense, useCallback, useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { AppHeader, Loader, SideMenu } from "@/components";
+import { Loader } from "@/components";
 import Console from "@/components/chat/console";
 import { ORCHESTRATOR_AGENT_ADDRESS, CHAT_SOURCE } from "@/constants";
 import { getEntityId, WorldManager } from "@/lib/world-manager";
@@ -105,15 +105,10 @@ const ConsolePageContent: FC = () => {
     },
     [roomId, socketIOManager, router]
   );
-  
-  if (loading) return <Loader />;
+
   
   return (
-    <div className="flex items-start gap-4">
-      <SideMenu />
-      <div className="grow w-full">
-        <AppHeader />
-        <div className="h-[calc(100dvh-80px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden flex items-center justify-center">
+    <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden flex items-center justify-center">
           <Console
             input={input}
             setInput={setInput}
@@ -121,11 +116,10 @@ const ConsolePageContent: FC = () => {
             handleTaskSend={handleTaskSend}
             agent={agent}
             messages={messages}
+            loading={loading}
           />
         </div>
-      </div>
-    </div>
-  );
+      );
 };
 
 const ConsolePage: FC = () => {

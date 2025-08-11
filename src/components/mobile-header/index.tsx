@@ -15,6 +15,7 @@ import { baseSepolia } from "viem/chains";
 import { createWalletClient, custom, parseEther } from "viem";
 import { AppContext } from "@/context/app";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const MobileHeader = () => {
   const [state] = useContext(AppContext);
@@ -144,7 +145,12 @@ const MobileHeader = () => {
     if (showWalletModal && state.embeddedWallet) {
       fetchBalance();
       const privyWallet = wallets?.find((w) => w.walletClientType === "privy");
-      setIsPrivyWallet(privyWallet ? privyWallet.address.toLowerCase() === state.embeddedWallet.address.toLowerCase() : false);
+      setIsPrivyWallet(
+        privyWallet
+          ? privyWallet.address.toLowerCase() ===
+              state.embeddedWallet.address.toLowerCase()
+          : false
+      );
     }
   }, [showWalletModal, state.embeddedWallet]);
 
@@ -238,19 +244,25 @@ const MobileHeader = () => {
     <>
       <div className="lg:hidden sticky top-0 bg-[#F9F9F9] z-[10] w-full p-4 flex items-center justify-between border-b-[0.5px] border-b-[#8F95B2]">
         {pathname === "/register-user" ? (
-          <img
-            src="/assets/logo-icon.svg"
-            alt="logo"
-            className="w-[40px] h-[36px]"
-          />
-        ) : (
-          <Link href={"/"}>
-            <img
-              src="/assets/logo-icon.svg"
+          state.user ? (
+            <Link href={"/"}>
+              <Image
+                src={"/assets/logo-icon.svg"}
+                alt="logo"
+                width={40}
+                height={36}
+              />
+            </Link>
+          ) : (
+            <Image
+              src={"/assets/logo-icon.svg"}
               alt="logo"
-              className="w-[40px] h-[36px]"
+              width={40}
+              height={36}
             />
-          </Link>
+          )
+        ) : (
+          <div />
         )}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -281,13 +293,56 @@ const MobileHeader = () => {
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-[#8F95B2]/20">
             <div className="flex items-center justify-between mb-6">
-              <img
-                src="/assets/logo-icon.svg"
-                alt="logo"
-                className="w-[40px] h-[36px]"
-              />
+              {pathname === "/register-user" ? (
+                state.user ? (
+                  <Link href={"/"}>
+                    <Image
+                      src={"/assets/logo-icon.svg"}
+                      alt="logo"
+                      width={40}
+                      height={36}
+                    />
+                  </Link>
+                ) : (
+                  <Image
+                    src={"/assets/logo-icon.svg"}
+                    alt="logo"
+                    width={40}
+                    height={36}
+                  />
+                )
+              ) : (
+                <div />
+              )}
             </div>
-            {ready && authenticated && state.embeddedWallet ? (
+            {pathname === "/register-user" ? (
+              <div className="flex items-center justify-start gap-2">
+                <Link
+                  href={`https://t.me/+V2yQK15ZYLw3YWU0`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="w-7 h-7 flex items-center justify-center rounded-full border border-black"
+                >
+                  <img
+                    src={"/assets/telegram-footer-icon.svg"}
+                    alt="telegram"
+                    className="w-5 h-5"
+                  />
+                </Link>
+                <Link
+                  href={`https://x.com/EnsembleCodes`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="w-7 h-7 flex items-center justify-center rounded-full border border-black"
+                >
+                  <img
+                    src={"/assets/x-footer-icon.svg"}
+                    alt="x"
+                    className="w-5 h-5"
+                  />
+                </Link>
+              </div>
+            ) : ready && authenticated && state.embeddedWallet ? (
               <button
                 className="py-1 px-4 text-[16px] text-[#000] border border-[#000] rounded-[20000px] font-normal flex items-center gap-2"
                 style={{
@@ -324,13 +379,25 @@ const MobileHeader = () => {
             <nav className="p-6">
               <ul className="space-y-6">
                 <li>
-                  {pathname === "/register-user" && !state.user ? null : <Link
-                    href="/register-agent"
-                    className="text-[16px] font-medium text-[#121212] hover:text-primary transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Register Agent
-                  </Link>}
+                  {pathname === "/register-user" ? (
+                    <Link
+                      href={"https://hub.ensemble.codes"}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="text-[14px] font-normal leading-[100%] text-[#121212]"
+                    >
+                      WEBSITE
+                    </Link>
+                  ) : (
+                    <Link
+                      href={"/register-agent"}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="text-[14px] font-normal leading-[100%] text-[#121212]"
+                    >
+                      REGISTER AGENT
+                    </Link>
+                  )}
                 </li>
                 <li>
                   <Link
@@ -432,14 +499,16 @@ const MobileHeader = () => {
                 </div>
               </div>
 
-              {isPrivyWallet ? <div className="flex items-center justify-center">
-                <div
-                  className="w-full py-3 text-center bg-light-text-color/20 cursor-pointer rounded-[12px] hover:scale-[1.05] font-semibold transition-all duration-300 ease-in-out ledaing-[18px] text-[13px] text-[#000]"
-                  onClick={handleExportWallet}
-                >
-                  Export Wallet
+              {isPrivyWallet ? (
+                <div className="flex items-center justify-center">
+                  <div
+                    className="w-full py-3 text-center bg-light-text-color/20 cursor-pointer rounded-[12px] hover:scale-[1.05] font-semibold transition-all duration-300 ease-in-out ledaing-[18px] text-[13px] text-[#000]"
+                    onClick={handleExportWallet}
+                  >
+                    Export Wallet
+                  </div>
                 </div>
-              </div> : null}
+              ) : null}
 
               {/* Collapsible Withdraw Section with Animation */}
               <div

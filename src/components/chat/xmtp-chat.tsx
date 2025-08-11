@@ -1,5 +1,5 @@
 "use client";
-import { AppHeader, Loader, SideMenu } from "@/components";
+import { Loader } from "@/components";
 import { useConversation } from "@/hooks/useConversation";
 import { useXMTP } from "@/context/XMTPContext";
 import {
@@ -324,12 +324,7 @@ export const XmtpChat: FC<{
 
   return (
     <>
-      <div>
-        <div className="flex items-start gap-4">
-          <SideMenu />
-          <div className="grow w-full ">
-            <AppHeader />
-            <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
+      <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
               <img
                 src="/assets/orchestrator-pattern-bg.svg"
                 alt="pattern"
@@ -704,9 +699,6 @@ export const XmtpChat: FC<{
                 )}
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
+          </>
+        );
+      };
