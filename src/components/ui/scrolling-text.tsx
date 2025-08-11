@@ -7,13 +7,15 @@ interface ScrollingTextProps {
   className?: string;
   speed?: number;
   delay?: number;
+  minWidth?: string; // Add optional minimum width
 }
 
 export const ScrollingText: React.FC<ScrollingTextProps> = ({
   text,
   className = '',
   speed = 20,
-  delay = 2000
+  delay = 2000,
+  minWidth
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -83,6 +85,7 @@ export const ScrollingText: React.FC<ScrollingTextProps> = ({
             animationDuration: shouldScroll ? `${speed}s` : '0s',
             animationDelay: `${delay}ms`,
             '--scroll-distance': `${scrollDistance}px`,
+            minWidth: minWidth || 'auto', // Apply minimum width if provided
           } as React.CSSProperties}
         >
           {text}

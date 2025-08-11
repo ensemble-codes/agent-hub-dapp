@@ -1,5 +1,4 @@
 "use client";
-import { AppHeader, SideMenu } from "@/components";
 import axios from "axios";
 import { useCallback, useMemo, useState, useEffect, useContext } from "react";
 import { usePrivy } from "@privy-io/react-auth";
@@ -448,12 +447,8 @@ const Page = () => {
   }, [selectedAgentService, selectedAgentSubServices]);
 
   return (
-    <div>
-      <div className="hidden lg:flex items-start gap-4">
-        <SideMenu />
-        <div className="grow w-full">
-          <AppHeader />
-          <div className="flex items-start gap-10 w-full bg-white py-6 px-4 rounded-[16px]">
+    <>
+      <div className="hidden lg:flex items-start gap-10 w-full bg-white py-6 px-4 rounded-[16px]">
             <div className="grow py-4 w-full">
               <div className="flex w-full justify-between items-center">
                 <p className="text-primary font-semibold text-[20px] leading-[auto] font-[Montserrat]">
@@ -1750,8 +1745,6 @@ const Page = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
       <div className="hidden max-lg:flex flex-col items-center justify-center h-[72dvh] w-full">
         <p
           className="text-[20px] font-semibold text-primary"
@@ -1768,7 +1761,7 @@ const Page = () => {
           portal's still getting its superpowers!
         </p>
       </div>
-    </div>
+    </>
   );
 };
 

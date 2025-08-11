@@ -18,7 +18,7 @@ const Console: FC<ConsoleProps> = ({
   messages,
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center lg:mt-[128px] mt-[72px]">
+    <div className="flex flex-col items-center justify-center">
       <div className="flex flex-col gap-2 items-center justify-center mb-8">
         <img
           src={"/assets/orchestrator-mascot-icon.svg"}

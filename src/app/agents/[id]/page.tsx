@@ -1,5 +1,5 @@
 "use client";
-import { AppHeader, Loader, SideMenu } from "@/components";
+import { Loader } from "@/components";
 import { TaskStatus } from "@/enum/taskstatus";
 import { convertRatingToStars, getTaskStatusText } from "@/utils";
 import Link from "next/link";
@@ -23,12 +23,8 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { agent, loading } = useAgent(id?.toLowerCase());
 
   return (
-    <div>
-      <div className="flex items-start gap-4">
-        <SideMenu />
-        <div className="grow w-full">
-          <AppHeader />
-          {loading ? (
+    <>
+      {loading ? (
             <Loader size="xl" />
           ) : agent ? (
             <>
@@ -577,7 +573,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
             </>
           ) : (
             <>
-              <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
+              <div className="h-[calc(100%-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
                 <div className="w-full h-full flex flex-col items-center justify-center gap-8">
                   <img
                     src={"/assets/agent-indexing-icon.svg"}
@@ -601,10 +597,8 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
               </div>
             </>
           )}
-        </div>
-      </div>
-    </div>
-  );
-};
+        </>
+      );
+    };
 
 export default Page;
