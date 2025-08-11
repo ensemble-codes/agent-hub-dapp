@@ -5,6 +5,10 @@ import { usePathname } from "next/navigation";
 const SideMenu = () => {
   const pathname = usePathname();
 
+  if (pathname === "/register-user") {
+    return null;
+  }
+
   return (
     <div className="hidden lg:block sticky top-[60px] flex-shrink-0">
       <div className="bg-white rounded-[16px] w-full">

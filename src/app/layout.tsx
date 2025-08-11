@@ -3,6 +3,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer, MobileFooter, MobileHeader, Wrapper } from "@/components";
+import { AppLayout } from "@/components/layout/app-layout";
 import OnchainProvider from "@/components/onchainconfig/provider";
 import { AppContextProvider } from "@/context/app";
 import { AgentCacheProvider } from "@/context/agent-cache";
@@ -63,7 +64,9 @@ export default function RootLayout({
                   <Wrapper>
                     <MobileHeader />
                     <main className="lg:py-[72px] py-[36px] container mx-auto flex-1 max-md:px-[20px]">
-                      {children}
+                      <AppLayout>
+                        {children}
+                      </AppLayout>
                     </main>
                     <Footer />
                     <MobileFooter />

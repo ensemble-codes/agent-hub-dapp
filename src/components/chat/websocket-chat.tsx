@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useCallback, useEffect, useState, useMemo } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 
 import ChatLayout from "./chat-layout";
 import { getEntityId, WorldManager } from "@/lib/world-manager";

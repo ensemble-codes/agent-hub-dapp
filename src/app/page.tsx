@@ -1,6 +1,6 @@
 "use client";
-import { AppHeader, Loader, SideMenu } from "@/components";
 import { ScrollingText } from "@/components/ui/scrolling-text";
+import { AgentCardSkeleton } from "@/components/ui/agent-card-skeleton";
 import { gql, useQuery } from "@apollo/client";
 import { convertRatingToStars } from "@/utils";
 import Link from "next/link";
@@ -140,16 +140,12 @@ export default function Home() {
   return (
     <>
       <div>
-        <div className="flex items-start gap-4">
-          <SideMenu />
-          <div className="grow w-full ">
-            <AppHeader />
-            <h1
-              className="lg:hidden text-[24px] font-semibold text-primary mb-4"
-              style={{ textShadow: "0px 4px 12px #F94D2733" }}
-            >
-              MarketPlace
-            </h1>
+        <h1
+          className="lg:hidden text-[24px] font-semibold text-primary mb-4"
+          style={{ textShadow: "0px 4px 12px #F94D2733" }}
+        >
+          MarketPlace
+        </h1>
             {/* <div className="flex items-stretch gap-6 mb-6 w-full overflow-x-auto">
                           {topAgentData ? (
                 <div className="basis-[calc(50%-12px)] min-w-[318px] flex flex-col justify-between bg-white rounded-[16px] border-[0.5px] border-[#CADFF4]">
@@ -342,7 +338,11 @@ export default function Home() {
                 }}
               />
               {loading ? (
-                <Loader size="xl" />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <AgentCardSkeleton key={index} />
+                  ))}
+                </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                   {agents.map((a: any) => (
@@ -534,8 +534,6 @@ export default function Home() {
               )}
             </div>
           </div>
-        </div>
-      </div>
-    </>
-  );
-}
+        </>
+      );
+    }

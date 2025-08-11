@@ -6,7 +6,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { AppHeader, SideMenu } from "@/components";
 import MemoizedMessage from "../memoized-message";
 import { useSearchParams } from "next/navigation";
 import { ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
@@ -37,12 +36,7 @@ const ChatLayoutContent: FC<{
 
   return (
     <>
-      <div>
-        <div className="flex items-start gap-4">
-          <SideMenu />
-          <div className="grow w-full ">
-            <AppHeader />
-            <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
+      <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
               <div className="flex flex-col w-full h-full">
                 {messages.length === 0 && !agentAddress &&
                 agent?.id?.toLowerCase() === ORCHESTRATOR_AGENT_ADDRESS.toLowerCase() ? null : (
@@ -201,11 +195,8 @@ const ChatLayoutContent: FC<{
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+          </>
+        );
 };
 
 const ChatLayout: FC<{

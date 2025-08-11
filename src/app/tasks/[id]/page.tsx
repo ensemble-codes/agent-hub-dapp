@@ -1,7 +1,7 @@
 "use client";
-import { AppHeader, Modal, SideMenu, StarRating } from "@/components";
+import { Modal, StarRating } from "@/components";
 import { FC, use, useEffect, useState } from "react";
-import Loader from "@/components/loader";
+import { TaskDetailSkeleton } from "@/components/ui/task-detail-skeleton";
 import { gql, useQuery } from "@apollo/client";
 import ReactMarkdown from "react-markdown";
 import { useSdk } from "@/sdk-config";
@@ -110,22 +110,13 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center py-8">
-        <Loader size="lg" />
-      </div>
-    );
+    return <TaskDetailSkeleton />;
   }
 
   return (
     <>
-      <div>
-        <div className="flex items-start gap-4">
-          <SideMenu />
-          <div className="grow w-full">
-            <AppHeader />
-            <div
-              className="min-h-[575px] w-full flex flex-col gap-6 rounded-[20px] pt-12 pb-6 px-8 bg-white border-[1px] shadow-[inset_5px_5px_10px_0px_#D9D9D9,inset_-5px_-5px_10px_0px_#E7EBF0]"
+      <div
+        className="h-[calc(100dvh-200px)] w-full flex flex-col gap-6 rounded-[20px] pt-12 pb-6 px-8 bg-white border-[1px] shadow-[inset_5px_5px_10px_0px_#D9D9D9,inset_-5px_-5px_10px_0px_#E7EBF0]"
               style={{
                 borderImageSource:
                   "linear-gradient(91.95deg, rgba(255, 255, 255, 0.4) -4.26%, rgba(255, 255, 255, 0) 107.52%)",
@@ -418,10 +409,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
               <img src="/assets/send-icon.svg" alt="send" className="w-6 h-6" />
             </div>
           </div> */}
-            </div>
-          </div>
         </div>
-      </div>
       <Modal
         isOpen={openAuditMarkdown}
         onClose={() => setOpenAuditMarkdown(false)}
