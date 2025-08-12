@@ -1,7 +1,7 @@
 'use client'
 import { Evt } from "evt";
 import { io, Socket } from "socket.io-client";
-import { randomUUID, WorldManager } from "./world-manager";
+import { randomUUID, WorldManager } from "../world-manager";
 import { USER_NAME } from "@/constants";
 
 enum SOCKET_MESSAGE_TYPE {
@@ -17,6 +17,8 @@ export type MessageBroadcastData = {
     senderName: string;
     text: string;
     roomId: string;
+    channelId: string;
+    serverId: string;
     createdAt: number;
     source: string;
     name: string; // Required for ContentWithUser compatibility
@@ -305,7 +307,6 @@ export type MessageBroadcastData = {
       const worldId = WorldManager.getWorldId();
   
       console.info(`[SocketIO] Sending message to room ${roomId}`);
-  
       // Emit message to server
       this.socket.emit('message', {
         type: SOCKET_MESSAGE_TYPE.SEND_MESSAGE,
@@ -314,9 +315,11 @@ export type MessageBroadcastData = {
           senderName: USER_NAME,
           message,
           roomId,
+          channelId: roomId,
+          serverId: "00000000-0000-0000-0000-000000000000",
           worldId,
           messageId,
-          source,
+          source: 'x123',
         },
       });
   
@@ -326,6 +329,8 @@ export type MessageBroadcastData = {
         senderName: USER_NAME,
         text: message,
         roomId,
+        channelId: roomId,
+        serverId: "00000000-0000-0000-0000-000000000000",
         createdAt: Date.now(),
         source,
         name: USER_NAME, // Required for ContentWithUser compatibility

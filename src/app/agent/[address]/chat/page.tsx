@@ -18,6 +18,10 @@ const PageContent: FC = () => {
     [agent]
   );
 
+
+  const communicationParams = JSON.parse(agent?.metadata?.communicationParams || '{}')
+  const { agentId, elizaV1 } = communicationParams || {};
+
   if (loading) return <ChatSkeleton />;
   
   // Fallback to using agent metadata
@@ -26,12 +30,9 @@ const PageContent: FC = () => {
       case "websocket":
         return (
           <WebsocketChat
-            agent={{
-              id: JSON.parse(agent?.metadata?.communicationParams)?.agentId,
-              metadata: {
-                communicationURL: agent?.metadata?.communicationURL ?? "",
-              },
-            }}
+            agentId={agentId}
+            communicationURL={agent?.metadata?.communicationURL ?? ""}
+            elizaV1={elizaV1 ?? false}
             agentAddress={agentAddress}
           />
         );
