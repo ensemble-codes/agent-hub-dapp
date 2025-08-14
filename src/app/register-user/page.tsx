@@ -171,7 +171,7 @@ const Register = () => {
         <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
           <div className="flex items-stretch h-full">
             <img
-              className="w-[35%] h-full object-cover hidden lg:block"
+              className="w-[35%] h-full object-cover hidden lg:block opacity-75"
               src={"/assets/login-page-portrait.png"}
               alt="portrait"
             />
