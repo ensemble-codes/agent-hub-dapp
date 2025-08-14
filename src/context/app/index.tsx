@@ -140,7 +140,7 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
     return (
       <div className="fixed inset-0 bg-white z-[999] flex items-center justify-center">
         {/* Static overlay content - counter-rotates to stay upright */}
-        <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-5">
+        <div className="absolute flex flex-col items-center justify-center gap-5" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
           <img
             src={"/assets/logo-icon.svg"}
             alt="agent hub"
