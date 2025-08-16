@@ -1,3 +1,4 @@
+-- Users table schema
 -- Create users table
 CREATE TABLE IF NOT EXISTS public.users (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -43,4 +44,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 CREATE TRIGGER update_users_updated_at 
     BEFORE UPDATE ON public.users 
     FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column(); 
+    EXECUTE FUNCTION update_updated_at_column();
