@@ -11,18 +11,64 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
+  const [showAccessCodeInput, setShowAccessCodeInput] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [grantingAccess, setGrantingAccess] = useState(false);
+  const [verifyingUser, setVerifyingUser] = useState(false);
+  const [accessCode, setAccessCode] = useState("");
+  const [userNotOnList, setUserNotOnList] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { push } = useRouter();
 
-  const handleSendOTP = async () => {
+  const handleSendOTP = async (skipUserCheck = false) => {
     if (!email) return;
     setIsLoading(true);
+    setError(null);
+    
+    try {
+      if (!skipUserCheck) {
+        // First, check if user exists in our database
+        const checkUserResponse = await fetch(`/api/auth/check-user`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: email }),
+        });
+
+        if (!checkUserResponse.ok) {
+          throw new Error("Failed to check user status");
+        }
+
+        const checkUserData = await checkUserResponse.json();
+        
+        if (checkUserData.user) {
+          // User exists, proceed with OTP flow
+          await sendOTP();
+        } else {
+          // User doesn't exist, show access code input
+          setUserNotOnList(true);
+          setShowAccessCodeInput(true);
+        }
+      } else {
+        // Skip user check (for resend when user already went through access code flow)
+        await sendOTP();
+      }
+    } catch (error) {
+      console.log(error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to check user status";
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const sendOTP = async () => {
     try {
       const result = await supabase.auth.signInWithOtp({
         email,
@@ -51,9 +97,58 @@ const Register = () => {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to send OTP";
       setError(errorMessage);
+    }
+  };
+
+  const handleVerifyAccessCode = async () => {
+    if (!email || !accessCode) return;
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Redeem the access code
+      const redeemResponse = await fetch(`/api/access-codes/redeem`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          code: accessCode.toUpperCase(),
+          email: email 
+        }),
+      });
+
+      if (!redeemResponse.ok) {
+        const errorData = await redeemResponse.json();
+        throw new Error(errorData.error || "Failed to redeem access code");
+      }
+
+      const redeemData = await redeemResponse.json();
+      
+      if (!redeemData.success) {
+        throw new Error("Failed to redeem access code");
+      }
+
+      // Access code redeemed successfully, now send OTP
+      setShowAccessCodeInput(false);
+      await sendOTP();
+      
+    } catch (error) {
+      console.log(error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to verify access code";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleInitialVerify = () => {
+    handleSendOTP(false);
+  };
+
+  const handleResendOTP = () => {
+    handleSendOTP(true);
   };
 
   // Countdown effect for resend button
@@ -208,11 +303,13 @@ const Register = () => {
                   <p className="font-[Montserrat] font-bold text-[20px] text-[#121212] absolute left-4 bottom-2">
                     {showOtpInput
                       ? "Enter OTP to verify"
+                      : showAccessCodeInput
+                      ? "Enter access code"
                       : "Enter email to verify"}
                   </p>
                 </div>
                 <div className="w-[340px] border border-[#AEAEAE] bg-white rounded-b-[16px] pb-4 px-6 pt-8">
-                  {!showOtpInput ? (
+                  {!showOtpInput && !showAccessCodeInput ? (
                     <>
                       <input
                         type="email"
@@ -227,7 +324,7 @@ const Register = () => {
                       </p>
                       <hr className="my-4 border-[0.5px] border-[#AEAEAE]" />
                       <button
-                        onClick={handleSendOTP}
+                        onClick={handleInitialVerify}
                         disabled={isLoading || !email}
                         className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-primary rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -237,7 +334,50 @@ const Register = () => {
                           className="w-6 h-6"
                         />
                         <p className="text-white font-[Montserrat] font-semibold text-[16px] leading-[120%]">
-                          {isLoading ? "Sending OTP..." : "Verify"}
+                          {isLoading ? "Checking..." : "Verify"}
+                        </p>
+                      </button>
+                    </>
+                  ) : showAccessCodeInput ? (
+                    <>
+                      <input
+                        type="text"
+                        value={accessCode}
+                        onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
+                        className="px-4 py-2 rounded border mb-3 border-[#121212] outline-none focus:outline-none placeholder:text-[#8F95B2] text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[120%] w-full text-center tracking-widest"
+                        placeholder="Enter access code"
+                        maxLength={6}
+                      />
+                      <p className="text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[auto] text-center">
+                        You're not on the list yet. Please enter an access code to continue.
+                      </p>
+                      <hr className="my-4 border-[0.5px] border-[#AEAEAE]" />
+                      <button
+                        onClick={handleVerifyAccessCode}
+                        disabled={isLoading || !accessCode || accessCode.length !== 6}
+                        className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-primary rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed mb-3"
+                      >
+                        <img
+                          src={"/assets/inverted-check-icon.svg"}
+                          alt="check"
+                          className="w-6 h-6"
+                        />
+                        <p className="text-white font-[Montserrat] font-semibold text-[16px] leading-[120%]">
+                          {isLoading ? "Verifying..." : "Verify Access Code"}
+                        </p>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowAccessCodeInput(false);
+                          setUserNotOnList(false);
+                          setAccessCode("");
+                          setError(null);
+                        }}
+                        disabled={isLoading}
+                        className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-gray-500 text-white rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <p className="font-[Montserrat] font-semibold text-[16px] leading-[120%]">
+                          Back to Email
                         </p>
                       </button>
                     </>
@@ -350,7 +490,7 @@ const Register = () => {
                       <div className="w-full text-center text-[14px] text-[#8F95B2] font-[Montserrat] font-normal">
                         Didn't receive the code?{" "}
                         <button
-                          onClick={handleSendOTP}
+                          onClick={handleResendOTP}
                           disabled={isLoading || resendDisabled}
                           className="text-primary hover:underline transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                         >
