@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { AppContext } from "@/context/app";
 import { SET_USER } from "@/context/app/actions";
+import Link from "next/link";
 
 const Register = () => {
   const [state, dispatch] = useContext(AppContext);
@@ -28,7 +29,7 @@ const Register = () => {
     if (!email) return;
     setIsLoading(true);
     setError(null);
-    
+
     try {
       if (!skipUserCheck) {
         // First, check if user exists in our database
@@ -45,7 +46,7 @@ const Register = () => {
         }
 
         const checkUserData = await checkUserResponse.json();
-        
+
         if (checkUserData.user) {
           // User exists, proceed with OTP flow
           await sendOTP();
@@ -89,6 +90,7 @@ const Register = () => {
       const data = await response.json();
       if (!data.success) throw "Failed to register user";
       setShowOtpInput(true);
+      setShowAccessCodeInput(false);
       // Start 5-minute countdown for resend
       setResendDisabled(true);
       setResendCountdown(300); // 5 minutes = 300 seconds
@@ -104,7 +106,7 @@ const Register = () => {
     if (!email || !accessCode) return;
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Redeem the access code
       const redeemResponse = await fetch(`/api/access-codes/redeem`, {
@@ -112,9 +114,9 @@ const Register = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           code: accessCode.toUpperCase(),
-          email: email 
+          email: email,
         }),
       });
 
@@ -124,15 +126,12 @@ const Register = () => {
       }
 
       const redeemData = await redeemResponse.json();
-      
+
       if (!redeemData.success) {
         throw new Error("Failed to redeem access code");
       }
 
-      // Access code redeemed successfully, now send OTP
-      setShowAccessCodeInput(false);
       await sendOTP();
-      
     } catch (error) {
       console.log(error);
       const errorMessage =
@@ -149,6 +148,31 @@ const Register = () => {
 
   const handleResendOTP = () => {
     handleSendOTP(true);
+  };
+
+  const handleRequestAccess = async () => {
+    if (!email) return;
+
+    try {
+      // Quietly submit access request without showing loading state
+      const response = await fetch(`/api/request-access`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        // Show brief success message
+        setError(null);
+        // You could add a temporary success state here if needed
+        console.log("Access request submitted successfully");
+      }
+    } catch (error) {
+      // Silently handle errors - don't show to user
+      console.error("Failed to submit access request:", error);
+    }
   };
 
   // Countdown effect for resend button
@@ -343,43 +367,51 @@ const Register = () => {
                       <input
                         type="text"
                         value={accessCode}
-                        onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
+                        onChange={(e) =>
+                          setAccessCode(e.target.value.toUpperCase())
+                        }
                         className="px-4 py-2 rounded border mb-3 border-[#121212] outline-none focus:outline-none placeholder:text-[#8F95B2] text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[120%] w-full text-center tracking-widest"
                         placeholder="Enter access code"
                         maxLength={6}
                       />
                       <p className="text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[auto] text-center">
-                        You're not on the list yet. Please enter an access code to continue.
+                        You're not on the list yet. Please enter an access code
+                        to continue.
                       </p>
                       <hr className="my-4 border-[0.5px] border-[#AEAEAE]" />
                       <button
                         onClick={handleVerifyAccessCode}
-                        disabled={isLoading || !accessCode || accessCode.length !== 6}
+                        disabled={
+                          isLoading || !accessCode || accessCode.length !== 6
+                        }
                         className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-primary rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed mb-3"
                       >
                         <img
-                          src={"/assets/inverted-check-icon.svg"}
+                          src={"/assets/stars-icon.svg"}
                           alt="check"
                           className="w-6 h-6"
                         />
                         <p className="text-white font-[Montserrat] font-semibold text-[16px] leading-[120%]">
-                          {isLoading ? "Verifying..." : "Verify Access Code"}
+                          {isLoading ? "Verifying..." : "Access Beta"}
                         </p>
                       </button>
-                      <button
-                        onClick={() => {
-                          setShowAccessCodeInput(false);
-                          setUserNotOnList(false);
-                          setAccessCode("");
-                          setError(null);
-                        }}
-                        disabled={isLoading}
-                        className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-gray-500 text-white rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed"
+                      <Link
+                        href="https://form.typeform.com/to/cYWjmOdd?utm_source=Ensemble+Codes&utm_campaign=6ba7fea7af-EMAIL_CAMPAIGN_2025_08_16_08_27&utm_medium=email&utm_term=0_0004be5780-6ba7fea7af-260251#ensemble=xxxxx&email=xxxxx"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={handleRequestAccess}
                       >
-                        <p className="font-[Montserrat] font-semibold text-[16px] leading-[120%]">
-                          Back to Email
-                        </p>
-                      </button>
+                        <button className="py-2 px-4 flex items-center justify-center gap-2 w-full bg-white text-[#121212] border border-[#121212] rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed mb-3">
+                          <img
+                            src={"/assets/bolt-dark-icon.svg"}
+                            alt="bolt"
+                            className="w-6 h-6"
+                          />
+                          <p className="font-[Montserrat] font-semibold text-[16px] leading-[120%] text-[#121212]">
+                            Request Access
+                          </p>
+                        </button>
+                      </Link>
                     </>
                   ) : (
                     <>
