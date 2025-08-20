@@ -297,8 +297,8 @@ export default function Home() {
           </div>
         </div>
         <div className="lg:p-6 rounded-[16px] lg:bg-white">
-          <div className="w-full flex items-center justify-between lg:mb-6 mb-4 overflow-x-auto">
-            <div className="flex items-center justify-start gap-3">
+          <div className="w-full flex lg:flex-row flex-col lg:items-center items-start justify-between max-lg:gap-2 lg:mb-6 mb-4">
+            <div className="flex items-center justify-start gap-3 overflow-x-auto max-lg:w-full">
               <div
                 onClick={() => setSelectedProposal(null)}
                 className={`px-4 py-2 rounded-[200px] flex-shrink-0 cursor-pointer ${
@@ -343,7 +343,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <div className="flex items-center gap-1 py-2 px-4 rounded-[2000px] border border-[#8F95B2]">
+            <div className="flex items-center gap-1 py-2 px-4 rounded-[2000px] border border-[#8F95B2] max-lg:w-full">
               <img
                 src="/assets/search-icon.svg"
                 alt="search"
@@ -354,7 +354,7 @@ export default function Home() {
                 placeholder="Search"
                 value={agentName}
                 onChange={(e) => setAgentName(e.target.value)}
-                className="outline-none text-[14px] leading-[19px] text-[#121212] font-medium"
+                className="outline-none text-[14px] leading-[19px] text-[#121212] font-medium w-full bg-inherit"
               />
             </div>
           </div>
