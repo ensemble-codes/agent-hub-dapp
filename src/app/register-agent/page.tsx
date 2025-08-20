@@ -257,7 +257,7 @@ const Page = () => {
         prompts: finalPrompts,
         attributes: allAttributes,
         agentCategory: selectedAgentService,
-        communicationParams: communicationParams,
+        communicationParams: JSON.parse(communicationParams),
         ...(selectedCommunicationProtocol === "websocket"
           ? { communicationURL: websocketUrl }
           : {}),

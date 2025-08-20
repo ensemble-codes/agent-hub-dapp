@@ -35,15 +35,12 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
         body: JSON.stringify({ email: email }),
       });
 
-      console.log({response});
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to load user data");
       }
 
       const data = await response.json();
-      console.log({data})
       dispatch({ type: SET_USER, payload: data.user });
     } else {
       dispatch({ type: SET_USER, payload: null });
@@ -54,19 +51,13 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log({ event, session });
       const email = session?.user?.email;
-      console.log({ email, user: session?.user, flag: session?.user && typeof email === "string" })
       if (event === "SIGNED_OUT") {
-        console.log('sign out');
         dispatch({ type: SET_USER, payload: null });
       }
       if (session?.user && typeof email === "string") {
-        console.log('refresh');
         await refreshUser(email);
-        console.log('wait');
       } else {
-        console.log('set null');
         dispatch({ type: SET_USER, payload: null });
       }
       dispatch({
@@ -125,11 +116,9 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   useEffect(() => {
     if (!state.authLoading) {
       if (!state.user) {
-        console.log('Redirecting to register-user...');
         push("/register-user");
       }
       const timeout = setTimeout(() => {
-        console.log('Setting redirecting to false');
         setRedirecting(false);
       }, 2000);
       return () => clearTimeout(timeout);

@@ -34,19 +34,15 @@ export const ScrollingText: React.FC<ScrollingTextProps> = ({
       const containerWidth = container.offsetWidth;
       const textWidth = textElement.scrollWidth;
       
-      console.log('Container width:', containerWidth, 'Text width:', textWidth, 'Text:', text);
-      
       if (textWidth > containerWidth) {
         setShouldScroll(true);
         // Calculate the exact distance needed to scroll to show the end of the text
         // We want to scroll so that the end of the text is visible
         const distance = textWidth - containerWidth + 20; // Add 20px padding to show the end clearly
         setScrollDistance(distance);
-        console.log('Should scroll: true, distance:', distance, 'textWidth:', textWidth, 'containerWidth:', containerWidth);
       } else {
         setShouldScroll(false);
         setScrollDistance(0);
-        console.log('Should scroll: false');
       }
     };
 
