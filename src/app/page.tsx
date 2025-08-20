@@ -5,13 +5,24 @@ import { gql, useQuery } from "@apollo/client";
 import { convertRatingToStars } from "@/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { getAddress } from "ethers";
 
 export default function Home() {
   const { push } = useRouter();
   const [selectedProposal, setSelectedProposal] = useState<string | null>(null);
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+  const [agentName, setAgentName] = useState<string>("");
+  const [debouncedAgentName, setDebouncedAgentName] = useState<string>("");
+
+  // Debounce agentName with 700ms delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedAgentName(agentName);
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, [agentName]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -31,11 +42,7 @@ export default function Home() {
     () =>
       gql`
         query MyQuery {
-          agents${
-            selectedProposal
-              ? `(where: {metadata_: {agentCategory: "${selectedProposal}"}})`
-              : ""
-          } {
+          agents {
             id
             metadata {
               description
@@ -82,8 +89,8 @@ export default function Home() {
       gql`
         query MyQuery {
           agents${
-            selectedProposal
-              ? `(where: {metadata_: {agentCategory: "${selectedProposal}"}})`
+            selectedProposal || debouncedAgentName
+              ? `(where: {${selectedProposal ? `metadata_: {agentCategory: "${selectedProposal}"}` : ""}${debouncedAgentName ? `, name_contains_nocase: "${debouncedAgentName.toLowerCase()}"` : ""}})`
               : ""
           } {
             id
@@ -114,7 +121,7 @@ export default function Home() {
           }
         }
       `,
-    [selectedProposal]
+    [selectedProposal, debouncedAgentName]
   );
 
   const { data, loading } = useQuery(GET_AGENTS);
@@ -130,8 +137,6 @@ export default function Home() {
   const trendingAgentsData = [...(trendingAgents?.agents || [])]
     ?.sort((a: any, b: any) => b.tasks.length - a.tasks.length)
     ?.slice(0, 3);
-
-  console.log(trendingAgentsData);
 
   // Get unique proposals from all agents
   const uniqueProposals = useMemo(() => {
@@ -250,7 +255,7 @@ export default function Home() {
                   {index !== arr.length - 1 ? (
                     <hr
                       className="border-[0.5px] border-[#8F95B2] w-[90%]"
-                      key={ta.id}
+                      key={`${ta.id}-${index}`}
                       style={{
                         borderImageSource:
                           "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
@@ -338,6 +343,20 @@ export default function Home() {
                 </div>
               ))}
             </div>
+            <div className="flex items-center gap-1 py-2 px-4 rounded-[2000px] border border-[#8F95B2]">
+              <img
+                src="/assets/search-icon.svg"
+                alt="search"
+                className="w-4 h-4"
+              />
+              <input
+                type="text"
+                placeholder="Search"
+                value={agentName}
+                onChange={(e) => setAgentName(e.target.value)}
+                className="outline-none text-[14px] leading-[19px] text-[#121212] font-medium"
+              />
+            </div>
           </div>
           <hr
             className="lg:mb-6 mb-4 border-[0.5px] border-[#8F95B2] w-[70%]"
@@ -357,7 +376,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
               {agents.map((a: any) => (
                 <div
-                  key={a.id}
+                  key={`${a.id}-${a.metadata.name}`}
                   className="bg-white rounded-[16px] border-[0.5px] border-[#8F95B2] overflow-hidden w-full"
                 >
                   <div className="w-full p-3 rounded-[8px] flex flex-col h-full justify-between">
