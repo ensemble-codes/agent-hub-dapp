@@ -98,7 +98,7 @@ const ChatLayoutContent: FC<{
                       className="w-12 h-12 opacity-50"
                     />
                     <p className="text-[#8F95B2] text-sm">
-                      Fetching conversation...
+                      Connecting...
                     </p>
                   </div>
                 </div>
