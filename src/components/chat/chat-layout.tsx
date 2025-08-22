@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import MemoizedMessage from "../memoized-message";
+import MemoizedMessage, { useClearTimestampsOnNavigation } from "../memoized-message";
 import { useSearchParams } from "next/navigation";
 import { ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
 import { useAgent } from "@/hooks/useAgent";
@@ -39,6 +39,9 @@ const ChatLayoutContent: FC<{
   const { agent, loading } = useAgent(
     agentAddress || ORCHESTRATOR_AGENT_ADDRESS
   );
+
+  // Clear timestamps when navigating away
+  useClearTimestampsOnNavigation();
 
   return (
     <>

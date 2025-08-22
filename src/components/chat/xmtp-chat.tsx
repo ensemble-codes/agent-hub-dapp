@@ -2,8 +2,7 @@
 import { Loader } from "@/components";
 import { useConversation } from "@/hooks/useConversation";
 import { useXMTP } from "@/context/XMTPContext";
-import { FC, useCallback, useEffect, useRef, useState, memo } from "react";
-import { MessageContent } from "@/components/chat/message-content";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -13,12 +12,10 @@ import {
 import Link from "next/link";
 import { usePrivy } from "@privy-io/react-auth";
 import { createEOASigner } from "@/utils";
-import { AgentServicesTable } from "@/components/chat/agent-services-table";
-import { ServiceDetailsCard } from "@/components/chat/service-details-card";
-import { StructuredMessage } from "@/components/chat/structured-message";
 import { useContext } from "react";
 import { AppContext } from "@/context/app";
 import { getAddress } from "ethers";
+import MemoizedMessage, { useClearTimestampsOnNavigation } from "../memoized-message";
 
 export const XmtpChat: FC<{
   agent: {
@@ -260,67 +257,10 @@ export const XmtpChat: FC<{
     login,
   ]);
 
-  // Memoized message component for better performance
-  const MemoizedMessage = memo(
-    ({
-      message,
-      index,
-      messages,
-      onSendMessage,
-      agentAddress,
-      account,
-    }: any) => {
-      const isPreviousFromSameSender =
-        index > 0 && messages[index - 1].isReceived === message.isReceived;
 
-      return (
-        <div
-          className={`flex ${
-            !message.isReceived ? "justify-end" : "justify-start"
-          } ${isPreviousFromSameSender ? "mb-1" : "mb-4"}`}
-        >
-          {message.isReceived ? (
-            message.contentType === "json" &&
-            message.content.type === "agent_services" ? (
-              <AgentServicesTable
-                services={message.content?.data?.services}
-                onCreateTask={(service) =>
-                  authenticated
-                    ? onSendMessage(`I want to enable ${service.name} service`)
-                    : login()
-                }
-              />
-            ) : message.contentType === "json" &&
-              message.content.type === "service_details" ? (
-              <ServiceDetailsCard
-                service={message.content.data.service}
-                agentAddress={agentAddress || ""}
-                userAddress={account.address!}
-                onCreateTask={(jsonString) =>
-                  authenticated ? onSendMessage(jsonString) : login()
-                }
-              />
-            ) : message.contentType === "json" &&
-              message.content.type === "agent_list" ? (
-              <StructuredMessage content={message.content.content} />
-            ) : (
-              <MessageContent
-                content={message.content}
-                isReceived={message.isReceived}
-              />
-            )
-          ) : (
-            <MessageContent
-              content={message.content}
-              isReceived={message.isReceived}
-            />
-          )}
-        </div>
-      );
-    }
-  );
 
-  MemoizedMessage.displayName = "MemoizedMessage";
+  // Clear timestamps when navigating away
+  useClearTimestampsOnNavigation();
 
   return (
     <>
@@ -459,7 +399,13 @@ export const XmtpChat: FC<{
                             message={message}
                             index={index}
                             messages={messages}
-                            onSendMessage={onSendMessage}
+                            onSendMessage={(msg: string) => {
+                              if (authenticated) {
+                                onSendMessage(msg);
+                              } else {
+                                login();
+                              }
+                            }}
                             agentAddress={agent.id || ""}
                             account={account}
                           />
