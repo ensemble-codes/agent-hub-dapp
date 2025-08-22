@@ -122,7 +122,6 @@ export const WebsocketChat: FC<{
   // Initialize room ID
   useEffect(() => {
     const initializeRoom = async () => {
-      debugger
       let channelId: string;
       
       if (elizaV1) {
@@ -132,7 +131,7 @@ export const WebsocketChat: FC<{
         // For Eliza v0, use generated room ID
         channelId = WorldManager.generateRoomId(agentId);
       }
-      
+      console.log("channelId", channelId);
       setRoomId(channelId);
       setIsInitializing(false);
     };
@@ -240,17 +239,6 @@ export const WebsocketChat: FC<{
     [roomId, socketIOManager]
   );
 
-  if (isInitializing) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Initializing chat...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <ChatLayout
       messages={messages}
@@ -260,6 +248,8 @@ export const WebsocketChat: FC<{
       input={input}
       messageProcessing={messageProcessing}
       agentAddress={agentAddress}
+      initializing={isInitializing}
+      roomId={roomId || ""}
     />
   );
 };

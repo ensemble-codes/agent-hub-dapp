@@ -56,6 +56,7 @@ const ConsolePageContent: FC = () => {
   }, [roomId, agentId, entityId, socketIOManager, agent]);
   
   const handleSend = useCallback(() => {
+    console.log("handleSend", input, messageProcessing, roomId);
     if (!input || messageProcessing || !roomId) return;
     
     // Store message with sending status in sessionStorage
