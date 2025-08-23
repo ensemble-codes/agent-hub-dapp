@@ -90,7 +90,15 @@ export default function Home() {
         query MyQuery {
           agents${
             selectedProposal || debouncedAgentName
-              ? `(where: {${selectedProposal ? `metadata_: {agentCategory: "${selectedProposal}"}` : ""}${debouncedAgentName ? `, name_contains_nocase: "${debouncedAgentName.toLowerCase()}"` : ""}})`
+              ? `(where: {${
+                  selectedProposal
+                    ? `metadata_: {agentCategory: "${selectedProposal}"}`
+                    : ""
+                }${
+                  debouncedAgentName
+                    ? `, name_contains_nocase: "${debouncedAgentName.toLowerCase()}"`
+                    : ""
+                }})`
               : ""
           } {
             id
@@ -193,15 +201,17 @@ export default function Home() {
                     className="flex items-center justify-between w-full py-2"
                   >
                     <div className="flex items-center gap-1">
-                      <img
-                        src={
-                          ta.metadata.imageUri.startsWith("https://")
-                            ? ta.metadata.imageUri
-                            : `https://${ta.metadata.imageUri}`
-                        }
-                        alt="trending-agent"
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
+                      <Link href={`/agents/${getAddress(ta.id)}`}>
+                        <img
+                          src={
+                            ta.metadata.imageUri.startsWith("https://")
+                              ? ta.metadata.imageUri
+                              : `https://${ta.metadata.imageUri}`
+                          }
+                          alt="trending-agent"
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                      </Link>
                       <div className="space-y-1">
                         <p className="font-semibold text-[14px] leading-[18px] text-[#121212]">
                           {ta.metadata.name}

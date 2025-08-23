@@ -1,10 +1,47 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import { AgentServicesTable } from "./chat/agent-services-table";
 import { ServiceDetailsCard } from "./chat/service-details-card";
 import { StructuredMessage } from "./chat/structured-message";
 import { MessageContent } from "./chat/message-content";
+
+// Store for local timestamps
+const localTimestamps = new Map<string, number>();
+
+// Function to generate a unique key for each message
+const getMessageKey = (message: any, index: number) => {
+  return `${message.id || message.cretedAt || index}_${index}`;
+};
+
+// Function to clear timestamps when navigating away
+export const clearLocalTimestamps = () => {
+  localTimestamps.clear();
+};
+
+// Hook to clear timestamps on navigation
+export const useClearTimestampsOnNavigation = () => {
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      clearLocalTimestamps();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        clearLocalTimestamps();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearLocalTimestamps();
+    };
+  }, []);
+};
 
 // Memoized message component for better performance
 const MemoizedMessage = memo(
@@ -16,6 +53,15 @@ const MemoizedMessage = memo(
       agentAddress,
       account,
     }: any) => {
+      const messageKey = useRef(getMessageKey(message, index));
+      
+      // Add local timestamp when component mounts
+      useEffect(() => {
+        if (!localTimestamps.has(messageKey.current)) {
+          localTimestamps.set(messageKey.current, Date.now());
+        }
+      }, [messageKey.current]);
+
       const isPreviousFromSameSender =
         index > 0 && messages[index - 1].isReceived === message.isReceived;
       
@@ -26,12 +72,23 @@ const MemoizedMessage = memo(
         messages[index - 1].isReceived === true &&
         messages[index - 1].isReceived === message.isReceived;
 
+      // Get the local timestamp for this message
+      const localTimestamp = localTimestamps.get(messageKey.current);
+
       return (
-        <div
-          className={`flex ${
-            !message.isReceived ? "justify-end" : "justify-start"
-          } ${isPreviousFromSameSender ? "mb-1" : "mb-4"}`}
-        >
+        <div className="flex flex-col">
+          {localTimestamp && (
+            <div className={`flex ${!message.isReceived ? "justify-end" : "justify-start"} mb-1`}>
+              <span className="text-xs text-[#8F95B2]">
+                {new Date(localTimestamp).toLocaleTimeString()}
+              </span>
+            </div>
+          )}
+          <div
+            className={`flex ${
+              !message.isReceived ? "justify-end" : "justify-start"
+            } ${isPreviousFromSameSender ? "mb-1" : "mb-4"}`}
+          >
           {message.isReceived ? (
             message.contentType === "json" &&
             message.content.type === "agent_services" ? (
@@ -66,6 +123,7 @@ const MemoizedMessage = memo(
               isBackToBack={isBackToBack}
             />
           )}
+          </div>
         </div>
       );
     }

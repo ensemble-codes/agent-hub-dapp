@@ -11,7 +11,18 @@ interface MessageContentProps {
 export const MessageContent: FC<MessageContentProps> = ({ content, isReceived, isBackToBack = false }) => {
   const [displayedContent, setDisplayedContent] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showCopied, setShowCopied] = useState(false);
   const hasAnimated = useRef(false);
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
 
   useEffect(() => {
     if (isReceived && !hasAnimated.current && !isBackToBack) {
@@ -66,6 +77,20 @@ export const MessageContent: FC<MessageContentProps> = ({ content, isReceived, i
         </ReactMarkdown>
         {isTyping && (
           <span className="inline-block w-0.5 h-4 bg-primary animate-pulse ml-1"></span>
+        )}
+        {!isTyping && isReceived && (
+          <div className="flex items-center gap-2 mt-2">
+            {showCopied ? (
+              <span className="text-[#8f95b2] text-xs">Copied!</span>
+            ) : (
+              <img
+                src="/assets/copy-icon.svg"
+                alt="copy"
+                className="w-4 h-4 cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
+                onClick={copyToClipboard}
+              />
+            )}
+          </div>
         )}
       </div>
     </div>

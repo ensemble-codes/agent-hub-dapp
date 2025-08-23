@@ -244,25 +244,28 @@ const MobileHeader = () => {
     <>
       <div className="lg:hidden sticky top-0 bg-[#F9F9F9] z-[10] w-full p-4 flex items-center justify-between border-b-[0.5px] border-b-[#8F95B2]">
         {pathname === "/register-user" ? (
-          state.user ? (
-            <Link href={"/"}>
-              <Image
-                src={"/assets/logo-icon.svg"}
-                alt="logo"
-                width={40}
-                height={36}
-              />
-            </Link>
-          ) : (
+          <Image
+            src={"/assets/logo-icon.svg"}
+            alt="logo"
+            width={40}
+            height={36}
+          />
+        ) : state.user ? (
+          <Link href={"/"}>
             <Image
               src={"/assets/logo-icon.svg"}
               alt="logo"
               width={40}
               height={36}
             />
-          )
+          </Link>
         ) : (
-          <div />
+          <Image
+            src={"/assets/logo-icon.svg"}
+            alt="logo"
+            width={40}
+            height={36}
+          />
         )}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
