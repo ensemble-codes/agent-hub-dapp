@@ -3,6 +3,7 @@ import { FC, useEffect, useContext } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { baseSepolia } from "viem/chains";
 import { AppContext } from "@/context/app";
+import { setSigner } from "@/sdk-config";
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
   // Auto-switch to Base Sepolia when embedded wallet is available
   useEffect(() => {
     if (ready && authenticated && state.embeddedWallet) {
+      setSigner(state.embeddedWallet);
       state.embeddedWallet.switchChain(baseSepolia.id).catch((error: any) => {
         console.log("Chain switch failed:", error);
       });

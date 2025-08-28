@@ -27,8 +27,8 @@ importers:
         specifier: latest
         version: 1.4.2(@langchain/core@0.3.66(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@5.10.1(ws@8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.72)))(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(axios@1.10.0)(openai@5.10.1(ws@8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.72))(ws@8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@ensemble-ai/sdk':
-        specifier: ^0.5.4
-        version: 0.5.4(@types/node@20.19.4)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^0.6.1
+        version: 0.6.1(@types/node@20.19.4)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@mantine/hooks':
         specifier: ^8.1.2
         version: 8.1.2(react@19.1.0)
@@ -748,8 +748,8 @@ packages:
   '@emotion/unitless@0.8.1':
     resolution: {integrity: sha512-KOEGMu6dmJZtpadb476IsZBclKvILjopjUii3V+7MnXIQCYh8W3NgNcgwo21n9LXZX6EDIKvqfjYxXebDwxKmQ==}
 
-  '@ensemble-ai/sdk@0.5.4':
-    resolution: {integrity: sha512-miFfNdFhGOA3nY3ftmx7Wuv2gpYQyy4DNYzGoKjlTSCapYj8oD64avCOLSdpspF52AA812V+DRhUSYtqpe8C6g==}
+  '@ensemble-ai/sdk@0.6.1':
+    resolution: {integrity: sha512-UhBxYhFF3m/mY124EHw3UUdthzoEP1bVPOMQiAcEIg501+cOT56016z49XZ6F349UQKEFdc4wNqb3QH4bwFcUg==}
 
   '@envelop/core@5.3.0':
     resolution: {integrity: sha512-xvUkOWXI8JsG2OOnqiI2tOkEc52wbmIqWORr7yGc8B8E53Oh1MMGGGck4mbR80s25LnHVzfNIiIlNkuDgZRuuA==}
@@ -7657,6 +7657,9 @@ packages:
   zod@3.25.72:
     resolution: {integrity: sha512-Cl+fe4dNL4XumOBNBsr0lHfA80PQiZXHI4xEMTEr8gt6aGz92t3lBA32e71j9+JeF/VAYvdfBnuwJs+BMx/BrA==}
 
+  zod@4.1.0:
+    resolution: {integrity: sha512-UWxluYj2IDX9MHRXTMbB/2eeWrAMmmMSESM+MfT9MQw8U1qo9q5ASW08anoJh6AJ7pkt099fLdNFmfI+4aChHg==}
+
   zustand@5.0.0:
     resolution: {integrity: sha512-LE+VcmbartOPM+auOjCCLQOsQ05zUTp8RkgwRzefUk+2jISdMMFnxvyTjA4YNWr5ZGXYbVsEMZosttuxUBkojQ==}
     engines: {node: '>=12.20.0'}
@@ -8432,7 +8435,7 @@ snapshots:
 
   '@emotion/unitless@0.8.1': {}
 
-  '@ensemble-ai/sdk@0.5.4(@types/node@20.19.4)(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@ensemble-ai/sdk@0.6.1(@types/node@20.19.4)(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@jest/globals': 29.7.0
       chai: 4.5.0
@@ -8442,6 +8445,7 @@ snapshots:
       graphql-request: 7.2.0(graphql@16.11.0)
       jest: 29.7.0(@types/node@20.19.4)
       pinata-web3: 0.5.4
+      zod: 4.1.0
     transitivePeerDependencies:
       - '@types/node'
       - babel-plugin-macros
@@ -18490,6 +18494,8 @@ snapshots:
   zod@3.22.4: {}
 
   zod@3.25.72: {}
+
+  zod@4.1.0: {}
 
   zustand@5.0.0(@types/react@19.1.8)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0)):
     optionalDependencies:

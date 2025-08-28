@@ -17,7 +17,7 @@ function OnchainProvider({ children }: Props) {
           appearance: {
             accentColor: "#F94D27",
             theme: "#FFFFFF",
-            showWalletLoginFirst: true,
+            showWalletLoginFirst: false,
             walletChainType: "ethereum-only",
           },
           defaultChain: baseSepolia,

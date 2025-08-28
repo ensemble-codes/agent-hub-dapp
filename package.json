@@ -16,7 +16,7 @@
     "@assistant-ui/react-ai-sdk": "^0.10.14",
     "@assistant-ui/react-markdown": "^0.10.5",
     "@elizaos/core": "latest",
-    "@ensemble-ai/sdk": "^0.5.4",
+    "@ensemble-ai/sdk": "^0.6.1",
     "@mantine/hooks": "^8.1.2",
     "@next/third-parties": "^15.3.5",
     "@privy-io/react-auth": "^2.18.1",
