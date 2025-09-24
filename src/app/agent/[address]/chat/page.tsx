@@ -32,6 +32,7 @@ const PageContent: FC = () => {
           <WebsocketChat
             agentId={agentId}
             communicationURL={agent?.metadata?.communicationURL ?? ""}
+            namespace="/fuse-faq"
             elizaV1={elizaV1 ?? false}
             agentAddress={agentAddress}
           />

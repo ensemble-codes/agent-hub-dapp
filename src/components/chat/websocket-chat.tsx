@@ -15,7 +15,8 @@ export const WebsocketChat: FC<{
   communicationURL: string;
   elizaV1?: boolean;
   agentAddress?: string;
-}> = ({ agentId, communicationURL, elizaV1, agentAddress }) => {
+  namespace?: string;
+}> = ({ agentId, communicationURL, elizaV1, agentAddress, namespace = '/' }) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
@@ -145,7 +146,8 @@ export const WebsocketChat: FC<{
     socketIOManager.initialize(
       entityId,
       communicationURL || process.env.NEXT_PUBLIC_SOCKET_URL!,
-      [agentId]
+      [agentId],
+      namespace
     );
 
     socketIOManager.joinRoom(roomId);

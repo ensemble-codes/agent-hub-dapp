@@ -156,6 +156,7 @@ export class SocketIOManager extends EventAdapter {
   private activeChannelIds: Set<string> = new Set();
   private clientEntityId: string | null = null;
   private logStreamSubscribed: boolean = false;
+  private namespace: string = '/';
 
   // Public accessor for EVT instances (for advanced usage)
   public get evtMessageBroadcast() {
@@ -208,18 +209,22 @@ export class SocketIOManager extends EventAdapter {
   /**
    * Initialize the Socket.io connection to the server
    * @param clientEntityId The client entity ID (central user ID)
+   * @param communicationURL The server URL
+   * @param agentIds Array of agent IDs
+   * @param namespace Optional namespace for the socket connection (e.g., '/fuse-faq')
    */
-  public initialize(clientEntityId: string, communicationURL: string, agentIds: string[]): void {
+  public initialize(clientEntityId: string, communicationURL: string, agentIds: string[], namespace: string = '/'): void {
     this.clientEntityId = clientEntityId;
+    this.namespace = namespace;
 
     if (this.socket) {
       console.debug('[SocketIO] Socket already initialized');
       return;
     }
 
-    // Create a single socket connection
-    const fullURL = communicationURL;
-    console.info('connecting to', fullURL);
+    // Create a single socket connection with namespace support
+    const fullURL = communicationURL + namespace;
+    console.info('connecting to', fullURL, 'with namespace:', namespace);
     this.socket = io(fullURL, {
       autoConnect: true,
       reconnection: true,

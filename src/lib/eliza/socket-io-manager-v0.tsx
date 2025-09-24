@@ -103,6 +103,7 @@ export type MessageBroadcastData = {
     private activeRooms: Set<string> = new Set();
     private entityId: string | null = null;
     private agentIds: string[] | null = null;
+    private namespace: string = '/';
   
     // Public accessor for EVT instances (for advanced usage)
     public get evtMessageBroadcast() {
@@ -127,19 +128,26 @@ export type MessageBroadcastData = {
     /**
      * Initialize the Socket.io connection to the server
      * @param entityId The client entity ID
+     * @param communicationURL The server URL
+     * @param agentIds Array of agent IDs
+     * @param namespace Optional namespace for the socket connection (e.g., '/fuse-faq')
      */
-    public initialize(entityId: string, communicationURL: string, agentIds: string[]): void {
+    public initialize(entityId: string, communicationURL: string, agentIds: string[], namespace: string = '/'): void {
       this.entityId = entityId;
       this.agentIds = agentIds;
+      this.namespace = namespace;
   
       if (this.socket) {
         console.warn('[SocketIO] Socket already initialized');
         return;
       }
   
-      // Create a single socket connection
-      const fullURL = communicationURL;
-      console.info('connecting to', fullURL);
+      // Create a single socket connection with namespace support
+      const baseURL = 'http://localhost:8000/fuse-faq';
+      const fullURL = baseURL;
+      console.info('connecting to', fullURL, 'with namespace:', namespace);
+
+
       this.socket = io(fullURL, {
         autoConnect: true,
         reconnection: true,
