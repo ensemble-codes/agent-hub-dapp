@@ -16,7 +16,13 @@ export const WebsocketChat: FC<{
   elizaV1?: boolean;
   agentAddress?: string;
   namespace?: string;
-}> = ({ agentId, communicationURL, elizaV1, agentAddress, namespace = '/' }) => {
+}> = ({
+  agentId,
+  communicationURL,
+  elizaV1,
+  agentAddress,
+  namespace = "/",
+}) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
@@ -25,33 +31,36 @@ export const WebsocketChat: FC<{
   const { authenticated, login } = usePrivy();
   const entityId = getEntityId();
 
+  console.log('websocket chat', agentId, communicationURL, elizaV1, agentAddress, namespace);
+
   const extractChannelId = (data: Content) => {
     return data.channelId || data.roomId;
   };
 
   // Function to create channel for Eliza v1
-  const createChannelForElizaV1 = async (agentId: string, userId: string): Promise<string> => {
+  const createChannelForElizaV1 = async (
+    agentId: string,
+    userId: string
+  ): Promise<string> => {
+    console.log('creating channel for eliza v1', agentId, userId);
     try {
-      const apiUrl = communicationURL.replace(/\/$/, ''); // Remove trailing slash if present
+      const apiUrl = communicationURL.replace(/\/$/, ""); // Remove trailing slash if present
       const response = await fetch(`${apiUrl}/api/messaging/central-channels`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: 'direct-message',
-          type: 'dm',
-          server_id: '00000000-0000-0000-0000-000000000000',
+          name: "direct-message",
+          type: "dm",
+          server_id: "00000000-0000-0000-0000-000000000000",
           metadata: {
             isDm: true,
             user1: userId,
             user2: agentId,
-            forAgent: agentId
+            forAgent: agentId,
           },
-          participantCentralUserIds: [
-            userId,
-            agentId
-          ]
+          participantCentralUserIds: [userId, agentId],
         }),
       });
 
@@ -62,9 +71,11 @@ export const WebsocketChat: FC<{
       const data = await response.json();
       return data?.data?.id || data.channelId;
     } catch (error) {
-      console.error('Error creating channel for Eliza v1:', error);
+      console.error("Error creating channel for Eliza v1:", error);
       // Fallback to generated room ID if API fails
-      return WorldManager.generateRoomId(agentId as `${string}-${string}-${string}-${string}-${string}`);
+      return WorldManager.generateRoomId(
+        agentId as `${string}-${string}-${string}-${string}-${string}`
+      );
     }
   };
 
@@ -118,14 +129,17 @@ export const WebsocketChat: FC<{
     [agentId]
   );
 
-  const socketIOManager = elizaV1 ? SocketIOManagerV1.getInstance() : SocketIOManagerV0.getInstance();
+  const socketIOManager = elizaV1
+    ? SocketIOManagerV1.getInstance()
+    : SocketIOManagerV0.getInstance();
 
   // Initialize room ID
   useEffect(() => {
     const initializeRoom = async () => {
       let channelId: string;
-      
+
       if (elizaV1) {
+        console.log('creating channel for eliza v1', agentId, entityId);
         // For Eliza v1, create channel via API
         channelId = await createChannelForElizaV1(agentId, entityId);
       } else {
@@ -166,11 +180,13 @@ export const WebsocketChat: FC<{
           contentType: "string" as const,
           isReceived: false,
           timestamp: msg.timestamp,
-          status: msg.status || 'sending'
+          status: msg.status || "sending",
         }));
         setMessages(formattedStoredMessages);
         // Set messageProcessing to true if there are pending messages
-        const hasPendingMessages = formattedStoredMessages.some((msg: any) => msg.status === 'sending');
+        const hasPendingMessages = formattedStoredMessages.some(
+          (msg: any) => msg.status === "sending"
+        );
         if (hasPendingMessages) {
           setMessageProcessing(true);
         }
@@ -203,21 +219,23 @@ export const WebsocketChat: FC<{
       if (extractChannelId(contentData) === roomId) {
         setMessageProcessing(false);
         // Update status of pending messages to 'sent'
-        setMessages(prev => prev.map(msg => 
-          msg.status === 'sending' ? { ...msg, status: 'sent' } : msg
-        ));
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.status === "sending" ? { ...msg, status: "sent" } : msg
+          )
+        );
       }
     };
 
     // Use the on method which both managers support
-    socketIOManager.on('messageBroadcast', handleMessageBroadcasting);
-    socketIOManager.on('messageComplete', handleMessageComplete);
+    socketIOManager.on("messageBroadcast", handleMessageBroadcasting);
+    socketIOManager.on("messageComplete", handleMessageComplete);
 
     return () => {
       socketIOManager.leaveRoom(roomId);
       // Use the off method to detach handlers
-      socketIOManager.off('messageBroadcast', handleMessageBroadcasting);
-      socketIOManager.off('messageComplete', handleMessageComplete);
+      socketIOManager.off("messageBroadcast", handleMessageBroadcasting);
+      socketIOManager.off("messageComplete", handleMessageComplete);
     };
   }, [roomId, agentId, entityId, socketIOManager]);
 
@@ -233,7 +251,7 @@ export const WebsocketChat: FC<{
   const handleTaskSend = useCallback(
     (msg: string) => {
       if (!roomId) return;
-      
+
       socketIOManager.sendMessage(msg, roomId, CHAT_SOURCE);
 
       setMessageProcessing(true);
@@ -245,7 +263,9 @@ export const WebsocketChat: FC<{
     <ChatLayout
       messages={messages}
       handleSend={authenticated ? () => handleSend() : () => login()}
-      handleTaskSend={authenticated ? (msg: string) => handleTaskSend(msg) : () => login()}
+      handleTaskSend={
+        authenticated ? (msg: string) => handleTaskSend(msg) : () => login()
+      }
       setInput={setInput}
       input={input}
       messageProcessing={messageProcessing}

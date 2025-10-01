@@ -136,6 +136,8 @@ export type MessageBroadcastData = {
       this.entityId = entityId;
       this.agentIds = agentIds;
       this.namespace = namespace;
+
+      console.log('initializing socket', entityId, communicationURL, agentIds, namespace);
   
       if (this.socket) {
         console.warn('[SocketIO] Socket already initialized');
@@ -143,7 +145,7 @@ export type MessageBroadcastData = {
       }
   
       // Create a single socket connection with namespace support
-      const baseURL = 'http://localhost:8000/fuse-faq';
+      const baseURL = `http://intern-api-staging.ensemble.codes${namespace}`;
       const fullURL = baseURL;
       console.info('connecting to', fullURL, 'with namespace:', namespace);
 

@@ -2,42 +2,56 @@
 
 import { XmtpChat } from "@/components/chat/xmtp-chat";
 import { WebsocketChat } from "@/components/chat/websocket-chat";
-import { FC, Suspense, useMemo } from "react";
+import { FC, Suspense, useMemo, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { ChatSkeleton } from "@/components/ui/chat-skeleton";
-import { useAgent } from "@/hooks/useAgent";
+import axios from "axios";
 
 const PageContent: FC = () => {
   const params = useParams();
   const agentAddress = params.address as string;
 
-  const { agent, loading } = useAgent(agentAddress);
+  const [agent, setAgent] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const communicationType = useMemo(
-    () => agent?.metadata?.communicationType ?? "",
-    [agent]
-  );
+  const getAgent = async () => {
+    try {
+      setLoading(true);
+      const data = await axios.get(
+        `http://intern-api-staging.ensemble.codes/api/v1/agents/${agentAddress}`
+      );
+      console.log(data.data);
+      setAgent(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    if (agentAddress) {
+      getAgent();
+    }
+  }, [agentAddress]);
 
-  const communicationParams = JSON.parse(agent?.metadata?.communicationParams || '{}')
-  const { agentId, elizaV1 } = communicationParams || {};
 
   if (loading) return <ChatSkeleton />;
   
   // Fallback to using agent metadata
   if (agent) {
-    switch (communicationType) {
-      case "websocket":
+    /* switch (communicationType) {
+      case "websocket": */
         return (
           <WebsocketChat
-            agentId={agentId}
+            agentId={agent.agent_id}
             communicationURL={agent?.metadata?.communicationURL ?? ""}
-            namespace="/fuse-faq"
-            elizaV1={elizaV1 ?? false}
+            namespace={`/${agent.agent_id}`}
+            elizaV1={false}
             agentAddress={agentAddress}
           />
         );
-      case "xmtp":
+      /* case "xmtp":
         return (
           <XmtpChat
             agent={{
@@ -52,7 +66,7 @@ const PageContent: FC = () => {
         );
       default:
         return <p>Unknown chat type: {communicationType}</p>;
-    }
+    } */
   }
   
   return <p>No agent found</p>;
