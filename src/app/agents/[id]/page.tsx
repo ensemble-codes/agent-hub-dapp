@@ -27,7 +27,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     try {
       setLoading(true);
       const data = await axios.get(
-        `http://intern-api-staging.ensemble.codes/api/v1/agents/${id}`
+        `https://intern-api-staging.ensemble.codes/api/v1/agents/${id}`
       );
       console.log(data.data);
       setAgent(data.data);

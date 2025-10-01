@@ -18,7 +18,7 @@ const PageContent: FC = () => {
     try {
       setLoading(true);
       const data = await axios.get(
-        `http://intern-api-staging.ensemble.codes/api/v1/agents/${agentAddress}`
+        `https://intern-api-staging.ensemble.codes/api/v1/agents/${agentAddress}`
       );
       console.log(data.data);
       setAgent(data.data);

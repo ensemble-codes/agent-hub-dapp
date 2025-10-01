@@ -23,7 +23,7 @@ export default function Home() {
     try {
       setLoading(true);
       const data = await axios.get(
-        "http://intern-api-staging.ensemble.codes/api/v1/agents"
+        "https://intern-api-staging.ensemble.codes/api/v1/agents"
       );
       console.log(data.data);
       setAgents(data.data);
