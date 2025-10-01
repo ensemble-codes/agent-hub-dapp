@@ -4,10 +4,10 @@ import { TaskStatus } from "@/enum/taskstatus";
 import { convertRatingToStars, getTaskStatusText } from "@/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FC, use, useState } from "react";
+import { FC, use, useState, useEffect } from "react";
 import { formatEther } from "viem";
 import AGENTS_INFO from "@/data/agentsinfo.json";
-import { useAgent } from "@/hooks/useAgent";
+import axios from "axios";
 
 const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
   const { id } = use(params);
@@ -20,7 +20,29 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
     setTimeout(() => setCopiedPrompt(null), 1000);
   };
 
-  const { agent, loading } = useAgent(id?.toLowerCase());
+  const [agent, setAgent] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const getAgent = async () => {
+    try {
+      setLoading(true);
+      const data = await axios.get(
+        `http://intern-api-staging.ensemble.codes/api/v1/agents/${id}`
+      );
+      console.log(data.data);
+      setAgent(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      getAgent();
+    }
+  }, [id]);
 
   return (
     <>
@@ -36,22 +58,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                     AGENT PROFILE
                   </p>
                   <div className="lg:flex items-center gap-1 hidden">
-                    {agent.metadata?.telegram ? (
+                    {agent.profile?.links?.twitter ? (
                       <Link
-                        href={agent.metadata?.telegram}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                      >
-                        <img
-                          src="/assets/agent-list-card-tg-icon.svg"
-                          alt="telegram"
-                          className="w-8 h-8 cursor-pointer"
-                        />
-                      </Link>
-                    ) : null}
-                    {agent.metadata?.twitter ? (
-                      <Link
-                        href={agent.metadata?.twitter}
+                        href={agent.profile?.links?.twitter}
                         target="_blank"
                         rel="noreferrer noopener"
                       >
@@ -62,9 +71,9 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         />
                       </Link>
                     ) : null}
-                    {agent.metadata?.github ? (
+                    {agent.profile?.links?.github ? (
                       <Link
-                        href={agent.metadata?.github}
+                        href={agent.profile?.links?.github}
                         target="_blank"
                         rel="noreferrer noopener"
                       >
@@ -75,28 +84,15 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                         />
                       </Link>
                     ) : null}
-                    {agent.metadata?.website ? (
+                    {agent.profile?.links?.website ? (
                       <Link
-                        href={agent.metadata?.website}
+                        href={agent.profile?.links?.website}
                         target="_blank"
                         rel="noreferrer noopener"
                       >
                         <img
                           src="/assets/agent-list-website-icon.svg"
-                          alt="github"
-                          className="w-8 h-8 cursor-pointer"
-                        />
-                      </Link>
-                    ) : null}
-                    {agent.metadata?.dexscreener ? (
-                      <Link
-                        href={agent.metadata?.dexscreener}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                      >
-                        <img
-                          src="/assets/agent-list-dex-icon.svg"
-                          alt="github"
+                          alt="website"
                           className="w-8 h-8 cursor-pointer"
                         />
                       </Link>
@@ -116,26 +112,28 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                     <img
                       className="w-[120px] h-[120px] rounded-full object-cover"
                       src={
-                        agent.metadata?.imageUri.startsWith("https://")
-                          ? agent.metadata?.imageUri
-                          : `https://${agent.metadata?.imageUri}`
+                        agent.profile?.avatar
+                          ? agent.profile.avatar.startsWith("https://")
+                            ? agent.profile.avatar
+                            : `https://${agent.profile.avatar}`
+                          : "/assets/karels-intern.jpg"
                       }
-                      alt={agent.metadata?.name}
+                      alt={agent.profile?.display_name}
                     />
                     <div className="flex flex-col items-start gap-2">
                       <p className="font-bold text-[#3d3d3d] text-[20px] leading-[auto] z-[1]">
-                        {agent.metadata?.name}
+                        {agent.profile?.display_name}
                       </p>
                       <p
                         className="font-bold text-light-text-color text-[16px] leading-[auto] cursor-pointer flex items-center gap-1 z-[1]"
-                        onClick={() => copyToClipboard(agent.id)}
+                        onClick={() => copyToClipboard(agent.identity?.ethereum_address)}
                         style={{
                           transition: "all 0.3s ease",
-                          opacity: copiedPrompt === agent.id ? 0.6 : 1,
+                          opacity: copiedPrompt === agent.identity?.ethereum_address ? 0.6 : 1,
                         }}
                       >
-                        {agent.id?.slice(0, 4)}...
-                        {agent.id?.slice(-4)}
+                        {agent.identity?.ethereum_address?.slice(0, 4)}...
+                        {agent.identity?.ethereum_address?.slice(-4)}
                       </p>
                       {id === "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ? (
                         <div className="py-1 px-4 bg-[#C8F3FF] rounded-[2000px] flex items-center gap-2 z-[1]">
@@ -203,11 +201,11 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                     About
                   </p>
                   <p className="text-[16px] font-medium text-[#121212]">
-                    {agent.metadata?.description}
+                    {agent.description}
                   </p>
                 </div>
-                {agent.metadata?.attributes &&
-                  agent.metadata.attributes.length > 0 && (
+                {agent.metadata?.tags &&
+                  agent.metadata.tags.length > 0 && (
                     <>
                       <hr
                         className="my-5 border-[1px] border-[#8F95B2]"
@@ -222,7 +220,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                           Attributes
                         </p>
                         <div className="flex items-center gap-4 flex-wrap">
-                          {agent.metadata.attributes.map(
+                          {agent.metadata.tags.map(
                             (capability: string, index: number) => (
                               <div
                                 key={index}
@@ -243,7 +241,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       </div>
                     </>
                   )}
-                <hr
+                {/* <hr
                   className="my-5 border-[1px] border-[#8F95B2]"
                   style={{
                     borderImageSource:
@@ -302,7 +300,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
                 <hr
                   className="my-5 border-[1px] border-[#8F95B2]"
                   style={{
@@ -313,29 +311,29 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                 />
                 <div className="w-full flex lg:flex-row flex-col items-center gap-4">
                   <button
-                    className="lg:w-fit w-full space-x-2 flex items-center justify-center rounded-[50px] bg-white py-[12px] px-[16px] border border-[#121212]"
-                    onClick={() => push(`/agent/${agent.id}/chat`)}
+                    className="lg:w-[160px] w-full border border-primary bg-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
+                    onClick={() => push(`/agent/${agent.agent_id}/chat`)}
                   >
                     <img
-                      src="/assets/chat-icon.svg"
+                      src="/assets/chat-white-icon.svg"
                       alt="chat"
                       className="w-4 h-4"
                     />
-                    <span className="text-[#121212] text-[18px] font-[700] leading-[24px]">
-                      {"Chat with Agent"}
-                    </span>
+                    <p className="font-bold text-white leading-[20px]">
+                      Chat
+                    </p>
                   </button>
                 </div>
               </div>
             </div>
-            {(agent?.agent?.metadata &&
-              agent?.agent?.metadata?.instructions &&
-              agent?.agent?.metadata?.instructions?.length) ||
-            (agent?.agent?.metadata &&
-              agent?.agent?.metadata?.prompts &&
-              agent?.agent?.metadata?.prompts?.length) ? (
+            {(agent?.metadata &&
+              agent?.metadata?.instructions &&
+              agent?.metadata?.instructions?.length) ||
+            (agent?.metadata &&
+              agent?.metadata?.prompts &&
+              agent?.metadata?.prompts?.length) ? (
               <div className="flex-shrink-0 flex flex-col lg:gap-12 gap-4 lg:w-[368px]">
-                {agent?.agent?.metadata?.instructions?.length ? (
+                {agent?.metadata?.instructions?.length ? (
                   <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
                     <p className="p-4 text-primary text-[16px] font-medium">
                       How agent works
@@ -371,7 +369,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                     )}
                   </div>
                 ) : null}
-                {agent?.agent?.metadata?.prompts?.length ? (
+                {agent?.metadata?.prompts?.length ? (
                   <div className="bg-white rounded-[16px] border border-[#8F95B2] lg:w-[320px] w-full">
                     <p className="p-4 text-primary text-[16px] font-medium">
                       Starter prompts

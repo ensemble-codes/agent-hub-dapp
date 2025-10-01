@@ -1,28 +1,47 @@
 "use client";
 import { ScrollingText } from "@/components/ui/scrolling-text";
 import { AgentCardSkeleton } from "@/components/ui/agent-card-skeleton";
-import { gql, useQuery } from "@apollo/client";
+// import { gql, useQuery } from "@apollo/client";
 import { convertRatingToStars } from "@/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useEffect } from "react";
+import { /* useMemo, */ useState, useEffect } from "react";
 import { getAddress } from "ethers";
+import axios from "axios";
+import Image from "next/image";
 
 export default function Home() {
   const { push } = useRouter();
-  const [selectedProposal, setSelectedProposal] = useState<string | null>(null);
+  // const [selectedProposal, setSelectedProposal] = useState<string | null>(null);
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
-  const [agentName, setAgentName] = useState<string>("");
-  const [debouncedAgentName, setDebouncedAgentName] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [agents, setAgents] = useState<any[]>([]);
+  /* const [agentName, setAgentName] = useState<string>("");
+  const [debouncedAgentName, setDebouncedAgentName] = useState<string>(""); */
+
+  const getAgents = async () => {
+    try {
+      setLoading(true);
+      const data = await axios.get(
+        "http://intern-api-staging.ensemble.codes/api/v1/agents"
+      );
+      console.log(data.data);
+      setAgents(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Debounce agentName with 700ms delay
-  useEffect(() => {
+  /*  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedAgentName(agentName);
     }, 700);
 
     return () => clearTimeout(timer);
-  }, [agentName]);
+  }, [agentName]); */
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -30,7 +49,7 @@ export default function Home() {
     setTimeout(() => setCopiedAddress(null), 1000);
   };
 
-  const GET_ALL_PROPOSALS = gql`
+  /* const GET_ALL_PROPOSALS = gql`
     query MyQuery {
       ipfsMetadata_collection {
         agentCategory
@@ -165,12 +184,115 @@ export default function Home() {
         0
       ) || 0
     );
-  }, [allAgentsData?.agents]);
+  }, [allAgentsData?.agents]); */
+
+  useEffect(() => {
+    getAgents();
+  }, []);
 
   return (
     <>
       <div>
+        <h1 className="font-[Montserrat] text-[24px] font-semibold leading-[32px] text-primary mb-2">
+          INTERN AGENTS
+        </h1>
+        <p className="text-[18px] font-normal leading-[22px] text-[#121212] mb-2">
+          Chat with any agent on the subject of your choice{" "}
+        </p>
+        <hr
+          className="border-[0.5px] border-[#8F95B2] my-4 w-[90%]"
+          style={{
+            borderImageSource:
+              "linear-gradient(90deg, #8F95B2 0%, rgba(255, 255, 255, 0) 100%)",
+            borderImageSlice: "1",
+          }}
+        />
         <div className="flex items-stretch gap-6 mb-6 w-full overflow-x-auto">
+          <div
+            className="basis-[calc(50%-12px)] min-w-[318px] p-4 flex flex-col rounded-[16px]"
+            style={{
+              backgroundImage: "url('/assets/featured-agent-bg.jpg')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <img
+                src="/assets/karels-intern.jpg"
+                alt="karels-intern"
+                width={68}
+                height={68}
+                className="rounded-full object-cover"
+              />
+              <div className="flex flex-col gap-1 w-full">
+                <div className="w-full flex items-center justify-between">
+                  <p className="font-[Montserrat] text-[24px] font-semibold leading-[32px] text-[#121212]">
+                    Union Intern
+                  </p>
+                  <p className="space-x-1 flex-shrink-0 text-[14px] font-medium leading-[20px] text-[#121212]">
+                    ⚡️ Featured
+                  </p>
+                </div>
+                <p className="font-[Montserrat] text-[16px] font-normal leading-[20px] text-[#3d3d3d]">
+                  Intern by the Ensemble Stack
+                </p>
+              </div>
+            </div>
+            <hr className="border-[0.5px] border-[#8F95B2] w-[50%] my-4" />
+            <div className="flex items-center justify-between">
+              <Link
+                href="https://x.com/karelsintern"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-[18px] font-normal leading-[22px] text-[#3d3d3d]"
+              >
+                Twitter
+              </Link>
+              <button className="py-2 px-4 rounded-[20000px] bg-gradient-to-r from-[#3d3d3d] to-[#595959] text-white flex items-center gap-2 text-[16px] font-medium leading-[24px]">
+                Explore
+                <Image
+                  src="/assets/pixelated-arrow-icon.svg"
+                  alt="pixelated-arrow"
+                  width={16}
+                  height={16}
+                />
+              </button>
+            </div>
+          </div>
+          <div
+            className="basis-[calc(50%-12px)] min-w-[318px] p-4 flex flex-col justify-between rounded-[16px]"
+            style={{
+              backgroundImage: "url('/assets/messages-bg.jpg')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <img
+                src="/assets/messages-icon.svg"
+                alt="messages-icon"
+                width={16}
+                height={16}
+                className="rounded-full object-cover"
+              />
+              <p className="font-[Montserrat] text-[18px] font-medium leading-[22px] text-[#3d3d3d]">
+                Messages
+              </p>
+            </div>
+            <div className="w-full flex items-baseline justify-between">
+              <p className="font-[Montserrat] text-[28px] font-medium leading-[32px] text-[#3d3d3d]">
+                1K+
+              </p>
+              <img
+                src={"/assets/messages-gradient.svg"}
+                alt="messages-gradient"
+              />
+            </div>
+          </div>
+        </div>
+        {/* <div className="flex items-stretch gap-6 mb-6 w-full overflow-x-auto">
           {trendingAgentsData.length > 0 ? (
             <div className="basis-[calc(50%-12px)] min-w-[318px] py-2 px-4 flex flex-col bg-white rounded-[16px] border-[0.5px] border-[#CADFF4]">
               <div className="flex items-center justify-between pb-1">
@@ -305,8 +427,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
-        <div className="lg:p-6 rounded-[16px] lg:bg-white">
+        </div> */}
+        {/* <>
           <div className="w-full flex lg:flex-row flex-col lg:items-center items-start justify-between max-lg:gap-2 lg:mb-6 mb-4">
             <div className="flex items-center justify-start gap-3 overflow-x-auto max-lg:w-full">
               <div
@@ -376,17 +498,19 @@ export default function Home() {
               borderImageSlice: "1",
             }}
           />
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <AgentCardSkeleton key={index} />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-              {agents.map((a: any) => (
+          </> */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <AgentCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : agents.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {agents.map((a: any) =>
+              a.profile ? (
                 <div
-                  key={`${a.id}-${a.metadata.name}`}
+                  key={`${a.agent_id}-${a.agent_type}`}
                   className="bg-white rounded-[16px] border-[0.5px] border-[#8F95B2] overflow-hidden w-full"
                 >
                   <div className="w-full p-3 rounded-[8px] flex flex-col h-full justify-between">
@@ -396,84 +520,61 @@ export default function Home() {
                           <div className="flex items-start justify-start gap-2 w-[60%] overflow-hidden pr-1">
                             <Link
                               className="cursor-pointer"
-                              href={`/agents/${getAddress(a.id)}`}
+                              href={`/agents/${a.agent_id}`}
                             >
                               <div className="w-14 h-14 rounded-full relative">
                                 <img
                                   className="w-full h-full rounded-full object-cover"
                                   alt="img"
                                   src={
-                                    a.metadata.imageUri.startsWith("https://")
-                                      ? a.metadata.imageUri
-                                      : `https://${a.metadata.imageUri}`
+                                    a.profile.avatar
+                                      ? a.profile.avatar.startsWith("https://")
+                                        ? a.profile.avatar
+                                        : `https://${a.profile.avatar}`
+                                      : "/assets/karels-intern.jpg"
                                   }
                                 />
-                                {a.id ===
-                                  "0xad739e0dbd5a19c22cc00c5fedcb3448630a8184" ||
-                                a.id ===
-                                  "0xc1ec8b9ca11ef907b959fed83272266b0e96b58d" ? (
-                                  <img
-                                    src="/assets/active-icon.svg"
-                                    alt="active"
-                                    className="w-2 h-2 absolute bottom-0 right-2"
-                                  />
-                                ) : null}
                               </div>
                             </Link>
                             <div className="w-full">
                               <ScrollingText
-                                text={a.metadata.name}
+                                text={a.profile.display_name}
                                 className="font-bold text-[16px] leading-[19px] text-text-color mb-2"
                                 speed={12}
                                 delay={1000}
                               />
-                              <p
-                                className={`font-bold text-[14px] leading-[19px] text-light-text-color cursor-pointer transition-all duration-200`}
-                                onClick={() => copyToClipboard(a.id)}
-                              >
-                                {copiedAddress === a.id
-                                  ? "Copied!"
-                                  : `${a.id.slice(0, 4)}...${a.id.slice(-4)}`}
-                              </p>
+                              {a.identity.ethereum_address && (
+                                <p
+                                  className={`font-bold text-[14px] leading-[19px] text-light-text-color cursor-pointer transition-all duration-200`}
+                                  onClick={() =>
+                                    copyToClipboard(a.identity.ethereum_address)
+                                  }
+                                >
+                                  {copiedAddress === a.identity.ethereum_address
+                                    ? "Copied!"
+                                    : `${a.identity.ethereum_address.slice(
+                                        0,
+                                        4
+                                      )}...${a.identity.ethereum_address.slice(
+                                        -4
+                                      )}`}
+                                </p>
+                              )}
                             </div>
                           </div>
                         )}
-                        <div
-                          className={`p-2 flex-shrink-0 rounded-[200px] flex items-center gap-1 max-w-[12ch] overflow-hidden whitespace-nowrap text-ellipsis ${
-                            a.metadata.agentCategory === "DeFi"
-                              ? "bg-[#FFC8F9]"
-                              : a.metadata.agentCategory === "Social"
-                              ? "bg-[#FBFFC8]"
-                              : a.metadata.agentCategory === "Research"
-                              ? "bg-[#C8FFCE]"
-                              : "bg-[#C8E6FF]"
-                          }`}
-                        >
-                          {a.metadata.agentCategory === "DeFi" ? (
+                        {a.identity.verified && (
+                          <div className="flex items-center gap-2">
                             <img
-                              src="/assets/defi-service-black-icon.svg"
-                              alt={a.metadata.agentCategory}
+                              src="/assets/check-icon.svg"
+                              alt="check"
+                              className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0"
                             />
-                          ) : a.metadata.agentCategory === "Social" ? (
-                            <img
-                              src="/assets/social-service-black-icon.svg"
-                              alt={a.metadata.agentCategory}
-                            />
-                          ) : a.metadata.agentCategory === "Research" ? (
-                            <img
-                              src="/assets/research-service-black-icon.svg"
-                              alt={a.metadata.agentCategory}
-                            />
-                          ) : (
-                            <img
-                              src="/assets/security-service-black-icon.svg"
-                              alt={a.metadata.agentCategory}
-                            />
-                          )}
-                          <p className="font-bold text-[14px] leading-[19px] text-[#3D3D3D] truncate">
-                            {a.metadata.agentCategory}
-                          </p>
-                        </div>
+                            <p className="text-[14px] leading-[19px] text-[#121212]">
+                              Verified
+                            </p>
+                          </div>
+                        )}
                       </div>
                       <div className="pt-2 pb-4">
                         <hr
@@ -485,7 +586,7 @@ export default function Home() {
                           }}
                         />
                         <div className="flex items-center justify-start gap-2 overflow-x-auto mb-2">
-                          {a?.metadata?.attributes?.map((up: string) => (
+                          {a?.metadata?.tags?.map((up: string) => (
                             <div
                               className="w-fit flex-shrink-0 p-[2px] px-2 border-[0.5px] border-primary rounded-[2000px]"
                               key={up}
@@ -497,7 +598,7 @@ export default function Home() {
                           ))}
                         </div>
                         <p className="h-[38px] font-normal text-[14px] leading-[19px] text-[#3D3D3D] line-clamp-2">
-                          {a.metadata.description}
+                          {a.description}
                         </p>
                         <hr
                           className="my-3 border-[0.5px] border-[#8F95B2] w-[70%]"
@@ -507,74 +608,70 @@ export default function Home() {
                             borderImageSlice: "1",
                           }}
                         />
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-1">
-                            <img
-                              src="/assets/ensemble-icon.svg"
-                              alt="wrench"
-                              className="w-4 h-4"
-                            />
-                            <div>
-                              <p className="font-normal text-[14px] leading-[19px] text-[#8F95B2] mb-1">
-                                Credits
-                              </p>
-                              <p className="font-bold text-[14px] leading-[19px] text-[#3d3d3d]">
-                                20-50
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-1">
-                            <img
-                              src="/assets/agent-list-card-wrench-icon.svg"
-                              alt="wrench"
-                              className="w-4 h-4"
-                            />
-                            <div>
-                              <p className="font-normal text-[14px] leading-[19px] text-[#8F95B2] mb-1">
-                                Tasks
-                              </p>
-                              <p className="font-bold text-[14px] leading-[19px] text-[#3d3d3d]">
-                                {a.tasks.length}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-1">
-                            <img
-                              src="/assets/star-dull-icon.svg"
-                              alt="wrench"
-                              className="w-4 h-4"
-                            />
-                            <div>
-                              <p className="font-normal text-[14px] leading-[19px] text-[#8F95B2] mb-1">
-                                Rating
-                              </p>
-                              <p className="font-bold text-[14px] leading-[19px] text-[#3d3d3d]">
-                                {convertRatingToStars(a.reputation)}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
                       </div>
                     </div>
-                    <button
-                      className="w-full border border-primary bg-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
-                      onClick={() => push(`/agents/${getAddress(a.id)}`)}
-                    >
-                      <img
-                        src="/assets/bolt-icon.svg"
-                        alt="bolt"
-                        className="w-4 h-4"
-                      />
-                      <p className="font-bold text-white leading-[20px]">
-                        Assign
-                      </p>
-                    </button>
+                    <div className="w-full flex items-center justify-center">
+                      <div className="w-full flex items-center gap-1">
+                        {a.profile?.links?.twitter ? (
+                          <Link
+                            href={a.profile?.links?.twitter}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            <img
+                              src="/assets/agent-list-card-x-icon.svg"
+                              alt="telegram"
+                              className="w-8 h-8 cursor-pointer"
+                            />
+                          </Link>
+                        ) : null}
+                        {a.profile?.links?.github ? (
+                          <Link
+                            href={a.profile?.links?.github}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            <img
+                              src="/assets/agent-list-card-gh-icon.svg"
+                              alt="github"
+                              className="w-8 h-8 cursor-pointer"
+                            />
+                          </Link>
+                        ) : null}
+                        {a.profile?.links?.website ? (
+                          <Link
+                            href={a.profile?.links?.website}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            <img
+                              src="/assets/agent-list-website-icon.svg"
+                              alt="github"
+                              className="w-8 h-8 cursor-pointer"
+                            />
+                          </Link>
+                        ) : null}
+                      </div>
+                      <button
+                        className="w-full border border-primary bg-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
+                        onClick={() => push(`/agents/${a.agent_id}`)}
+                      >
+                        <img
+                          src="/assets/chat-white-icon.svg"
+                          alt="chat"
+                          className="w-4 h-4"
+                        />
+                        <p className="font-bold text-white leading-[20px]">
+                          Chat
+                        </p>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              ) : null
+            )}
+          </div>
+        ) : null}
       </div>
     </>
   );
