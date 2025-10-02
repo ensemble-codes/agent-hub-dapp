@@ -145,7 +145,7 @@ export type MessageBroadcastData = {
       }
   
       // Create a single socket connection with namespace support
-      const baseURL = `http://intern-api-staging.ensemble.codes${namespace}`;
+      const baseURL = `https://intern-api-staging.ensemble.codes${namespace}`;
       const fullURL = baseURL;
       console.info('connecting to', fullURL, 'with namespace:', namespace);
 
