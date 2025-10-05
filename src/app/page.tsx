@@ -22,8 +22,9 @@ export default function Home() {
   const getAgents = async () => {
     try {
       setLoading(true);
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://intern-api-staging.ensemble.codes';
       const data = await axios.get(
-        "https://intern-api-staging.ensemble.codes/api/v1/agents"
+        `${apiBaseUrl}/api/v1/agents`
       );
       console.log(data.data);
       setAgents(data.data);

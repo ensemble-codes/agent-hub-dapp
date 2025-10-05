@@ -133,19 +133,26 @@ export type MessageBroadcastData = {
      * @param namespace Optional namespace for the socket connection (e.g., '/fuse-faq')
      */
     public initialize(entityId: string, communicationURL: string, agentIds: string[], namespace: string = '/'): void {
+      console.log('initializing socket', entityId, communicationURL, agentIds, namespace);
+
+      // Check if we need to reinitialize due to namespace change
+      if (this.socket && this.namespace !== namespace) {
+        console.info('[SocketIO] Namespace changed, disconnecting and reinitializing', this.namespace, '->', namespace);
+        this.disconnect();
+      }
+
       this.entityId = entityId;
       this.agentIds = agentIds;
       this.namespace = namespace;
 
-      console.log('initializing socket', entityId, communicationURL, agentIds, namespace);
-  
       if (this.socket) {
-        console.warn('[SocketIO] Socket already initialized');
+        console.warn('[SocketIO] Socket already initialized for namespace:', namespace);
         return;
       }
   
       // Create a single socket connection with namespace support
-      const baseURL = `https://intern-api-staging.ensemble.codes${namespace}`;
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://intern-api-staging.ensemble.codes';
+      const baseURL = `${apiBaseUrl}${namespace}`;
       const fullURL = baseURL;
       console.info('connecting to', fullURL, 'with namespace:', namespace);
 

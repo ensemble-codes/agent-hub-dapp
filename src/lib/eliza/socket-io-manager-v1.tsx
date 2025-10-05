@@ -214,11 +214,19 @@ export class SocketIOManager extends EventAdapter {
    * @param namespace Optional namespace for the socket connection (e.g., '/fuse-faq')
    */
   public initialize(clientEntityId: string, communicationURL: string, agentIds: string[], namespace: string = '/'): void {
+    console.log('initializing socket v1', clientEntityId, communicationURL, agentIds, namespace);
+
+    // Check if we need to reinitialize due to namespace change
+    if (this.socket && this.namespace !== namespace) {
+      console.info('[SocketIO v1] Namespace changed, disconnecting and reinitializing', this.namespace, '->', namespace);
+      this.disconnect();
+    }
+
     this.clientEntityId = clientEntityId;
     this.namespace = namespace;
 
     if (this.socket) {
-      console.debug('[SocketIO] Socket already initialized');
+      console.debug('[SocketIO v1] Socket already initialized for namespace:', namespace);
       return;
     }
 

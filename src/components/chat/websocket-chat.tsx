@@ -157,6 +157,8 @@ export const WebsocketChat: FC<{
   useEffect(() => {
     if (!roomId) return;
 
+    console.log('Initializing socket for namespace:', namespace, 'roomId:', roomId);
+
     socketIOManager.initialize(
       entityId,
       communicationURL || process.env.NEXT_PUBLIC_SOCKET_URL!,
@@ -232,12 +234,13 @@ export const WebsocketChat: FC<{
     socketIOManager.on("messageComplete", handleMessageComplete);
 
     return () => {
+      console.log('Cleaning up socket for roomId:', roomId, 'namespace:', namespace);
       socketIOManager.leaveRoom(roomId);
       // Use the off method to detach handlers
       socketIOManager.off("messageBroadcast", handleMessageBroadcasting);
       socketIOManager.off("messageComplete", handleMessageComplete);
     };
-  }, [roomId, agentId, entityId, socketIOManager]);
+  }, [roomId, agentId, entityId, socketIOManager, namespace]);
 
   const handleSend = useCallback(() => {
     if (!input || messageProcessing || !roomId) return;

@@ -17,8 +17,9 @@ const PageContent: FC = () => {
   const getAgent = async () => {
     try {
       setLoading(true);
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://intern-api-staging.ensemble.codes';
       const data = await axios.get(
-        `https://intern-api-staging.ensemble.codes/api/v1/agents/${agentAddress}`
+        `${apiBaseUrl}/api/v1/agents/${agentAddress}`
       );
       console.log(data.data);
       setAgent(data.data);
