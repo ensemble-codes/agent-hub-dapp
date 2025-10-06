@@ -103,6 +103,7 @@ export type MessageBroadcastData = {
     private activeRooms: Set<string> = new Set();
     private entityId: string | null = null;
     private agentIds: string[] | null = null;
+    private namespace: string = '/';
   
     // Public accessor for EVT instances (for advanced usage)
     public get evtMessageBroadcast() {
@@ -127,19 +128,35 @@ export type MessageBroadcastData = {
     /**
      * Initialize the Socket.io connection to the server
      * @param entityId The client entity ID
+     * @param communicationURL The server URL
+     * @param agentIds Array of agent IDs
+     * @param namespace Optional namespace for the socket connection (e.g., '/fuse-faq')
      */
-    public initialize(entityId: string, communicationURL: string, agentIds: string[]): void {
+    public initialize(entityId: string, communicationURL: string, agentIds: string[], namespace: string = '/'): void {
+      console.log('initializing socket', entityId, communicationURL, agentIds, namespace);
+
+      // Check if we need to reinitialize due to namespace change
+      if (this.socket && this.namespace !== namespace) {
+        console.info('[SocketIO] Namespace changed, disconnecting and reinitializing', this.namespace, '->', namespace);
+        this.disconnect();
+      }
+
       this.entityId = entityId;
       this.agentIds = agentIds;
-  
+      this.namespace = namespace;
+
       if (this.socket) {
-        console.warn('[SocketIO] Socket already initialized');
+        console.warn('[SocketIO] Socket already initialized for namespace:', namespace);
         return;
       }
   
-      // Create a single socket connection
-      const fullURL = communicationURL;
-      console.info('connecting to', fullURL);
+      // Create a single socket connection with namespace support
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://intern-api-staging.ensemble.codes';
+      const baseURL = `${apiBaseUrl}${namespace}`;
+      const fullURL = baseURL;
+      console.info('connecting to', fullURL, 'with namespace:', namespace);
+
+
       this.socket = io(fullURL, {
         autoConnect: true,
         reconnection: true,

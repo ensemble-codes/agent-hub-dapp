@@ -1,4 +1,4 @@
-import { FC, Suspense } from "react";
+import { FC, Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Tooltip,
@@ -6,12 +6,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import MemoizedMessage, { useClearTimestampsOnNavigation } from "../memoized-message";
+import MemoizedMessage, {
+  useClearTimestampsOnNavigation,
+} from "../memoized-message";
 import { useSearchParams } from "next/navigation";
 import { ORCHESTRATOR_AGENT_ADDRESS } from "@/constants";
-import { useAgent } from "@/hooks/useAgent";
+import axios from "axios";
 
 const ChatLayoutContent: FC<{
+  agentId: `${string}-${string}-${string}-${string}-${string}`;
   messages: any[];
   handleSend: () => void;
   handleTaskSend: (msg: string) => void;
@@ -22,6 +25,7 @@ const ChatLayoutContent: FC<{
   initializing: boolean;
   roomId: string;
 }> = ({
+  agentId,
   messages,
   handleSend,
   handleTaskSend,
@@ -36,9 +40,39 @@ const ChatLayoutContent: FC<{
   const queryAgentAddress = searchParams.get("agent");
   const agentAddress = propAgentAddress || queryAgentAddress;
 
-  const { agent, loading } = useAgent(
-    agentAddress || ORCHESTRATOR_AGENT_ADDRESS
-  );
+  const [agent, setAgent] = useState<any | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchAgent = async () => {
+      try {
+        setLoading(true);
+        const apiBaseUrl =
+          process.env.NEXT_PUBLIC_API_BASE_URL ||
+          "https://intern-api-staging.ensemble.codes";
+        const response = await axios.get(
+          `${apiBaseUrl}/api/v1/agents/${agentId}`
+        );
+        if (!isMounted) return;
+        setAgent(response.data);
+      } catch (e) {
+        if (!isMounted) return;
+        console.error("Failed to fetch agent", e);
+        setAgent(null);
+      } finally {
+        if (!isMounted) return;
+        setLoading(false);
+      }
+    };
+
+    fetchAgent();
+    return () => {
+      isMounted = false;
+    };
+  }, [agentAddress]);
+
+  console.log("chat layout", agent, loading);
 
   // Clear timestamps when navigating away
   useClearTimestampsOnNavigation();
@@ -49,17 +83,19 @@ const ChatLayoutContent: FC<{
         <div className="flex flex-col w-full h-full">
           {messages.length === 0 &&
           !agentAddress &&
-          agent?.id?.toLowerCase() ===
+          agent?.agent_id?.toLowerCase() ===
             ORCHESTRATOR_AGENT_ADDRESS.toLowerCase() ? null : (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Link href={`/agents/${agent?.id}`}>
+                <Link href={`/agents/${agent?.agent_id}`}>
                   <div className="relative">
                     <img
                       src={
-                        agent?.metadata?.imageUri.startsWith("https://")
-                          ? agent?.metadata?.imageUri
-                          : `https://${agent?.metadata?.imageUri}`
+                        agent?.profile?.avatar
+                          ? agent?.profile?.avatar.startsWith("https://")
+                            ? agent?.profile?.avatar
+                            : `https://${agent?.profile?.avatar}`
+                          : "/assets/karels-intern.jpg"
                       }
                       alt="mascot"
                       className="w-10 h-10 border-[0.5px] border-[#8F95B2] rounded-full object-cover"
@@ -75,7 +111,7 @@ const ChatLayoutContent: FC<{
                 </Link>
                 <div>
                   <p className="text-primary text-[16px] font-medium">
-                    {agent?.metadata?.name}
+                    {agent?.profile?.display_name || agent?.name}
                   </p>
                   {roomId ? (
                     <p className="text-[#8F95B2] text-[14px] font-normal">
@@ -100,9 +136,7 @@ const ChatLayoutContent: FC<{
                       alt="chat"
                       className="w-12 h-12 opacity-50"
                     />
-                    <p className="text-[#8F95B2] text-sm">
-                      Connecting...
-                    </p>
+                    <p className="text-[#8F95B2] text-sm">Connecting...</p>
                   </div>
                 </div>
               ) : !roomId ? (
@@ -174,7 +208,8 @@ const ChatLayoutContent: FC<{
                 </>
               )}
             </div>
-            {roomId && messages.length === 0 &&
+            {roomId &&
+              messages.length === 0 &&
               agent?.metadata?.prompts &&
               agent?.metadata?.prompts?.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -263,6 +298,7 @@ const ChatLayoutContent: FC<{
 };
 
 const ChatLayout: FC<{
+  agentId: `${string}-${string}-${string}-${string}-${string}`;
   messages: any[];
   handleSend: () => void;
   handleTaskSend: (msg: string) => void;
@@ -273,6 +309,7 @@ const ChatLayout: FC<{
   initializing: boolean;
   roomId: string;
 }> = ({
+  agentId,
   messages,
   handleSend,
   handleTaskSend,
@@ -286,6 +323,7 @@ const ChatLayout: FC<{
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ChatLayoutContent
+        agentId={agentId}
         messages={messages}
         handleSend={handleSend}
         handleTaskSend={handleTaskSend}
