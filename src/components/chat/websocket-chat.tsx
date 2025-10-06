@@ -264,6 +264,7 @@ export const WebsocketChat: FC<{
 
   return (
     <ChatLayout
+      agentId={agentId}
       messages={messages}
       handleSend={authenticated ? () => handleSend() : () => login()}
       handleTaskSend={
