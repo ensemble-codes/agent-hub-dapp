@@ -49,7 +49,7 @@ const PageContent: FC = () => {
             communicationURL={agent?.metadata?.communicationURL ?? ""}
             namespace={`/${agent.agent_id}`}
             elizaV1={false}
-            agentAddress={agentAddress}
+            agentAddress={agent.identity?.ethereum_address || agentAddress}
           />
         );
       /* case "xmtp":
