@@ -9,7 +9,7 @@ import axios from "axios";
 
 const PageContent: FC = () => {
   const params = useParams();
-  const agentAddress = params.address as string;
+  const agentAddress = params.id as string;
 
   const [agent, setAgent] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
