@@ -655,7 +655,7 @@ export default function Home() {
                       </div>
                       <button
                         className="w-full border border-primary bg-primary rounded-[50px] py-2 flex items-center justify-center gap-2"
-                        onClick={() => push(`/agents/${a.agent_id}`)}
+                        onClick={() => push(`/agents/${a.agent_id}/chat`)}
                       >
                         <img
                           src="/assets/chat-white-icon.svg"

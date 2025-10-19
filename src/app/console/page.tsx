@@ -77,7 +77,7 @@ const ConsolePageContent: FC = () => {
     socketIOManager.sendMessage(input, roomId, CHAT_SOURCE);
     
     // Redirect immediately to chat page
-    router.push(`/agent/${ORCHESTRATOR_AGENT_ADDRESS}/chat`);
+    router.push(`/agents/${ORCHESTRATOR_AGENT_ADDRESS}/chat`);
   }, [roomId, input, socketIOManager, messageProcessing, router]);
   
   const handleTaskSend = useCallback(
@@ -102,7 +102,7 @@ const ConsolePageContent: FC = () => {
       socketIOManager.sendMessage(msg, roomId, CHAT_SOURCE);
       
       // Redirect immediately to chat page
-      router.push(`/agent/${ORCHESTRATOR_AGENT_ADDRESS}/chat`);
+      router.push(`/agents/${ORCHESTRATOR_AGENT_ADDRESS}/chat`);
     },
     [roomId, socketIOManager, router]
   );
