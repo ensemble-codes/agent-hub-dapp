@@ -30,7 +30,6 @@ export const WebsocketChat: FC<{
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
-  const [roomId, setRoomId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [platformConversationId, setPlatformConversationId] = useState<string | null>(initialPlatformConversationId || null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -149,25 +148,7 @@ export const WebsocketChat: FC<{
       try {
         setIsInitializing(true);
 
-        // Step 1: Determine room ID
-        let channelId: string;
-        if (elizaV1) {
-          console.log('creating channel for eliza v1', agentId, entityId);
-          channelId = await createChannelForElizaV1(agentId, entityId);
-        } else {
-          channelId = WorldManager.generateRoomId(agentId);
-        }
-
-        // Check if effect was cancelled during async operation
-        if (isCancelled) {
-          console.log('[WebsocketChat] Initialization cancelled');
-          return;
-        }
-
-        console.log("channelId", channelId);
-        setRoomId(channelId);
-
-        // Step 2: Load existing conversation from URL or create new one
+        // Step 1: Load existing conversation from URL or create new one
         if (initialPlatformConversationId) {
           // Load existing conversation from URL parameter
           console.log('[WebsocketChat] Loading existing conversation from URL:', initialPlatformConversationId);
@@ -188,6 +169,20 @@ export const WebsocketChat: FC<{
 
         // Create new conversation if no URL parameter or loading failed
         if (!conversationId && !isCancelled) {
+          // Determine channel/room ID for Eliza v1 compatibility
+          let channelId: string;
+          if (elizaV1) {
+            console.log('Creating channel for eliza v1', agentId, entityId);
+            channelId = await createChannelForElizaV1(agentId, entityId);
+          } else {
+            channelId = WorldManager.generateRoomId(agentId);
+          }
+
+          if (isCancelled) {
+            console.log('[WebsocketChat] Initialization cancelled');
+            return;
+          }
+
           console.log('[WebsocketChat] Creating new conversation...');
           const { conversationId: convId, platformConversationId: platConvId } = await ConversationManager.createNewConversation(
             entityId,
@@ -195,7 +190,7 @@ export const WebsocketChat: FC<{
             {
               agentAddress,
               namespace,
-              roomId: channelId,
+              roomId: channelId, // Store channel ID in metadata for Eliza v1 compatibility
             }
           );
 
@@ -234,9 +229,9 @@ export const WebsocketChat: FC<{
   }, [agentId, entityId, elizaV1, agentAddress, namespace, initialPlatformConversationId, pathname, router]);
 
   useEffect(() => {
-    if (!roomId || !conversationId) return;
+    if (!platformConversationId || !conversationId) return;
 
-    console.log('Initializing socket for namespace:', namespace, 'roomId:', roomId, 'conversationId:', conversationId);
+    console.log('Initializing socket for namespace:', namespace, 'platformConversationId:', platformConversationId, 'conversationId:', conversationId);
 
     socketIOManager.initialize(
       entityId,
@@ -246,13 +241,14 @@ export const WebsocketChat: FC<{
       conversationId
     );
 
-    socketIOManager.joinRoom(roomId);
+    // BREAKING CHANGE: Join using platform_conversation_id instead of roomId
+    socketIOManager.joinRoom(platformConversationId);
 
-    console.log("joined room", roomId);
+    console.log("Joined conversation with platform_conversation_id:", platformConversationId);
 
     // Load messages from sessionStorage if available
     if (agentAddress) {
-      const storedKey = `orchestrator_messages_${roomId}`;
+      const storedKey = `orchestrator_messages_${platformConversationId}`;
       const storedMessages = sessionStorage.getItem(storedKey);
       if (storedMessages) {
         const parsedMessages = JSON.parse(storedMessages);
@@ -285,8 +281,9 @@ export const WebsocketChat: FC<{
       }
 
       const contentData = data as Content;
-      if (extractChannelId(contentData) !== roomId) {
-        console.warn("Message received from a different room", data);
+      // Check against platform_conversation_id instead of roomId
+      if (extractChannelId(contentData) !== platformConversationId) {
+        console.warn("Message received from a different conversation", data);
         return;
       }
 
@@ -298,7 +295,7 @@ export const WebsocketChat: FC<{
 
     const handleMessageComplete = (data: any) => {
       const contentData = data as Content;
-      if (extractChannelId(contentData) === roomId) {
+      if (extractChannelId(contentData) === platformConversationId) {
         setMessageProcessing(false);
         // Update status of pending messages to 'sent'
         setMessages((prev) =>
@@ -314,43 +311,47 @@ export const WebsocketChat: FC<{
     socketIOManager.on("messageComplete", handleMessageComplete);
 
     return () => {
-      console.log('Cleaning up socket for roomId:', roomId, 'namespace:', namespace);
-      socketIOManager.leaveRoom(roomId);
+      console.log('Cleaning up socket for platformConversationId:', platformConversationId, 'namespace:', namespace);
+      if (platformConversationId) {
+        socketIOManager.leaveRoom(platformConversationId);
+      }
       // Use the off method to detach handlers
       socketIOManager.off("messageBroadcast", handleMessageBroadcasting);
       socketIOManager.off("messageComplete", handleMessageComplete);
     };
-  }, [roomId, conversationId, agentId, entityId, socketIOManager, namespace]);
+  }, [platformConversationId, conversationId, agentId, entityId, socketIOManager, namespace]);
 
   const handleSend = useCallback(() => {
-    if (!input || messageProcessing || !roomId || !conversationId) return;
+    if (!input || messageProcessing || !platformConversationId || !conversationId) return;
 
     // V1 manager has different signature (message, channelId, source, attachments, messageId, metadata)
-    // V0 manager has signature (message, roomId, source, conversationId)
+    // V0 manager has signature (message, platform_conversation_id, source, conversationId)
     if (elizaV1) {
-      (socketIOManager as any).sendMessage(input, roomId, CHAT_SOURCE, undefined, undefined, { conversationId });
+      (socketIOManager as any).sendMessage(input, platformConversationId, CHAT_SOURCE, undefined, undefined, { conversationId });
     } else {
-      (socketIOManager as any).sendMessage(input, roomId, CHAT_SOURCE, conversationId);
+      // BREAKING CHANGE: Now using platform_conversation_id
+      (socketIOManager as any).sendMessage(input, platformConversationId, CHAT_SOURCE, conversationId);
     }
 
     setMessageProcessing(true);
     setInput("");
-  }, [roomId, conversationId, entityId, input, socketIOManager, messageProcessing, elizaV1]);
+  }, [platformConversationId, conversationId, entityId, input, socketIOManager, messageProcessing, elizaV1]);
 
   const handleTaskSend = useCallback(
     (msg: string) => {
-      if (!roomId || !conversationId) return;
+      if (!platformConversationId || !conversationId) return;
 
       // V1 manager has different signature
       if (elizaV1) {
-        (socketIOManager as any).sendMessage(msg, roomId, CHAT_SOURCE, undefined, undefined, { conversationId });
+        (socketIOManager as any).sendMessage(msg, platformConversationId, CHAT_SOURCE, undefined, undefined, { conversationId });
       } else {
-        (socketIOManager as any).sendMessage(msg, roomId, CHAT_SOURCE, conversationId);
+        // BREAKING CHANGE: Now using platform_conversation_id
+        (socketIOManager as any).sendMessage(msg, platformConversationId, CHAT_SOURCE, conversationId);
       }
 
       setMessageProcessing(true);
     },
-    [roomId, conversationId, socketIOManager, elizaV1]
+    [platformConversationId, conversationId, socketIOManager, elizaV1]
   );
 
   return (
@@ -366,7 +367,7 @@ export const WebsocketChat: FC<{
       messageProcessing={messageProcessing}
       agentAddress={agentAddress}
       initializing={isInitializing}
-      roomId={roomId || ""}
+      roomId={platformConversationId || ""}
     />
   );
 };

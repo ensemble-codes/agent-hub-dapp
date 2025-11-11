@@ -54,7 +54,6 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
     // Get initial session
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      debugger
       const email = session?.user?.email;
       if (session?.user && typeof email === "string") {
         await refreshUser(email);

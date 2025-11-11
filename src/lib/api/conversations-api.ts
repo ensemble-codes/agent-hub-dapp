@@ -112,12 +112,28 @@ export class ConversationsAPI {
   static async getConversation(conversationId: string): Promise<ConversationResponse> {
     console.log('[ConversationsAPI] Getting conversation:', conversationId);
 
-    const response = await this.fetch<{ data: ConversationResponse }>(
+    const response = await this.fetch<{
+      success: boolean;
+      conversation?: ConversationResponse;
+      data?: ConversationResponse;
+    }>(
       `/api/v1/communication/conversations/${conversationId}`
     );
 
-    console.log('[ConversationsAPI] Conversation retrieved:', response.data);
-    return response.data;
+    console.log('[ConversationsAPI] Conversation retrieved:', response);
+
+    // Handle multiple response formats
+    if (response.conversation) {
+      return response.conversation;
+    } else if (response.data) {
+      return response.data;
+    } else if ('id' in (response as any)) {
+      // Response is the conversation object directly
+      return response as any;
+    } else {
+      console.error('[ConversationsAPI] Unexpected response format for getConversation:', response);
+      throw new Error('Conversation not found or invalid response format');
+    }
   }
 
   /**
@@ -139,12 +155,25 @@ export class ConversationsAPI {
 
     console.log('[ConversationsAPI] Listing conversations with params:', params);
 
-    const response = await this.fetch<{ data: { items: ConversationResponse[]; total: number; has_more: boolean } }>(
+    const response = await this.fetch<{
+      success: boolean;
+      data: { items: ConversationResponse[]; total: number; has_more: boolean };
+    }>(
       `/api/v1/communication/conversations/?${queryParams.toString()}`
     );
 
-    console.log('[ConversationsAPI] Conversations retrieved:', response.data.items.length);
-    return response.data;
+    console.log('[ConversationsAPI] Conversations retrieved:', response.data?.items?.length || 0);
+    console.log('[ConversationsAPI] Full response:', JSON.stringify(response, null, 2));
+
+    // Handle both response formats: { data: { items } } or { items } directly
+    if (response.data && 'items' in response.data) {
+      return response.data;
+    } else if ('items' in (response as any)) {
+      return response as any;
+    } else {
+      console.error('[ConversationsAPI] Unexpected response format:', response);
+      return { items: [], total: 0, has_more: false };
+    }
   }
 
   /**
