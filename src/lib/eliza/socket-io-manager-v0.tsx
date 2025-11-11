@@ -104,6 +104,7 @@ export type MessageBroadcastData = {
     private entityId: string | null = null;
     private agentIds: string[] | null = null;
     private namespace: string = '/';
+    private conversationId: string | null = null;
   
     // Public accessor for EVT instances (for advanced usage)
     public get evtMessageBroadcast() {
@@ -131,9 +132,10 @@ export type MessageBroadcastData = {
      * @param communicationURL The server URL
      * @param agentIds Array of agent IDs
      * @param namespace Optional namespace for the socket connection (e.g., '/fuse-faq')
+     * @param conversationId Optional conversation ID for tracking
      */
-    public initialize(entityId: string, communicationURL: string, agentIds: string[], namespace: string = '/'): void {
-      console.log('initializing socket', entityId, communicationURL, agentIds, namespace);
+    public initialize(entityId: string, communicationURL: string, agentIds: string[], namespace: string = '/', conversationId?: string): void {
+      console.log('initializing socket', entityId, communicationURL, agentIds, namespace, conversationId);
 
       // Check if we need to reinitialize due to namespace change
       if (this.socket && this.namespace !== namespace) {
@@ -144,6 +146,7 @@ export type MessageBroadcastData = {
       this.entityId = entityId;
       this.agentIds = agentIds;
       this.namespace = namespace;
+      this.conversationId = conversationId || null;
 
       if (this.socket) {
         console.warn('[SocketIO] Socket already initialized for namespace:', namespace);
@@ -304,26 +307,28 @@ export type MessageBroadcastData = {
     }
   
     /**
-     * Send a message to a specific room
+     * Send a message to a specific room with conversation tracking
      * @param message Message text to send
      * @param roomId Room/Agent ID to send the message to
      * @param source Source identifier (e.g., 'client_chat')
+     * @param conversationId Optional conversation ID for tracking
      */
-    public async sendMessage(message: string, roomId: string, source: string): Promise<void> {
+    public async sendMessage(message: string, roomId: string, source: string, conversationId?: string): Promise<void> {
       if (!this.socket) {
         console.error('[SocketIO] Cannot send message: socket not initialized');
         return;
       }
-  
+
       // Wait for connection if needed
       if (!this.isConnected) {
         await this.connectPromise;
       }
-  
+
       const messageId = randomUUID();
       const worldId = WorldManager.getWorldId();
-  
-      console.info(`[SocketIO] Sending message to room ${roomId}`);
+      const convId = conversationId || this.conversationId;
+
+      console.info(`[SocketIO] Sending message to room ${roomId}, conversation ${convId}`);
       // Emit message to server
       this.socket.emit('message', {
         type: SOCKET_MESSAGE_TYPE.SEND_MESSAGE,
@@ -337,9 +342,10 @@ export type MessageBroadcastData = {
           worldId,
           messageId,
           source: 'x123',
+          conversationId: convId, // Include conversation ID in payload
         },
       });
-  
+
       // Immediately broadcast message locally so UI updates instantly
       this.emit('messageBroadcast', {
         senderId: this.entityId || '',
@@ -351,9 +357,25 @@ export type MessageBroadcastData = {
         createdAt: Date.now(),
         source,
         name: USER_NAME, // Required for ContentWithUser compatibility
+        conversationId: convId, // Include in local broadcast
       });
     }
   
+    /**
+     * Get the current conversation ID
+     */
+    public getConversationId(): string | null {
+      return this.conversationId;
+    }
+
+    /**
+     * Set the conversation ID
+     */
+    public setConversationId(conversationId: string): void {
+      this.conversationId = conversationId;
+      console.info(`[SocketIO] Conversation ID set to: ${conversationId}`);
+    }
+
     /**
      * Disconnect from the server
      */
@@ -367,5 +389,5 @@ export type MessageBroadcastData = {
       }
     }
   }
-  
+
   export default SocketIOManager;

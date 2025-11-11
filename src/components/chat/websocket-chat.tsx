@@ -9,6 +9,7 @@ import SocketIOManagerV1 from "@/lib/eliza/socket-io-manager-v1";
 import { Content } from "@elizaos/core";
 import { CHAT_SOURCE } from "@/constants";
 import { usePrivy } from "@privy-io/react-auth";
+import { ConversationManager } from "@/lib/conversations/conversation-manager";
 
 export const WebsocketChat: FC<{
   agentId: `${string}-${string}-${string}-${string}-${string}`;
@@ -27,6 +28,7 @@ export const WebsocketChat: FC<{
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
   const [roomId, setRoomId] = useState<string | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const { authenticated, login } = usePrivy();
   const entityId = getEntityId();
@@ -133,37 +135,58 @@ export const WebsocketChat: FC<{
     ? SocketIOManagerV1.getInstance()
     : SocketIOManagerV0.getInstance();
 
-  // Initialize room ID
+  // Initialize conversation and room ID
   useEffect(() => {
-    const initializeRoom = async () => {
-      let channelId: string;
+    const initializeConversation = async () => {
+      try {
+        setIsInitializing(true);
 
-      if (elizaV1) {
-        console.log('creating channel for eliza v1', agentId, entityId);
-        // For Eliza v1, create channel via API
-        channelId = await createChannelForElizaV1(agentId, entityId);
-      } else {
-        // For Eliza v0, use generated room ID
-        channelId = WorldManager.generateRoomId(agentId);
+        // Step 1: Determine room ID
+        let channelId: string;
+        if (elizaV1) {
+          console.log('creating channel for eliza v1', agentId, entityId);
+          channelId = await createChannelForElizaV1(agentId, entityId);
+        } else {
+          channelId = WorldManager.generateRoomId(agentId);
+        }
+        console.log("channelId", channelId);
+        setRoomId(channelId);
+
+        // Step 2: Get or create conversation
+        console.log('[WebsocketChat] Initializing conversation...');
+        const { conversationId: convId, isNew } = await ConversationManager.getOrCreateConversation(
+          entityId,
+          agentId,
+          {
+            agentAddress,
+            namespace,
+            roomId: channelId,
+          }
+        );
+        setConversationId(convId);
+        console.log(`[WebsocketChat] Conversation initialized: ${convId} (new: ${isNew})`);
+
+        setIsInitializing(false);
+      } catch (error) {
+        console.error('[WebsocketChat] Error initializing conversation:', error);
+        setIsInitializing(false);
       }
-      console.log("channelId", channelId);
-      setRoomId(channelId);
-      setIsInitializing(false);
     };
 
-    initializeRoom();
-  }, [agentId, entityId, elizaV1]);
+    initializeConversation();
+  }, [agentId, entityId, elizaV1, agentAddress, namespace]);
 
   useEffect(() => {
-    if (!roomId) return;
+    if (!roomId || !conversationId) return;
 
-    console.log('Initializing socket for namespace:', namespace, 'roomId:', roomId);
+    console.log('Initializing socket for namespace:', namespace, 'roomId:', roomId, 'conversationId:', conversationId);
 
     socketIOManager.initialize(
       entityId,
       communicationURL || process.env.NEXT_PUBLIC_SOCKET_URL!,
       [agentId],
-      namespace
+      namespace,
+      conversationId
     );
 
     socketIOManager.joinRoom(roomId);
@@ -240,26 +263,37 @@ export const WebsocketChat: FC<{
       socketIOManager.off("messageBroadcast", handleMessageBroadcasting);
       socketIOManager.off("messageComplete", handleMessageComplete);
     };
-  }, [roomId, agentId, entityId, socketIOManager, namespace]);
+  }, [roomId, conversationId, agentId, entityId, socketIOManager, namespace]);
 
   const handleSend = useCallback(() => {
-    if (!input || messageProcessing || !roomId) return;
+    if (!input || messageProcessing || !roomId || !conversationId) return;
 
-    socketIOManager.sendMessage(input, roomId, CHAT_SOURCE);
+    // V1 manager has different signature (message, channelId, source, attachments, messageId, metadata)
+    // V0 manager has signature (message, roomId, source, conversationId)
+    if (elizaV1) {
+      (socketIOManager as any).sendMessage(input, roomId, CHAT_SOURCE, undefined, undefined, { conversationId });
+    } else {
+      (socketIOManager as any).sendMessage(input, roomId, CHAT_SOURCE, conversationId);
+    }
 
     setMessageProcessing(true);
     setInput("");
-  }, [roomId, entityId, input, socketIOManager, messageProcessing]);
+  }, [roomId, conversationId, entityId, input, socketIOManager, messageProcessing, elizaV1]);
 
   const handleTaskSend = useCallback(
     (msg: string) => {
-      if (!roomId) return;
+      if (!roomId || !conversationId) return;
 
-      socketIOManager.sendMessage(msg, roomId, CHAT_SOURCE);
+      // V1 manager has different signature
+      if (elizaV1) {
+        (socketIOManager as any).sendMessage(msg, roomId, CHAT_SOURCE, undefined, undefined, { conversationId });
+      } else {
+        (socketIOManager as any).sendMessage(msg, roomId, CHAT_SOURCE, conversationId);
+      }
 
       setMessageProcessing(true);
     },
-    [roomId, socketIOManager]
+    [roomId, conversationId, socketIOManager, elizaV1]
   );
 
   return (
