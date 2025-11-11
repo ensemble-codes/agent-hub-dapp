@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useContext, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { AppContext } from "@/context/app";
 import { SET_USER } from "@/context/app/actions";
 import Link from "next/link";
@@ -24,6 +24,9 @@ const Register = () => {
   const [error, setError] = useState<string | null>(null);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { push } = useRouter();
+
+  // Get Supabase client singleton
+  const supabase = createClient();
 
   const handleSendOTP = async (skipUserCheck = false) => {
     if (!email) return;
