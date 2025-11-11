@@ -3,13 +3,15 @@
 import { XmtpChat } from "@/components/chat/xmtp-chat";
 import { WebsocketChat } from "@/components/chat/websocket-chat";
 import { FC, Suspense, useMemo, useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { ChatSkeleton } from "@/components/ui/chat-skeleton";
 import axios from "axios";
 
 const PageContent: FC = () => {
   const params = useParams();
+  const searchParams = useSearchParams();
   const agentAddress = params.id as string;
+  const platformConversationId = searchParams.get('conversation_id');
 
   const [agent, setAgent] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -38,7 +40,7 @@ const PageContent: FC = () => {
 
 
   if (loading) return <ChatSkeleton />;
-  
+
   // Fallback to using agent metadata
   if (agent) {
     /* switch (communicationType) {
@@ -50,6 +52,7 @@ const PageContent: FC = () => {
             namespace={`/${agent.agent_id}`}
             elizaV1={false}
             agentAddress={agent.identity?.ethereum_address || agentAddress}
+            initialPlatformConversationId={platformConversationId || undefined}
           />
         );
       /* case "xmtp":

@@ -3,7 +3,7 @@ import {
   PaginatedMessagesResponse,
   ConversationOperationResponse,
 } from '@/types/conversations';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
@@ -13,8 +13,15 @@ export class ConversationsAPI {
    */
   private static async getAuthToken(): Promise<string | null> {
     try {
+      const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
-      return session?.access_token || null;
+
+      if (!session?.access_token) {
+        console.warn('[ConversationsAPI] No active session - user may not be logged in');
+        return null;
+      }
+
+      return session.access_token;
     } catch (error) {
       console.error('[ConversationsAPI] Error getting auth token:', error);
       return null;
@@ -28,11 +35,16 @@ export class ConversationsAPI {
     // Get JWT token from Supabase
     const jwt = await this.getAuthToken();
 
+    if (!jwt) {
+      console.error('[ConversationsAPI] No JWT token available - user must be logged in');
+      throw new Error('Authentication required - please log in to continue');
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        ...(jwt && { 'Authorization': `Bearer ${jwt}` }),
+        'Authorization': `Bearer ${jwt}`,
         ...options?.headers,
       },
     });
@@ -62,25 +74,36 @@ export class ConversationsAPI {
     name?: string;
     metadata?: Record<string, any>;
   }): Promise<ConversationResponse> {
-    console.log('[ConversationsAPI] Creating conversation:', params);
+    console.log('[ConversationsAPI] Creating conversation with params:', params);
+    console.log('[ConversationsAPI] ⭐ platformConversationId being sent:', params.platformConversationId);
 
-    const response = await this.fetch<{ data: ConversationResponse }>(
+    const requestBody = {
+      platform_conversation_id: params.platformConversationId,
+      platform: params.platform || 'websocket',
+      creator_id: params.creatorId,
+      participants: params.participants,
+      name: params.name,
+      metadata: params.metadata,
+    };
+
+    console.log('[ConversationsAPI] Request body:', JSON.stringify(requestBody, null, 2));
+
+    const response = await this.fetch<{
+      success: boolean;
+      conversation_id: string;
+      conversation: ConversationResponse;
+      message: string;
+    }>(
       '/api/v1/communication/conversations/',
       {
         method: 'POST',
-        body: JSON.stringify({
-          platform_conversation_id: params.platformConversationId,
-          platform: params.platform || 'websocket',
-          creator_id: params.creatorId,
-          participants: params.participants,
-          name: params.name,
-          metadata: params.metadata,
-        }),
+        body: JSON.stringify(requestBody),
       }
     );
 
-    console.log('[ConversationsAPI] Conversation created:', response.data);
-    return response.data;
+    console.log('[ConversationsAPI] Conversation created:', response.conversation);
+    console.log('[ConversationsAPI] ✅ Conversation ID:', response.conversation_id);
+    return response.conversation;
   }
 
   /**

@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, useCallback, useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
 import ChatLayout from "./chat-layout";
 import { getEntityId, WorldManager } from "@/lib/world-manager";
@@ -17,21 +18,26 @@ export const WebsocketChat: FC<{
   elizaV1?: boolean;
   agentAddress?: string;
   namespace?: string;
+  initialPlatformConversationId?: string;
 }> = ({
   agentId,
   communicationURL,
   elizaV1,
   agentAddress,
   namespace = "/",
+  initialPlatformConversationId,
 }) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [messageProcessing, setMessageProcessing] = useState(false);
   const [roomId, setRoomId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [platformConversationId, setPlatformConversationId] = useState<string | null>(initialPlatformConversationId || null);
   const [isInitializing, setIsInitializing] = useState(true);
   const { authenticated, login } = usePrivy();
   const entityId = getEntityId();
+  const router = useRouter();
+  const pathname = usePathname();
 
   console.log('websocket chat', agentId, communicationURL, elizaV1, agentAddress, namespace);
 
@@ -137,6 +143,8 @@ export const WebsocketChat: FC<{
 
   // Initialize conversation and room ID
   useEffect(() => {
+    let isCancelled = false;
+
     const initializeConversation = async () => {
       try {
         setIsInitializing(true);
@@ -149,32 +157,81 @@ export const WebsocketChat: FC<{
         } else {
           channelId = WorldManager.generateRoomId(agentId);
         }
+
+        // Check if effect was cancelled during async operation
+        if (isCancelled) {
+          console.log('[WebsocketChat] Initialization cancelled');
+          return;
+        }
+
         console.log("channelId", channelId);
         setRoomId(channelId);
 
-        // Step 2: Get or create conversation
-        console.log('[WebsocketChat] Initializing conversation...');
-        const { conversationId: convId, isNew } = await ConversationManager.getOrCreateConversation(
-          entityId,
-          agentId,
-          {
-            agentAddress,
-            namespace,
-            roomId: channelId,
+        // Step 2: Load existing conversation from URL or create new one
+        if (initialPlatformConversationId) {
+          // Load existing conversation from URL parameter
+          console.log('[WebsocketChat] Loading existing conversation from URL:', initialPlatformConversationId);
+          try {
+            const conversation = await ConversationManager.getConversationByPlatformId(initialPlatformConversationId);
+
+            if (isCancelled) return;
+
+            setConversationId(conversation.id);
+            setPlatformConversationId(initialPlatformConversationId);
+            console.log(`[WebsocketChat] ✅ Loaded existing conversation: ${conversation.id}`);
+            console.log(`[WebsocketChat] ⭐ Platform conversation ID: ${initialPlatformConversationId}`);
+          } catch (error) {
+            console.warn('[WebsocketChat] Failed to load conversation from URL, creating new one:', error);
+            // Fall through to create new conversation
           }
-        );
-        setConversationId(convId);
-        console.log(`[WebsocketChat] Conversation initialized: ${convId} (new: ${isNew})`);
+        }
+
+        // Create new conversation if no URL parameter or loading failed
+        if (!conversationId && !isCancelled) {
+          console.log('[WebsocketChat] Creating new conversation...');
+          const { conversationId: convId, platformConversationId: platConvId } = await ConversationManager.createNewConversation(
+            entityId,
+            agentId,
+            {
+              agentAddress,
+              namespace,
+              roomId: channelId,
+            }
+          );
+
+          // Check again if effect was cancelled
+          if (isCancelled) {
+            console.log('[WebsocketChat] Initialization cancelled after conversation creation');
+            return;
+          }
+
+          setConversationId(convId);
+          setPlatformConversationId(platConvId);
+          console.log(`[WebsocketChat] ✅ Conversation created: ${convId}`);
+          console.log(`[WebsocketChat] ⭐ Platform conversation ID: ${platConvId}`);
+
+          // Update URL with the new platform_conversation_id
+          const newUrl = `${pathname}?conversation_id=${platConvId}`;
+          router.replace(newUrl, { scroll: false });
+          console.log(`[WebsocketChat] 🔗 URL updated: ${newUrl}`);
+        }
 
         setIsInitializing(false);
       } catch (error) {
-        console.error('[WebsocketChat] Error initializing conversation:', error);
-        setIsInitializing(false);
+        if (!isCancelled) {
+          console.error('[WebsocketChat] Error initializing conversation:', error);
+          setIsInitializing(false);
+        }
       }
     };
 
     initializeConversation();
-  }, [agentId, entityId, elizaV1, agentAddress, namespace]);
+
+    // Cleanup function to prevent state updates if component unmounts
+    return () => {
+      isCancelled = true;
+    };
+  }, [agentId, entityId, elizaV1, agentAddress, namespace, initialPlatformConversationId, pathname, router]);
 
   useEffect(() => {
     if (!roomId || !conversationId) return;
