@@ -154,7 +154,10 @@ export type MessageBroadcastData = {
       }
   
       // Create a single socket connection with namespace support
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://intern-api-staging.ensemble.codes';
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      if (!apiBaseUrl) {
+        throw new Error('NEXT_PUBLIC_API_BASE_URL environment variable is not set');
+      }
       const baseURL = `${apiBaseUrl}${namespace}`;
       const fullURL = baseURL;
       console.info('connecting to', fullURL, 'with namespace:', namespace);

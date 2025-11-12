@@ -48,9 +48,10 @@ const ChatLayoutContent: FC<{
     const fetchAgent = async () => {
       try {
         setLoading(true);
-        const apiBaseUrl =
-          process.env.NEXT_PUBLIC_API_BASE_URL ||
-          "https://intern-api-staging.ensemble.codes";
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+        if (!apiBaseUrl) {
+          throw new Error('NEXT_PUBLIC_API_BASE_URL environment variable is not set');
+        }
         const response = await axios.get(
           `${apiBaseUrl}/api/v1/agents/${agentId}`
         );
