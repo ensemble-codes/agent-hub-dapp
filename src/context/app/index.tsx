@@ -5,7 +5,7 @@ import reducer from "./reducer";
 import initialState, { AppState } from "./state";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { SET_AUTH_LOADING, SET_EMBEDDED_WALLET, SET_USER } from "./actions";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 interface ContextProps {
@@ -23,6 +23,9 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   const { wallets } = useWallets();
   const { push } = useRouter();
   const [redirecting, setRedirecting] = useState(true);
+
+  // Get Supabase client singleton
+  const supabase = createClient();
 
   // Expose refreshUser function
   const refreshUser = async (email: string) => {
@@ -48,22 +51,41 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    // Get initial session
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       const email = session?.user?.email;
-      if (event === "SIGNED_OUT") {
-        dispatch({ type: SET_USER, payload: null });
-      }
       if (session?.user && typeof email === "string") {
         await refreshUser(email);
       } else {
         dispatch({ type: SET_USER, payload: null });
       }
+      // Set loading to false after initial session check
       dispatch({
         type: SET_AUTH_LOADING,
         payload: false,
       });
+    }).catch((error) => {
+      console.error("Error getting initial session:", error);
+      dispatch({
+        type: SET_AUTH_LOADING,
+        payload: false,
+      });
+    });
+
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const email = session?.user?.email;
+
+      if (event === "SIGNED_OUT") {
+        dispatch({ type: SET_USER, payload: null });
+      } else if (session?.user && typeof email === "string") {
+        await refreshUser(email);
+      } else {
+        dispatch({ type: SET_USER, payload: null });
+      }
     });
 
     return () => subscription.unsubscribe();

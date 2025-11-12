@@ -273,7 +273,7 @@ export class SocketIOManager extends EventAdapter {
 
     this.socket.on('messageBroadcast', (data: MessageBroadcastData) => {
       console.info(`[SocketIO] Message broadcast received:`, data);
-      debugger
+
       // Log the full data structure to understand formats
       console.debug('[SocketIO] Message broadcast data structure:', {
         keys: Object.keys(data),
@@ -463,7 +463,6 @@ export class SocketIOManager extends EventAdapter {
    * @param channelId Channel ID to join
    */
   public async joinChannel(channelId: string): Promise<void> {
-    debugger
     if (!this.socket) {
       console.error('[SocketIO] Cannot join channel: socket not initialized');
       return;
@@ -497,7 +496,6 @@ export class SocketIOManager extends EventAdapter {
         },
       },
     });
-    debugger
     console.info(`[SocketIO] Emitted ROOM_JOINING for ${channelId}`);
   }
 
@@ -555,7 +553,6 @@ export class SocketIOManager extends EventAdapter {
     messageId?: string,
     metadata?: Record<string, any>
   ): Promise<void> {
-    debugger
     const serverId = "00000000-0000-0000-0000-000000000000";
     if (!this.socket) {
       console.error('[SocketIO] Cannot send message: socket not initialized');
