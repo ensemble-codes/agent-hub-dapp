@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { AppContext } from "@/context/app";
 import { SET_USER } from "@/context/app/actions";
 import Link from "next/link";
+import { logBusinessEvent } from '../../utils/logging';
 
 const Register = () => {
   const [state, dispatch] = useContext(AppContext);
@@ -332,7 +333,7 @@ const Register = () => {
                       ? "Enter OTP to verify"
                       : showAccessCodeInput
                       ? "Enter access code"
-                      : "Enter email to verify"}
+                      : "Enter email"}
                   </p>
                 </div>
                 <div className="w-[340px] border border-[#AEAEAE] bg-white rounded-b-[16px] pb-4 px-6 pt-8">
@@ -345,10 +346,6 @@ const Register = () => {
                         className="px-4 py-2 rounded border mb-3 border-[#121212] outline-none focus:outline-none placeholder:text-[#8F95B2] text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[120%] w-full"
                         placeholder="Enter email"
                       />
-                      <p className="text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[auto]">
-                        Please provide your email to verify if you're on the
-                        list!
-                      </p>
                       <hr className="my-4 border-[0.5px] border-[#AEAEAE]" />
                       <button
                         onClick={handleInitialVerify}
@@ -361,7 +358,7 @@ const Register = () => {
                           className="w-6 h-6"
                         />
                         <p className="text-white font-[Montserrat] font-semibold text-[16px] leading-[120%]">
-                          {isLoading ? "Checking..." : "Verify"}
+                          {isLoading ? "Checking..." : "Login"}
                         </p>
                       </button>
                     </>
