@@ -26,15 +26,72 @@ const Register = () => {
   const [error, setError] = useState<string | null>(null);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { push } = useRouter();
+  const [pasteSuccess, setPasteSuccess] = useState(false);
+  const [pasteError, setPasteError] = useState<string | null>(null);
 
   // Get Ensemble auth services
   const ensembleAuth = getEnsembleAuthService();
   const tokenManager = getTokenManager();
 
+  // Redirect logged-in users to home page
+  useEffect(() => {
+    if (state.user && !state.authLoading) {
+      console.log('[Register] User already logged in, redirecting to home...');
+      push('/');
+    }
+  }, [state.user, state.authLoading, push]);
+
+  const handlePasteFromClipboard = async () => {
+    setPasteError(null);
+    setPasteSuccess(false);
+
+    try {
+      // Check if clipboard API is available
+      if (!navigator.clipboard) {
+        setPasteError("Clipboard not supported");
+        return;
+      }
+
+      // Read from clipboard
+      const text = await navigator.clipboard.readText();
+      // Remove whitespace and special characters, keep alphanumeric only
+      const cleanData = text.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 6);
+
+      if (cleanData.length === 6) {
+        setOtp(cleanData);
+        setPasteSuccess(true);
+
+        // Focus the last input
+        const lastInput = otpRefs.current[5];
+        if (lastInput) {
+          lastInput.focus();
+        }
+
+        // Hide success message after 2 seconds
+        setTimeout(() => {
+          setPasteSuccess(false);
+        }, 2000);
+      } else {
+        setPasteError("Invalid code format. Please paste a 6-character code.");
+        setTimeout(() => {
+          setPasteError(null);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Failed to read clipboard:", error);
+      setPasteError("Failed to read clipboard. Please paste manually.");
+      setTimeout(() => {
+        setPasteError(null);
+      }, 3000);
+    }
+  };
+
   const handleSendOTP = async () => {
     if (!email) return;
     setIsLoading(true);
     setError(null);
+    setPasteSuccess(false);
+    setPasteError(null);
 
     try {
       // Use Ensemble backend auth endpoint
@@ -231,27 +288,6 @@ const Register = () => {
             </p>
           </div>
         </div>
-      ) : state.user && !grantingAccess ? (
-        <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
-          <div className="max-w-[570px] mx-auto flex flex-col items-center justify-center h-full">
-            <div className="text-center mb-8">
-              <h1 className="text-[32px] font-[Montserrat] font-bold leading-[120%] mb-4 bg-gradient-to-r from-[#F94D27] to-[#FF886D] bg-clip-text text-transparent">
-                Welcome back!
-              </h1>
-              <p className="text-[18px] font-[Montserrat] font-medium text-[#121212] mb-4">
-                You are logged in as:{" "}
-                <span className="text-primary">{state.user.email}</span>
-              </p>
-              <button
-                onClick={handleSignOut}
-                disabled={signingOut}
-                className="py-2 px-6 bg-red-500 text-white rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed font-[Montserrat] font-semibold"
-              >
-                {signingOut ? "Signing out..." : "Sign Out"}
-              </button>
-            </div>
-          </div>
-        </div>
       ) : (
         <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
           <div className="flex items-stretch h-full">
@@ -272,14 +308,7 @@ const Register = () => {
                     Welcome to Agent Hub
                   </p>
                   <p className="text-[16px] font-[Montserrat] font-normal leading-[100%] text-[#121212] text-center">
-                    We're in Beta and handing out early access to a select few
-                    users
-                    <br />
-                    If you're an{" "}
-                    <span className="text-primary">
-                      agent builder or an aspiring user
-                    </span>
-                    , feel free to request access
+                    We're in Beta and handing out early access to a select users
                   </p>
                 </div>
               </div>
@@ -305,6 +334,11 @@ const Register = () => {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && email && !isLoading) {
+                            handleInitialVerify();
+                          }
+                        }}
                         className="px-4 py-2 rounded border mb-3 border-[#121212] outline-none focus:outline-none placeholder:text-[#8F95B2] text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[120%] w-full"
                         placeholder="Enter email"
                       />
@@ -389,8 +423,9 @@ const Register = () => {
                             className="w-12 h-12 text-center rounded border border-[#121212] outline-none focus:outline-none text-[20px] font-[Montserrat] font-medium text-[#121212] focus:border-primary"
                             value={otp[index] || ""}
                             onChange={(e) => {
-                              const value = e.target.value;
-                              if (value.length <= 1) {
+                              const value = e.target.value.toUpperCase();
+                              // Only allow alphanumeric characters
+                              if (value.length <= 1 && /^[A-Z0-9]*$/.test(value)) {
                                 const newOtp = otp.split("");
                                 newOtp[index] = value;
                                 setOtp(newOtp.join(""));
@@ -410,9 +445,11 @@ const Register = () => {
                                 e.preventDefault();
                                 const pastedData =
                                   e.clipboardData.getData("text");
+                                // Remove non-alphanumeric characters and limit to 6
                                 const cleanData = pastedData
-                                  .replace(/\D/g, "")
-                                  .slice(0, 6); // Remove non-digits and limit to 6
+                                  .replace(/[^a-zA-Z0-9]/g, "")
+                                  .toUpperCase()
+                                  .slice(0, 6);
 
                                 if (cleanData.length === 6) {
                                   setOtp(cleanData);
@@ -425,6 +462,12 @@ const Register = () => {
                               }
                             }}
                             onKeyDown={(e) => {
+                              // Handle Enter key
+                              if (e.key === "Enter" && otp.length === 6 && !isLoading) {
+                                handleVerifyOTP();
+                                return;
+                              }
+
                               // Handle backspace
                               if (e.key === "Backspace") {
                                 if (!otp[index] && index > 0) {
@@ -448,7 +491,65 @@ const Register = () => {
                           />
                         ))}
                       </div>
-                      <p className="text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[auto] text-center">
+
+                      {/* Paste Button */}
+                      <button
+                        onClick={handlePasteFromClipboard}
+                        type="button"
+                        className="w-full py-2 mb-3 flex items-center justify-center gap-2 text-[14px] text-primary font-[Montserrat] font-medium hover:bg-primary/5 rounded-[8px] transition-all duration-200"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                          />
+                        </svg>
+                        Paste Code from Clipboard
+                      </button>
+
+                      {/* Success/Error Feedback */}
+                      {pasteSuccess && (
+                        <div className="mb-3 flex items-center justify-center gap-2 text-green-600 text-[14px] font-[Montserrat] font-medium animate-fade-in">
+                          <svg
+                            className="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Code pasted successfully!
+                        </div>
+                      )}
+
+                      {pasteError && (
+                        <div className="mb-3 flex items-center justify-center gap-2 text-red-600 text-[14px] font-[Montserrat] font-medium animate-fade-in">
+                          <svg
+                            className="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          {pasteError}
+                        </div>
+                      )}
+
+                      <p className="text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[auto] text-center mb-3">
                         Please enter the invite code sent to your email.
                       </p>
                       <hr className="my-4 border-[0.5px] border-[#AEAEAE]" />

@@ -111,23 +111,18 @@ const MobileHeader = () => {
       // Update app state
       dispatch({ type: SET_USER, payload: null });
 
-      // Close modal
-      setShowWalletModal(false);
-      resetWithdrawStates();
-
-      // Redirect to login page
-      router.push("/register-user");
-
       console.log('[MobileHeader] User logged out successfully');
+
+      // Force browser refresh to clear all credentials and redirect to login
+      window.location.href = "/register-user";
     } catch (error) {
       console.error("Error during logout:", error);
       // Still clear tokens locally even if backend call fails
       tokenManager.clear();
       dispatch({ type: SET_USER, payload: null });
-      setShowWalletModal(false);
-      router.push("/register-user");
-    } finally {
-      setLoggingOut(false);
+
+      // Force browser refresh
+      window.location.href = "/register-user";
     }
   };
 
