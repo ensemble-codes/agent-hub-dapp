@@ -3,7 +3,8 @@ import {
   PaginatedMessagesResponse,
   ConversationOperationResponse,
 } from '@/types/conversations';
-import { createClient } from '@/lib/supabase/client';
+import { getTokenManager } from '@/lib/auth/token-manager';
+import { getEnsembleAuthService } from '@/lib/auth/ensemble-auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -13,21 +14,47 @@ if (!API_BASE_URL) {
 
 export class ConversationsAPI {
   /**
-   * Get JWT token from Supabase session
+   * Get JWT token from Ensemble backend
+   * Automatically refreshes token if expired
    */
   private static async getAuthToken(): Promise<string | null> {
     try {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const tokenManager = getTokenManager();
 
-      if (!session?.access_token) {
-        console.warn('[ConversationsAPI] No active session - user may not be logged in');
+      // Check if token needs refresh (within 5 minutes of expiry)
+      if (tokenManager.isTokenExpired(5 * 60 * 1000)) {
+        console.log('[ConversationsAPI] Token expired or near expiry, refreshing...');
+
+        const refreshToken = tokenManager.getRefreshToken();
+        if (!refreshToken) {
+          console.warn('[ConversationsAPI] No refresh token available');
+          return null;
+        }
+
+        const authService = getEnsembleAuthService();
+        const result = await authService.refreshToken(refreshToken);
+        tokenManager.updateAccessToken(result.access_token, result.expires_in);
+
+        console.log('[ConversationsAPI] Token refreshed successfully');
+        return result.access_token;
+      }
+
+      // Token is still valid
+      const accessToken = tokenManager.getAccessToken();
+
+      if (!accessToken) {
+        console.warn('[ConversationsAPI] No access token - user may not be logged in');
         return null;
       }
 
-      return session.access_token;
+      return accessToken;
     } catch (error) {
       console.error('[ConversationsAPI] Error getting auth token:', error);
+
+      // Clear tokens on error
+      const tokenManager = getTokenManager();
+      tokenManager.clear();
+
       return null;
     }
   }
@@ -36,7 +63,7 @@ export class ConversationsAPI {
     endpoint: string,
     options?: RequestInit
   ): Promise<T> {
-    // Get JWT token from Supabase
+    // Get JWT token from Ensemble backend (auto-refreshes if needed)
     const jwt = await this.getAuthToken();
 
     if (!jwt) {

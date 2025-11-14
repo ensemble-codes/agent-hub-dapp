@@ -16,10 +16,15 @@ import { createWalletClient, custom, parseEther } from "viem";
 import { AppContext } from "@/context/app";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { getEnsembleAuthService } from "@/lib/auth/ensemble-auth";
+import { getTokenManager } from "@/lib/auth/token-manager";
+import { SET_USER } from "@/context/app/actions";
+import { useRouter } from "next/navigation";
 
 const AppHeader = () => {
-  const [state] = useContext(AppContext);
+  const [state, dispatch] = useContext(AppContext);
   const pathname = usePathname();
+  const router = useRouter();
   const { login, logout, ready, exportWallet, authenticated } = usePrivy();
   const { wallets } = useWallets();
   const [showWalletModal, setShowWalletModal] = useState(false);
@@ -36,6 +41,11 @@ const AppHeader = () => {
   const withdrawRef = useRef<HTMLDivElement>(null);
   const [withdrawHeight, setWithdrawHeight] = useState(0);
   const [isPrivyWallet, setIsPrivyWallet] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  // Get auth services
+  const ensembleAuth = getEnsembleAuthService();
+  const tokenManager = getTokenManager();
 
   const copyAddress = async () => {
     if (state.embeddedWallet) {
@@ -64,6 +74,39 @@ const AppHeader = () => {
       logout();
       setShowWalletModal(false);
       resetWithdrawStates();
+    }
+  };
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      // Logout from Ensemble backend
+      const refreshToken = tokenManager.getRefreshToken();
+      await ensembleAuth.logout(refreshToken || undefined);
+
+      // Clear Ensemble/Supabase tokens
+      tokenManager.clear();
+
+      // Update app state
+      dispatch({ type: SET_USER, payload: null });
+
+      // Close modal
+      setShowWalletModal(false);
+      resetWithdrawStates();
+
+      // Redirect to login page
+      router.push("/register-user");
+
+      console.log('[AppHeader] User logged out successfully');
+    } catch (error) {
+      console.error("Error during logout:", error);
+      // Still clear tokens locally even if backend call fails
+      tokenManager.clear();
+      dispatch({ type: SET_USER, payload: null });
+      setShowWalletModal(false);
+      router.push("/register-user");
+    } finally {
+      setLoggingOut(false);
     }
   };
 
@@ -490,6 +533,23 @@ const AppHeader = () => {
                   className="w-4 h-4"
                 />
                 Disconnect
+              </button>
+
+              <button
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="w-full flex items-center justify-center gap-2 text-[16px] text-red-600 font-semibold hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <img
+                  src="/assets/logout-icon.svg"
+                  alt="logout"
+                  className="w-4 h-4"
+                  onError={(e) => {
+                    // Fallback if logout icon doesn't exist
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                {loggingOut ? "Logging out..." : "Logout"}
               </button>
             </div>
           )}

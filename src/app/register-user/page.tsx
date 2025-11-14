@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useContext, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { getEnsembleAuthService } from "@/lib/auth/ensemble-auth";
+import { getTokenManager } from "@/lib/auth/token-manager";
 import { AppContext } from "@/context/app";
 import { SET_USER } from "@/context/app/actions";
 import Link from "next/link";
@@ -26,83 +27,36 @@ const Register = () => {
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { push } = useRouter();
 
-  // Get Supabase client singleton
-  const supabase = createClient();
+  // Get Ensemble auth services
+  const ensembleAuth = getEnsembleAuthService();
+  const tokenManager = getTokenManager();
 
-  const handleSendOTP = async (skipUserCheck = false) => {
+  const handleSendOTP = async () => {
     if (!email) return;
     setIsLoading(true);
     setError(null);
 
     try {
-      if (!skipUserCheck) {
-        // First, check if user exists in our database
-        const checkUserResponse = await fetch(`/api/auth/check-user`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: email }),
-        });
+      // Use Ensemble backend auth endpoint
+      // Backend handles user existence check and sends OTP
+      await ensembleAuth.requestAccessCode(email);
 
-        if (!checkUserResponse.ok) {
-          throw new Error("Failed to check user status");
-        }
-
-        const checkUserData = await checkUserResponse.json();
-
-        if (checkUserData.user) {
-          // User exists, proceed with OTP flow
-          await sendOTP();
-        } else {
-          // User doesn't exist, show access code input
-          setUserNotOnList(true);
-          setShowAccessCodeInput(true);
-        }
-      } else {
-        // Skip user check (for resend when user already went through access code flow)
-        await sendOTP();
-      }
-    } catch (error) {
-      console.log(error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to check user status";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const sendOTP = async () => {
-    try {
-      const result = await supabase.auth.signInWithOtp({
-        email,
-      });
-      if (result.error) {
-        throw result.error;
-      }
-      const response = await fetch(`/api/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: email }),
-      });
-      if (!response.ok) {
-        throw "Failed to register user";
-      }
-      const data = await response.json();
-      if (!data.success) throw "Failed to register user";
       setShowOtpInput(true);
       setShowAccessCodeInput(false);
+      setUserNotOnList(false);
+
       // Start 5-minute countdown for resend
       setResendDisabled(true);
       setResendCountdown(300); // 5 minutes = 300 seconds
+
+      console.log('[Register] Access code sent to:', email);
     } catch (error) {
       console.log(error);
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to send OTP";
+        error instanceof Error ? error.message : "Failed to send code";
       setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -147,11 +101,11 @@ const Register = () => {
   };
 
   const handleInitialVerify = () => {
-    handleSendOTP(false);
+    handleSendOTP();
   };
 
   const handleResendOTP = () => {
-    handleSendOTP(true);
+    handleSendOTP();
   };
 
   const handleRequestAccess = async () => {
@@ -194,40 +148,39 @@ const Register = () => {
   const handleVerifyOTP = async () => {
     if (!email || !otp) return;
     setIsLoading(true);
+    setError(null);
+
     try {
-      const result = await supabase.auth.verifyOtp({
-        email,
-        token: otp,
-        type: "email",
+      // Use Ensemble backend auth endpoint (which calls Supabase internally)
+      const result = await ensembleAuth.verifyAccessCode(email, otp);
+
+      // Store backend-issued tokens
+      tokenManager.storeTokens({
+        access_token: result.session.access_token,
+        refresh_token: result.session.refresh_token,
+        expires_in: result.session.expires_in,
       });
-      if (result.error) {
-        throw error;
-      }
-      console.log("result", result);
-      setGrantingAccess(true);
-      const response = await fetch(`/api/auth/verify-user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: email }),
+
+      // Store user data
+      tokenManager.storeUser({
+        id: result.user.id,
+        email: result.user.email,
+        user_metadata: result.user.user_metadata,
       });
-      console.log("response", response);
-      if (!response.ok) {
-        throw "Failed to register user";
-      }
-      const data = await response.json();
-      console.log("data", data);
-      if (!data.success) throw "Failed to register user";
-      push("/");
+
+      // Update app state
       dispatch({
         type: SET_USER,
-        payload: data.user,
+        payload: result.user,
       });
+
+      console.log('[Register] Login successful:', result.message);
+      logBusinessEvent('user_login', { email, method: 'otp' });
+      push("/");
     } catch (error) {
       console.log(error);
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to verify OTP";
+        error instanceof Error ? error.message : "Failed to verify code";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -237,11 +190,20 @@ const Register = () => {
   const handleSignOut = async () => {
     if (!state.user) return;
     setSigningOut(true);
+    setError(null);
+
     try {
-      const result = await supabase.auth.signOut();
-      if (result.error) {
-        throw error;
-      }
+      // Logout via Ensemble backend
+      const refreshToken = tokenManager.getRefreshToken();
+      await ensembleAuth.logout(refreshToken || undefined);
+
+      // Clear tokens
+      tokenManager.clear();
+
+      // Update app state
+      dispatch({ type: SET_USER, payload: null });
+
+      console.log('[Register] Sign out successful');
     } catch (error) {
       console.log(error);
       const errorMessage =
