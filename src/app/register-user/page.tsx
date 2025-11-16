@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useContext, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { getEnsembleAuthService } from "@/lib/auth/ensemble-auth";
+import { getTokenManager } from "@/lib/auth/token-manager";
 import { AppContext } from "@/context/app";
 import { SET_USER } from "@/context/app/actions";
 import Link from "next/link";
+import { logBusinessEvent } from '../../utils/logging';
 
 const Register = () => {
   const [state, dispatch] = useContext(AppContext);
@@ -24,84 +26,94 @@ const Register = () => {
   const [error, setError] = useState<string | null>(null);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { push } = useRouter();
+  const [pasteSuccess, setPasteSuccess] = useState(false);
+  const [pasteError, setPasteError] = useState<string | null>(null);
 
-  // Get Supabase client singleton
-  const supabase = createClient();
+  // Get Ensemble auth services
+  const ensembleAuth = getEnsembleAuthService();
+  const tokenManager = getTokenManager();
 
-  const handleSendOTP = async (skipUserCheck = false) => {
-    if (!email) return;
-    setIsLoading(true);
-    setError(null);
+  // Redirect logged-in users to home page
+  useEffect(() => {
+    if (state.user && !state.authLoading) {
+      console.log('[Register] User already logged in, redirecting to home...');
+      push('/');
+    }
+  }, [state.user, state.authLoading, push]);
+
+  const handlePasteFromClipboard = async () => {
+    setPasteError(null);
+    setPasteSuccess(false);
 
     try {
-      if (!skipUserCheck) {
-        // First, check if user exists in our database
-        const checkUserResponse = await fetch(`/api/auth/check-user`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: email }),
-        });
+      // Check if clipboard API is available
+      if (!navigator.clipboard) {
+        setPasteError("Clipboard not supported");
+        return;
+      }
 
-        if (!checkUserResponse.ok) {
-          throw new Error("Failed to check user status");
+      // Read from clipboard
+      const text = await navigator.clipboard.readText();
+      // Remove whitespace and special characters, keep alphanumeric only
+      const cleanData = text.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 6);
+
+      if (cleanData.length === 6) {
+        setOtp(cleanData);
+        setPasteSuccess(true);
+
+        // Focus the last input
+        const lastInput = otpRefs.current[5];
+        if (lastInput) {
+          lastInput.focus();
         }
 
-        const checkUserData = await checkUserResponse.json();
-
-        if (checkUserData.user) {
-          // User exists, proceed with OTP flow
-          await sendOTP();
-        } else {
-          // User doesn't exist, show access code input
-          setUserNotOnList(true);
-          setShowAccessCodeInput(true);
-        }
+        // Hide success message after 2 seconds
+        setTimeout(() => {
+          setPasteSuccess(false);
+        }, 2000);
       } else {
-        // Skip user check (for resend when user already went through access code flow)
-        await sendOTP();
+        setPasteError("Invalid code format. Please paste a 6-character code.");
+        setTimeout(() => {
+          setPasteError(null);
+        }, 3000);
       }
     } catch (error) {
-      console.log(error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to check user status";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
+      console.error("Failed to read clipboard:", error);
+      setPasteError("Failed to read clipboard. Please paste manually.");
+      setTimeout(() => {
+        setPasteError(null);
+      }, 3000);
     }
   };
 
-  const sendOTP = async () => {
+  const handleSendOTP = async () => {
+    if (!email) return;
+    setIsLoading(true);
+    setError(null);
+    setPasteSuccess(false);
+    setPasteError(null);
+
     try {
-      const result = await supabase.auth.signInWithOtp({
-        email,
-      });
-      if (result.error) {
-        throw result.error;
-      }
-      const response = await fetch(`/api/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: email }),
-      });
-      if (!response.ok) {
-        throw "Failed to register user";
-      }
-      const data = await response.json();
-      if (!data.success) throw "Failed to register user";
+      // Use Ensemble backend auth endpoint
+      // Backend handles user existence check and sends OTP
+      await ensembleAuth.requestAccessCode(email);
+
       setShowOtpInput(true);
       setShowAccessCodeInput(false);
+      setUserNotOnList(false);
+
       // Start 5-minute countdown for resend
       setResendDisabled(true);
       setResendCountdown(300); // 5 minutes = 300 seconds
+
+      console.log('[Register] Access code sent to:', email);
     } catch (error) {
       console.log(error);
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to send OTP";
+        error instanceof Error ? error.message : "Failed to send code";
       setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -134,7 +146,7 @@ const Register = () => {
         throw new Error("Failed to redeem access code");
       }
 
-      await sendOTP();
+      await handleSendOTP();
     } catch (error) {
       console.log(error);
       const errorMessage =
@@ -146,11 +158,11 @@ const Register = () => {
   };
 
   const handleInitialVerify = () => {
-    handleSendOTP(false);
+    handleSendOTP();
   };
 
   const handleResendOTP = () => {
-    handleSendOTP(true);
+    handleSendOTP();
   };
 
   const handleRequestAccess = async () => {
@@ -193,40 +205,58 @@ const Register = () => {
   const handleVerifyOTP = async () => {
     if (!email || !otp) return;
     setIsLoading(true);
+    setError(null);
+
     try {
-      const result = await supabase.auth.verifyOtp({
-        email,
-        token: otp,
-        type: "email",
-      });
-      if (result.error) {
-        throw error;
+      // Use Ensemble backend auth endpoint (which calls Supabase internally)
+      const result = await ensembleAuth.verifyAccessCode(email, otp);
+
+      console.log('[Register] ✅ Backend response received');
+      console.log('[Register] - Has session:', !!result.session);
+      console.log('[Register] - Has user:', !!result.user);
+      console.log('[Register] - Session keys:', result.session ? Object.keys(result.session) : 'none');
+      console.log('[Register] - User keys:', result.user ? Object.keys(result.user) : 'none');
+
+      // Validate backend response
+      if (!result.session || !result.session.access_token || !result.session.refresh_token) {
+        console.error('[Register] ❌ Invalid session data from backend:', result.session);
+        throw new Error('Invalid session data received from backend - missing tokens');
       }
-      console.log("result", result);
-      setGrantingAccess(true);
-      const response = await fetch(`/api/auth/verify-user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: email }),
-      });
-      console.log("response", response);
-      if (!response.ok) {
-        throw "Failed to register user";
+
+      if (!result.user || !result.user.id || !result.user.email) {
+        console.error('[Register] ❌ Invalid user data from backend:', result.user);
+        throw new Error('Invalid user data received from backend - missing id or email');
       }
-      const data = await response.json();
-      console.log("data", data);
-      if (!data.success) throw "Failed to register user";
-      push("/");
+
+      console.log('[Register] ✅ Backend response validated, storing credentials...');
+
+      // Store backend-issued tokens
+      tokenManager.storeTokens({
+        access_token: result.session.access_token,
+        refresh_token: result.session.refresh_token,
+        expires_in: result.session.expires_in,
+      });
+
+      // Store user data
+      tokenManager.storeUser({
+        id: result.user.id,
+        email: result.user.email,
+        user_metadata: result.user.user_metadata,
+      });
+
+      // Update app state
       dispatch({
         type: SET_USER,
-        payload: data.user,
+        payload: result.user,
       });
+
+      console.log('[Register] Login successful:', result.message);
+      logBusinessEvent('user_login', { email, method: 'otp' });
+      push("/");
     } catch (error) {
       console.log(error);
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to verify OTP";
+        error instanceof Error ? error.message : "Failed to verify code";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -236,11 +266,20 @@ const Register = () => {
   const handleSignOut = async () => {
     if (!state.user) return;
     setSigningOut(true);
+    setError(null);
+
     try {
-      const result = await supabase.auth.signOut();
-      if (result.error) {
-        throw error;
-      }
+      // Logout via Ensemble backend
+      const refreshToken = tokenManager.getRefreshToken();
+      await ensembleAuth.logout(refreshToken || undefined);
+
+      // Clear tokens
+      tokenManager.clear();
+
+      // Update app state
+      dispatch({ type: SET_USER, payload: null });
+
+      console.log('[Register] Sign out successful');
     } catch (error) {
       console.log(error);
       const errorMessage =
@@ -268,27 +307,6 @@ const Register = () => {
             </p>
           </div>
         </div>
-      ) : state.user && !grantingAccess ? (
-        <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:p-4 lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
-          <div className="max-w-[570px] mx-auto flex flex-col items-center justify-center h-full">
-            <div className="text-center mb-8">
-              <h1 className="text-[32px] font-[Montserrat] font-bold leading-[120%] mb-4 bg-gradient-to-r from-[#F94D27] to-[#FF886D] bg-clip-text text-transparent">
-                Welcome back!
-              </h1>
-              <p className="text-[18px] font-[Montserrat] font-medium text-[#121212] mb-4">
-                You are logged in as:{" "}
-                <span className="text-primary">{state.user.email}</span>
-              </p>
-              <button
-                onClick={handleSignOut}
-                disabled={signingOut}
-                className="py-2 px-6 bg-red-500 text-white rounded-[20000px] disabled:opacity-50 disabled:cursor-not-allowed font-[Montserrat] font-semibold"
-              >
-                {signingOut ? "Signing out..." : "Sign Out"}
-              </button>
-            </div>
-          </div>
-        </div>
       ) : (
         <div className="h-[calc(100dvh-200px)] lg:bg-white lg:rounded-[16px] lg:border-[0.5px] lg:border-[#8F95B2] relative overflow-hidden">
           <div className="flex items-stretch h-full">
@@ -309,14 +327,7 @@ const Register = () => {
                     Welcome to Agent Hub
                   </p>
                   <p className="text-[16px] font-[Montserrat] font-normal leading-[100%] text-[#121212] text-center">
-                    We're in Beta and handing out early access to a select few
-                    users
-                    <br />
-                    If you're an{" "}
-                    <span className="text-primary">
-                      agent builder or an aspiring user
-                    </span>
-                    , feel free to request access
+                    We're in Beta and handing out early access to a select users
                   </p>
                 </div>
               </div>
@@ -332,7 +343,7 @@ const Register = () => {
                       ? "Enter OTP to verify"
                       : showAccessCodeInput
                       ? "Enter access code"
-                      : "Enter email to verify"}
+                      : "Enter email"}
                   </p>
                 </div>
                 <div className="w-[340px] border border-[#AEAEAE] bg-white rounded-b-[16px] pb-4 px-6 pt-8">
@@ -342,13 +353,14 @@ const Register = () => {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && email && !isLoading) {
+                            handleInitialVerify();
+                          }
+                        }}
                         className="px-4 py-2 rounded border mb-3 border-[#121212] outline-none focus:outline-none placeholder:text-[#8F95B2] text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[120%] w-full"
                         placeholder="Enter email"
                       />
-                      <p className="text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[auto]">
-                        Please provide your email to verify if you're on the
-                        list!
-                      </p>
                       <hr className="my-4 border-[0.5px] border-[#AEAEAE]" />
                       <button
                         onClick={handleInitialVerify}
@@ -361,7 +373,7 @@ const Register = () => {
                           className="w-6 h-6"
                         />
                         <p className="text-white font-[Montserrat] font-semibold text-[16px] leading-[120%]">
-                          {isLoading ? "Checking..." : "Verify"}
+                          {isLoading ? "Checking..." : "Login"}
                         </p>
                       </button>
                     </>
@@ -430,8 +442,9 @@ const Register = () => {
                             className="w-12 h-12 text-center rounded border border-[#121212] outline-none focus:outline-none text-[20px] font-[Montserrat] font-medium text-[#121212] focus:border-primary"
                             value={otp[index] || ""}
                             onChange={(e) => {
-                              const value = e.target.value;
-                              if (value.length <= 1) {
+                              const value = e.target.value.toUpperCase();
+                              // Only allow alphanumeric characters
+                              if (value.length <= 1 && /^[A-Z0-9]*$/.test(value)) {
                                 const newOtp = otp.split("");
                                 newOtp[index] = value;
                                 setOtp(newOtp.join(""));
@@ -451,9 +464,11 @@ const Register = () => {
                                 e.preventDefault();
                                 const pastedData =
                                   e.clipboardData.getData("text");
+                                // Remove non-alphanumeric characters and limit to 6
                                 const cleanData = pastedData
-                                  .replace(/\D/g, "")
-                                  .slice(0, 6); // Remove non-digits and limit to 6
+                                  .replace(/[^a-zA-Z0-9]/g, "")
+                                  .toUpperCase()
+                                  .slice(0, 6);
 
                                 if (cleanData.length === 6) {
                                   setOtp(cleanData);
@@ -466,6 +481,12 @@ const Register = () => {
                               }
                             }}
                             onKeyDown={(e) => {
+                              // Handle Enter key
+                              if (e.key === "Enter" && otp.length === 6 && !isLoading) {
+                                handleVerifyOTP();
+                                return;
+                              }
+
                               // Handle backspace
                               if (e.key === "Backspace") {
                                 if (!otp[index] && index > 0) {
@@ -489,7 +510,65 @@ const Register = () => {
                           />
                         ))}
                       </div>
-                      <p className="text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[auto] text-center">
+
+                      {/* Paste Button */}
+                      <button
+                        onClick={handlePasteFromClipboard}
+                        type="button"
+                        className="w-full py-2 mb-3 flex items-center justify-center gap-2 text-[14px] text-primary font-[Montserrat] font-medium hover:bg-primary/5 rounded-[8px] transition-all duration-200"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                          />
+                        </svg>
+                        Paste Code from Clipboard
+                      </button>
+
+                      {/* Success/Error Feedback */}
+                      {pasteSuccess && (
+                        <div className="mb-3 flex items-center justify-center gap-2 text-green-600 text-[14px] font-[Montserrat] font-medium animate-fade-in">
+                          <svg
+                            className="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Code pasted successfully!
+                        </div>
+                      )}
+
+                      {pasteError && (
+                        <div className="mb-3 flex items-center justify-center gap-2 text-red-600 text-[14px] font-[Montserrat] font-medium animate-fade-in">
+                          <svg
+                            className="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          {pasteError}
+                        </div>
+                      )}
+
+                      <p className="text-[16px] text-[#121212] font-[Montserrat] font-normal leading-[auto] text-center mb-3">
                         Please enter the invite code sent to your email.
                       </p>
                       <hr className="my-4 border-[0.5px] border-[#AEAEAE]" />

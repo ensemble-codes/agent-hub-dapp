@@ -6,6 +6,7 @@ import initialState, { AppState } from "./state";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { SET_AUTH_LOADING, SET_EMBEDDED_WALLET, SET_USER } from "./actions";
 import { createClient } from "@/lib/supabase/client";
+import { getTokenManager } from "@/lib/auth/token-manager";
 import { useRouter } from "next/navigation";
 
 interface ContextProps {
@@ -24,71 +25,58 @@ export const AppContextProvider: FC<ContextProps> = ({ children }) => {
   const { push } = useRouter();
   const [redirecting, setRedirecting] = useState(true);
 
-  // Get Supabase client singleton
+  // Get Supabase client singleton (for backward compatibility with other features)
   const supabase = createClient();
 
+  // Get token manager for Ensemble auth
+  const tokenManager = getTokenManager();
+
   // Expose refreshUser function
+  // Note: This now uses locally stored user data from token manager
+  // The backend will validate the JWT on each API call
   const refreshUser = async (email: string) => {
     if (email) {
-      const response = await fetch("/api/auth/check-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: email }),
-      });
+      // Get user from token manager (stored during login)
+      const user = tokenManager.getUser();
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to load user data");
+      if (user && user.email === email) {
+        dispatch({ type: SET_USER, payload: user });
+      } else {
+        // User data mismatch or not found, clear tokens
+        tokenManager.clear();
+        dispatch({ type: SET_USER, payload: null });
       }
-
-      const data = await response.json();
-      dispatch({ type: SET_USER, payload: data.user });
     } else {
       dispatch({ type: SET_USER, payload: null });
     }
   };
 
   useEffect(() => {
-    // Get initial session
+    // Get initial session from Ensemble tokens
+    async function initializeAuth() {
+      try {
+        const user = tokenManager.getUser();
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      const email = session?.user?.email;
-      if (session?.user && typeof email === "string") {
-        await refreshUser(email);
-      } else {
+        if (user && tokenManager.hasValidAuth()) {
+          // User has valid tokens - refresh user data from database
+          console.log('[AppContext] Valid auth found for user:', user.email);
+          await refreshUser(user.email);
+        } else {
+          console.log('[AppContext] No valid auth found');
+          dispatch({ type: SET_USER, payload: null });
+        }
+      } catch (error) {
+        console.error('[AppContext] Error initializing auth:', error);
         dispatch({ type: SET_USER, payload: null });
+      } finally {
+        dispatch({
+          type: SET_AUTH_LOADING,
+          payload: false,
+        });
       }
-      // Set loading to false after initial session check
-      dispatch({
-        type: SET_AUTH_LOADING,
-        payload: false,
-      });
-    }).catch((error) => {
-      console.error("Error getting initial session:", error);
-      dispatch({
-        type: SET_AUTH_LOADING,
-        payload: false,
-      });
-    });
+    }
 
-    // Listen for auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const email = session?.user?.email;
-
-      if (event === "SIGNED_OUT") {
-        dispatch({ type: SET_USER, payload: null });
-      } else if (session?.user && typeof email === "string") {
-        await refreshUser(email);
-      } else {
-        dispatch({ type: SET_USER, payload: null });
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    initializeAuth();
   }, []);
 
   // Function to silently track wallet connection

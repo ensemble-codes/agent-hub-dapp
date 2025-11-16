@@ -3,7 +3,8 @@ import {
   PaginatedMessagesResponse,
   ConversationOperationResponse,
 } from '@/types/conversations';
-import { createClient } from '@/lib/supabase/client';
+import { getTokenManager } from '@/lib/auth/token-manager';
+import { getEnsembleAuthService } from '@/lib/auth/ensemble-auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -13,21 +14,62 @@ if (!API_BASE_URL) {
 
 export class ConversationsAPI {
   /**
-   * Get JWT token from Supabase session
+   * Get JWT token from Ensemble backend
+   * Automatically refreshes token if expired
    */
   private static async getAuthToken(): Promise<string | null> {
     try {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const tokenManager = getTokenManager();
 
-      if (!session?.access_token) {
-        console.warn('[ConversationsAPI] No active session - user may not be logged in');
+      console.log('[ConversationsAPI] Getting auth token...');
+
+      // Check if token needs refresh (within 5 minutes of expiry)
+      if (tokenManager.isTokenExpired(5 * 60 * 1000)) {
+        console.log('[ConversationsAPI] Token expired or near expiry, refreshing...');
+
+        const refreshToken = tokenManager.getRefreshToken();
+        if (!refreshToken) {
+          console.error('[ConversationsAPI] ❌ No refresh token available');
+          console.error('[ConversationsAPI] This usually means:');
+          console.error('[ConversationsAPI]   1. User never logged in');
+          console.error('[ConversationsAPI]   2. Tokens were cleared/expired');
+          console.error('[ConversationsAPI]   3. Backend did not return refresh_token on login');
+          return null;
+        }
+
+        const authService = getEnsembleAuthService();
+        const result = await authService.refreshToken(refreshToken);
+        tokenManager.updateAccessToken(result.access_token, result.expires_in);
+
+        console.log('[ConversationsAPI] ✅ Token refreshed successfully');
+        return result.access_token;
+      }
+
+      // Token is still valid
+      const accessToken = tokenManager.getAccessToken();
+
+      if (!accessToken) {
+        console.error('[ConversationsAPI] ❌ No access token available');
+        console.error('[ConversationsAPI] This usually means:');
+        console.error('[ConversationsAPI]   1. User has not logged in yet');
+        console.error('[ConversationsAPI]   2. Tokens were cleared');
+        console.error('[ConversationsAPI]   3. Backend did not return access_token on login');
+        console.error('[ConversationsAPI] Check localStorage keys:');
+        console.error('[ConversationsAPI]   - ensemble_access_token:', localStorage.getItem('ensemble_access_token') ? 'exists' : 'missing');
+        console.error('[ConversationsAPI]   - ensemble_refresh_token:', localStorage.getItem('ensemble_refresh_token') ? 'exists' : 'missing');
+        console.error('[ConversationsAPI]   - ensemble_user:', localStorage.getItem('ensemble_user') ? 'exists' : 'missing');
         return null;
       }
 
-      return session.access_token;
+      console.log('[ConversationsAPI] ✅ Using valid access token (length:', accessToken.length, ')');
+      return accessToken;
     } catch (error) {
-      console.error('[ConversationsAPI] Error getting auth token:', error);
+      console.error('[ConversationsAPI] ❌ Error getting auth token:', error);
+
+      // Clear tokens on error
+      const tokenManager = getTokenManager();
+      tokenManager.clear();
+
       return null;
     }
   }
@@ -36,10 +78,10 @@ export class ConversationsAPI {
     endpoint: string,
     options?: RequestInit
   ): Promise<T> {
-    // Get JWT token from Supabase
+    // Get JWT token from Ensemble backend (auto-refreshes if needed)
     const jwt = await this.getAuthToken();
 
-    if (!jwt) {
+    if (!jwt || jwt === 'null' || jwt === 'undefined') {
       console.error('[ConversationsAPI] No JWT token available - user must be logged in');
       throw new Error('Authentication required - please log in to continue');
     }
