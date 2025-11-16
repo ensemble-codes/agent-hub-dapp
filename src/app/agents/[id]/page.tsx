@@ -205,7 +205,7 @@ const Page: FC<{ params: Promise<{ id: string }> }> = ({ params }) => {
                     About
                   </p>
                   <p className="text-[16px] font-medium text-[#121212]">
-                    {agent.description}
+                    {agent.profile?.description || agent.description}
                   </p>
                 </div>
                 {agent.metadata?.tags &&
