@@ -21,13 +21,19 @@ export class ConversationsAPI {
     try {
       const tokenManager = getTokenManager();
 
+      console.log('[ConversationsAPI] Getting auth token...');
+
       // Check if token needs refresh (within 5 minutes of expiry)
       if (tokenManager.isTokenExpired(5 * 60 * 1000)) {
         console.log('[ConversationsAPI] Token expired or near expiry, refreshing...');
 
         const refreshToken = tokenManager.getRefreshToken();
         if (!refreshToken) {
-          console.warn('[ConversationsAPI] No refresh token available');
+          console.error('[ConversationsAPI] ❌ No refresh token available');
+          console.error('[ConversationsAPI] This usually means:');
+          console.error('[ConversationsAPI]   1. User never logged in');
+          console.error('[ConversationsAPI]   2. Tokens were cleared/expired');
+          console.error('[ConversationsAPI]   3. Backend did not return refresh_token on login');
           return null;
         }
 
@@ -35,7 +41,7 @@ export class ConversationsAPI {
         const result = await authService.refreshToken(refreshToken);
         tokenManager.updateAccessToken(result.access_token, result.expires_in);
 
-        console.log('[ConversationsAPI] Token refreshed successfully');
+        console.log('[ConversationsAPI] ✅ Token refreshed successfully');
         return result.access_token;
       }
 
@@ -43,13 +49,22 @@ export class ConversationsAPI {
       const accessToken = tokenManager.getAccessToken();
 
       if (!accessToken) {
-        console.warn('[ConversationsAPI] No access token - user may not be logged in');
+        console.error('[ConversationsAPI] ❌ No access token available');
+        console.error('[ConversationsAPI] This usually means:');
+        console.error('[ConversationsAPI]   1. User has not logged in yet');
+        console.error('[ConversationsAPI]   2. Tokens were cleared');
+        console.error('[ConversationsAPI]   3. Backend did not return access_token on login');
+        console.error('[ConversationsAPI] Check localStorage keys:');
+        console.error('[ConversationsAPI]   - ensemble_access_token:', localStorage.getItem('ensemble_access_token') ? 'exists' : 'missing');
+        console.error('[ConversationsAPI]   - ensemble_refresh_token:', localStorage.getItem('ensemble_refresh_token') ? 'exists' : 'missing');
+        console.error('[ConversationsAPI]   - ensemble_user:', localStorage.getItem('ensemble_user') ? 'exists' : 'missing');
         return null;
       }
 
+      console.log('[ConversationsAPI] ✅ Using valid access token (length:', accessToken.length, ')');
       return accessToken;
     } catch (error) {
-      console.error('[ConversationsAPI] Error getting auth token:', error);
+      console.error('[ConversationsAPI] ❌ Error getting auth token:', error);
 
       // Clear tokens on error
       const tokenManager = getTokenManager();
@@ -66,7 +81,7 @@ export class ConversationsAPI {
     // Get JWT token from Ensemble backend (auto-refreshes if needed)
     const jwt = await this.getAuthToken();
 
-    if (!jwt) {
+    if (!jwt || jwt === 'null' || jwt === 'undefined') {
       console.error('[ConversationsAPI] No JWT token available - user must be logged in');
       throw new Error('Authentication required - please log in to continue');
     }

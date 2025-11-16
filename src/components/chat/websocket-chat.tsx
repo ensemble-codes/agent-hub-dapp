@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 import ChatLayout from "./chat-layout";
@@ -11,6 +11,7 @@ import { Content } from "@elizaos/core";
 import { CHAT_SOURCE } from "@/constants";
 import { usePrivy } from "@privy-io/react-auth";
 import { ConversationManager } from "@/lib/conversations/conversation-manager";
+import { AppContext } from "@/context/app";
 
 export const WebsocketChat: FC<{
   agentId: `${string}-${string}-${string}-${string}-${string}`;
@@ -34,6 +35,7 @@ export const WebsocketChat: FC<{
   const [platformConversationId, setPlatformConversationId] = useState<string | null>(initialPlatformConversationId || null);
   const [isInitializing, setIsInitializing] = useState(true);
   const { authenticated, login } = usePrivy();
+  const [state] = useContext(AppContext);
   const entityId = getEntityId();
   const router = useRouter();
   const pathname = usePathname();
@@ -142,6 +144,20 @@ export const WebsocketChat: FC<{
 
   // Initialize conversation and room ID
   useEffect(() => {
+    // Wait for authentication to complete before initializing conversation
+    if (state.authLoading) {
+      console.log('[WebsocketChat] Waiting for authentication to complete...');
+      return;
+    }
+
+    if (!state.user) {
+      console.log('[WebsocketChat] No authenticated user - skipping conversation initialization');
+      setIsInitializing(false);
+      return;
+    }
+
+    console.log('[WebsocketChat] Authentication complete, initializing conversation...');
+
     let isCancelled = false;
 
     const initializeConversation = async () => {
@@ -226,7 +242,7 @@ export const WebsocketChat: FC<{
     return () => {
       isCancelled = true;
     };
-  }, [agentId, entityId, elizaV1, agentAddress, namespace, initialPlatformConversationId, pathname, router]);
+  }, [agentId, entityId, elizaV1, agentAddress, namespace, initialPlatformConversationId, pathname, router, state.authLoading, state.user]);
 
   useEffect(() => {
     if (!platformConversationId || !conversationId) return;

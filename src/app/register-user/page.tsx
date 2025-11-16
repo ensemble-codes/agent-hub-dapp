@@ -146,7 +146,7 @@ const Register = () => {
         throw new Error("Failed to redeem access code");
       }
 
-      await sendOTP();
+      await handleSendOTP();
     } catch (error) {
       console.log(error);
       const errorMessage =
@@ -210,6 +210,25 @@ const Register = () => {
     try {
       // Use Ensemble backend auth endpoint (which calls Supabase internally)
       const result = await ensembleAuth.verifyAccessCode(email, otp);
+
+      console.log('[Register] ✅ Backend response received');
+      console.log('[Register] - Has session:', !!result.session);
+      console.log('[Register] - Has user:', !!result.user);
+      console.log('[Register] - Session keys:', result.session ? Object.keys(result.session) : 'none');
+      console.log('[Register] - User keys:', result.user ? Object.keys(result.user) : 'none');
+
+      // Validate backend response
+      if (!result.session || !result.session.access_token || !result.session.refresh_token) {
+        console.error('[Register] ❌ Invalid session data from backend:', result.session);
+        throw new Error('Invalid session data received from backend - missing tokens');
+      }
+
+      if (!result.user || !result.user.id || !result.user.email) {
+        console.error('[Register] ❌ Invalid user data from backend:', result.user);
+        throw new Error('Invalid user data received from backend - missing id or email');
+      }
+
+      console.log('[Register] ✅ Backend response validated, storing credentials...');
 
       // Store backend-issued tokens
       tokenManager.storeTokens({

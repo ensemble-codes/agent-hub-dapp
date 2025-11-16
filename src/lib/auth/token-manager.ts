@@ -25,13 +25,33 @@ export class TokenManager {
     refresh_token: string;
     expires_in: number; // seconds
   }): void {
+    // Validate tokens before storing
+    if (!tokens.access_token || tokens.access_token === 'null' || tokens.access_token === 'undefined') {
+      console.error('[TokenManager] Invalid access_token received:', tokens.access_token);
+      throw new Error('Invalid access_token - cannot store');
+    }
+
+    if (!tokens.refresh_token || tokens.refresh_token === 'null' || tokens.refresh_token === 'undefined') {
+      console.error('[TokenManager] Invalid refresh_token received:', tokens.refresh_token);
+      throw new Error('Invalid refresh_token - cannot store');
+    }
+
+    if (!tokens.expires_in || tokens.expires_in <= 0) {
+      console.error('[TokenManager] Invalid expires_in received:', tokens.expires_in);
+      throw new Error('Invalid expires_in - cannot store');
+    }
+
     const expiresAt = Date.now() + tokens.expires_in * 1000;
 
     localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, tokens.access_token);
     localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, tokens.refresh_token);
     localStorage.setItem(STORAGE_KEYS.EXPIRES_AT, expiresAt.toString());
 
-    console.log('[TokenManager] Tokens stored, expires at:', new Date(expiresAt).toISOString());
+    console.log('[TokenManager] ✅ Tokens stored successfully');
+    console.log('[TokenManager] - Access token length:', tokens.access_token.length);
+    console.log('[TokenManager] - Refresh token length:', tokens.refresh_token.length);
+    console.log('[TokenManager] - Expires in:', tokens.expires_in, 'seconds');
+    console.log('[TokenManager] - Expires at:', new Date(expiresAt).toISOString());
   }
 
   /**
@@ -50,14 +70,24 @@ export class TokenManager {
    * Get current access token
    */
   getAccessToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    // Handle edge case where localStorage might have string 'null' or 'undefined'
+    if (!token || token === 'null' || token === 'undefined') {
+      return null;
+    }
+    return token;
   }
 
   /**
    * Get refresh token
    */
   getRefreshToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+    const token = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+    // Handle edge case where localStorage might have string 'null' or 'undefined'
+    if (!token || token === 'null' || token === 'undefined') {
+      return null;
+    }
+    return token;
   }
 
   /**
@@ -109,7 +139,28 @@ export class TokenManager {
    * Store user data
    */
   storeUser(user: StoredUser): void {
+    // Validate user data before storing
+    if (!user || !user.id || !user.email) {
+      console.error('[TokenManager] Invalid user data received:', user);
+      throw new Error('Invalid user data - must have id and email');
+    }
+
+    if (user.id === 'null' || user.id === 'undefined') {
+      console.error('[TokenManager] Invalid user.id:', user.id);
+      throw new Error('Invalid user.id');
+    }
+
+    if (user.email === 'null' || user.email === 'undefined') {
+      console.error('[TokenManager] Invalid user.email:', user.email);
+      throw new Error('Invalid user.email');
+    }
+
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+
+    console.log('[TokenManager] ✅ User data stored successfully');
+    console.log('[TokenManager] - User ID:', user.id);
+    console.log('[TokenManager] - User email:', user.email);
+    console.log('[TokenManager] - Has metadata:', !!user.user_metadata);
   }
 
   /**
