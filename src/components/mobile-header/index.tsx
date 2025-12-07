@@ -102,8 +102,8 @@ const MobileHeader = () => {
     setLoggingOut(true);
     try {
       // Logout from Ensemble backend
-      const refreshToken = tokenManager.getRefreshToken();
-      await ensembleAuth.logout(refreshToken || undefined);
+      const accessToken = tokenManager.getAccessToken();
+      await ensembleAuth.logout(accessToken || undefined);
 
       // Clear Ensemble/Supabase tokens
       tokenManager.clear();

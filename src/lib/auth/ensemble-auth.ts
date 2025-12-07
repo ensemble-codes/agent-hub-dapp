@@ -35,7 +35,7 @@ export class EnsembleAuthService {
    * Request access code via backend
    */
   async requestAccessCode(email: string): Promise<{ success: boolean; message: string }> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/request-access`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/access-code/request`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
@@ -54,7 +54,7 @@ export class EnsembleAuthService {
    * Verify access code via backend
    */
   async verifyAccessCode(email: string, code: string): Promise<AuthResult> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/verify-access`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/access-code/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, code }),
@@ -73,7 +73,7 @@ export class EnsembleAuthService {
    * Refresh access token via backend
    */
   async refreshToken(refreshToken: string): Promise<{ access_token: string; expires_in: number }> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/sessions/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token: refreshToken }),
@@ -85,19 +85,25 @@ export class EnsembleAuthService {
       throw new Error(data.detail || data.message || 'Failed to refresh token');
     }
 
-    return data;
+    // New API wraps tokens in session object
+    return {
+      access_token: data.session.access_token,
+      expires_in: data.session.expires_in,
+    };
   }
 
   /**
    * Logout via backend
    */
-  async logout(refreshToken?: string): Promise<void> {
-    if (refreshToken) {
+  async logout(accessToken?: string): Promise<void> {
+    if (accessToken) {
       try {
-        await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+        await fetch(`${API_BASE_URL}/api/v1/auth/sessions/logout`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh_token: refreshToken }),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
         });
       } catch (error) {
         console.error('[EnsembleAuth] Logout error:', error);
