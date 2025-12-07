@@ -1,0 +1,282 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Secret Sanitization",
+        "description": "Scan the codebase and git history to identify and remove any sensitive information such as passwords, API keys, tokens, and internal URLs.",
+        "details": "1. Run `git log -p | grep -iE \"password|secret|api_key|token\"` to identify secrets in git history\n2. Use `grep -rE \"(password|secret|key|token)\\s*[:=]\" src/` to find hardcoded secrets in the codebase\n3. Ensure `.env` is properly added to `.gitignore`\n4. Create `.env.example` with placeholder values for all required environment variables\n5. Search for and remove any internal URLs, staging endpoints, or private service references\n6. Consider using tools like git-filter-branch or BFG Repo-Cleaner if secrets need to be purged from git history",
+        "testStrategy": "1. Verify no secrets appear in git history after sanitization\n2. Confirm no hardcoded secrets exist in the codebase\n3. Test that `.env` is properly ignored by git\n4. Validate that `.env.example` contains all necessary environment variables with placeholder values\n5. Ensure the application can still run properly after sanitization",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Scan Git History for Secrets",
+            "description": "Identify and remove sensitive information from the git history using appropriate tools and techniques.",
+            "dependencies": [],
+            "details": "1. Run `git log -p | grep -iE \"password|secret|api_key|token\"` to identify secrets in git history\n2. Document all found secrets and their locations\n3. Use BFG Repo-Cleaner or git-filter-branch to purge secrets from git history\n4. For BFG: `bfg --replace-text secrets.txt --no-blob-protection repo.git`\n5. For git-filter-branch: create a script that replaces secrets with placeholders\n6. Force push changes to remote repository after cleaning\n7. Verify secrets have been removed from history",
+            "status": "done",
+            "testStrategy": "1. Run the initial grep command again to verify no secrets appear in git history\n2. Check a few specific commits where secrets were found to confirm they've been properly sanitized\n3. Clone the repository fresh and verify no sensitive data exists in the history"
+          },
+          {
+            "id": 2,
+            "title": "Search Codebase for Hardcoded Secrets",
+            "description": "Identify and remove any hardcoded secrets, API keys, tokens, or sensitive credentials from the current codebase.",
+            "dependencies": [],
+            "details": "1. Use `grep -rE \"(password|secret|key|token)\\s*[:=]\" src/` to find hardcoded secrets in the codebase\n2. Expand search to include other directories with `grep -rE \"(password|secret|key|token)\\s*[:=]\" --include=\"*.{js,ts,jsx,tsx,json,yml,yaml,env}\" ./`\n3. Create a list of all found secrets and their locations\n4. Replace hardcoded secrets with environment variable references\n5. Document each secret that needs to be configured as an environment variable\n6. Search for internal URLs with `grep -r \"http\" --include=\"*.{js,ts,jsx,tsx,json,yml,yaml}\" ./`\n7. Replace internal URLs with configurable environment variables",
+            "status": "done",
+            "testStrategy": "1. Run the grep commands again to verify no hardcoded secrets remain\n2. Verify application functionality after removing hardcoded secrets\n3. Ensure all replaced secrets are properly referenced via environment variables"
+          },
+          {
+            "id": 3,
+            "title": "Configure Environment Variables and Examples",
+            "description": "Set up proper environment variable handling and create example templates for configuration.",
+            "dependencies": [],
+            "details": "1. Check if `.env` is properly added to `.gitignore`\n2. If not, add it with `echo \".env\" >> .gitignore`\n3. Create `.env.example` with placeholder values for all required environment variables\n4. Include all environment variables identified during the secret removal process\n5. Add clear comments in `.env.example` explaining each variable's purpose\n6. Update application code to validate required environment variables on startup\n7. Document the environment setup process in a dedicated section of the README\n8. Consider implementing a validation script that checks for missing required variables",
+            "status": "done",
+            "testStrategy": "1. Verify `.env` is properly ignored by git with `git check-ignore -v .env`\n2. Confirm `.env.example` contains all necessary environment variables with placeholder values\n3. Test application startup with missing variables to ensure proper validation\n4. Have a team member attempt to set up the environment using only the example file"
+          },
+          {
+            "id": 4,
+            "title": "Remove Internal URLs and References",
+            "description": "Identify and remove or replace any internal URLs, staging endpoints, or references to private services.",
+            "dependencies": [],
+            "details": "1. Search for internal domains and URLs with `grep -r \"internal\" --include=\"*.{js,ts,jsx,tsx,json,yml,yaml}\" ./`\n2. Search for staging or development endpoints with `grep -r \"staging\\|dev\\|test\" --include=\"*.{js,ts,jsx,tsx,json,yml,yaml}\" ./`\n3. Search for IP addresses that might be internal with `grep -r \"[0-9]\\{1,3\\}\\.[0-9]\\{1,3\\}\\.[0-9]\\{1,3\\}\\.[0-9]\\{1,3\\}\" ./`\n4. Replace internal service references with public alternatives or configurable options\n5. Remove any code that exclusively works with internal systems\n6. Update documentation to remove mentions of internal systems\n7. Create a configuration system for service endpoints that can be changed by users",
+            "status": "done",
+            "testStrategy": "1. Verify no internal URLs or endpoints remain in the codebase\n2. Test the application with public/external service configurations\n3. Confirm the application functions correctly with the replaced services\n4. Review documentation to ensure no internal references remain"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Code Cleanup",
+        "description": "Remove internal-only features, proprietary integrations, references to internal systems, and clean up debugging code.",
+        "details": "1. Identify and remove any features that are specific to internal use\n2. Delete all proprietary integrations that cannot be open-sourced\n3. Remove references to internal ticket systems (e.g., JIRA tickets)\n4. Delete mentions of employee names and links to internal documentation\n5. Clean up unused code, dead imports, and commented-out code blocks\n6. Remove console.log statements, debug outputs, and development-only code\n7. Use tools like ESLint to help identify unused code with rules like 'no-unused-vars'",
+        "testStrategy": "1. Run the application to ensure it still functions after removing internal features\n2. Verify all tests pass after cleanup\n3. Perform a manual review to ensure no internal references remain\n4. Check build process completes successfully\n5. Validate that removing debug statements doesn't affect application logging",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Remove Internal Features and Proprietary Integrations",
+            "description": "Identify and remove all internal-only features and proprietary integrations that cannot be open-sourced.",
+            "dependencies": [],
+            "details": "1. Create a list of all internal-only features by reviewing the codebase\n2. Identify proprietary integrations that cannot be open-sourced\n3. Remove code related to internal features, ensuring functionality is preserved for remaining features\n4. Delete proprietary integration code and associated configuration\n5. Update any conditional logic that may reference removed features\n6. Verify application builds successfully after removal",
+            "status": "done",
+            "testStrategy": "1. Run the application to verify it still functions after removing internal features\n2. Test core functionality to ensure no regressions\n3. Check for any runtime errors related to missing features\n4. Verify build process completes successfully"
+          },
+          {
+            "id": 2,
+            "title": "Remove References to Internal Systems and Employee Information",
+            "description": "Delete all references to internal ticket systems, employee names, and links to internal documentation.",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "1. Use grep to search for references to internal ticket systems (e.g., `grep -r \"JIRA-\" --include=\"*.{js,ts,jsx,tsx,md,json}\" ./`)\n2. Search for employee names and email addresses using pattern matching\n3. Identify and remove links to internal documentation and wikis\n4. Replace specific internal references with generic terms where needed\n5. Update comments to remove company-specific information\n6. Remove internal URLs and endpoints from configuration files",
+            "status": "done",
+            "testStrategy": "1. Perform a manual review of search results to ensure no internal references remain\n2. Use regular expressions to validate no employee emails or internal ticket IDs exist\n3. Verify documentation doesn't contain links to internal systems"
+          },
+          {
+            "id": 3,
+            "title": "Clean Up Unused Code and Dead Imports",
+            "description": "Remove unused code, dead imports, commented-out code blocks, and other unnecessary code elements.",
+            "dependencies": [
+              "2.2"
+            ],
+            "details": "1. Configure and run ESLint with rules like 'no-unused-vars' and 'no-dead-code'\n2. Remove commented-out code blocks throughout the codebase\n3. Delete unused functions, classes, and variables\n4. Remove imports that are no longer used after previous cleanup steps\n5. Delete empty files or components that are no longer referenced\n6. Clean up package.json to remove unused dependencies",
+            "status": "done",
+            "testStrategy": "1. Run the test suite to ensure functionality is preserved\n2. Verify the build process completes without warnings\n3. Use code coverage tools to identify untested/unused code\n4. Check bundle size before and after to confirm reduction"
+          },
+          {
+            "id": 4,
+            "title": "Remove Debug Code and Development-Only Features",
+            "description": "Clean up console.log statements, debug outputs, development-only code, and other debugging artifacts.",
+            "dependencies": [
+              "2.3"
+            ],
+            "details": "1. Search for and remove console.log statements (e.g., `grep -r \"console\\.log\" --include=\"*.{js,ts,jsx,tsx}\" ./`)\n2. Remove debug outputs and development-only code paths\n3. Delete debugging utilities that shouldn't be in production\n4. Remove feature flags or conditionals for development-only features\n5. Clean up any TODO or FIXME comments that are no longer relevant\n6. Remove any performance monitoring code that's specific to internal use",
+            "status": "done",
+            "testStrategy": "1. Verify application logs are clean and don't contain debug information\n2. Test in production mode to ensure no development features are accessible\n3. Check browser console for unwanted log messages\n4. Validate that removing debug statements doesn't affect application behavior"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Dependency Audit",
+        "description": "Audit project dependencies for license compatibility, security vulnerabilities, and remove any private package references.",
+        "details": "1. Run `npx license-checker --summary` to review all dependency licenses\n2. Ensure all dependencies have open-source compatible licenses (e.g., MIT, Apache, BSD)\n3. Execute `npm audit` to identify security vulnerabilities\n4. Fix critical and high severity vulnerabilities by updating packages\n5. Remove any private npm packages or references to internal registries\n6. Update package.json to remove private fields and internal scripts\n7. Consider replacing proprietary dependencies with open-source alternatives if needed\n8. Update npm scripts to ensure they work in a public environment",
+        "testStrategy": "1. Verify all dependencies have compatible licenses for open source\n2. Confirm npm audit shows no critical vulnerabilities\n3. Test that the application builds and runs without private dependencies\n4. Validate that package.json no longer contains private registry URLs\n5. Run all tests to ensure functionality is maintained after dependency changes",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Review Dependency Licenses",
+            "description": "Scan all project dependencies to identify their licenses and ensure compatibility with open-source requirements.",
+            "dependencies": [],
+            "details": "1. Run `npx license-checker --summary` to get an overview of all licenses used in the project\n2. Run `npx license-checker --json > licenses.json` to save detailed license information\n3. Review each dependency license to ensure it's compatible with open-source (MIT, Apache, BSD, etc.)\n4. Create a list of dependencies with problematic licenses (proprietary, non-commercial, etc.)\n5. Research alternative packages for any dependencies with incompatible licenses\n6. Document license findings in a report for the team",
+            "status": "done",
+            "testStrategy": "1. Verify all dependencies have identified licenses\n2. Confirm no dependencies use licenses incompatible with open-source distribution\n3. Validate that any replacement packages maintain the same functionality"
+          },
+          {
+            "id": 2,
+            "title": "Audit and Fix Security Vulnerabilities",
+            "description": "Identify and remediate security vulnerabilities in project dependencies.",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "1. Run `npm audit` to identify all security vulnerabilities in dependencies\n2. Generate a detailed report with `npm audit --json > security-audit.json`\n3. Prioritize fixing critical and high severity vulnerabilities first\n4. Run `npm audit fix` to automatically update packages where possible\n5. For vulnerabilities that can't be fixed automatically:\n   - Research each issue and determine the risk level\n   - Update packages manually where needed using `npm update <package-name>@<version>`\n   - Document any vulnerabilities that cannot be fixed and their mitigation strategies\n6. Run `npm audit` again to verify fixes and document remaining issues",
+            "status": "done",
+            "testStrategy": "1. Verify no critical or high severity vulnerabilities remain after fixes\n2. Run the application test suite to ensure updates haven't broken functionality\n3. Document any remaining medium or low severity issues with justification"
+          },
+          {
+            "id": 3,
+            "title": "Remove Private Package References",
+            "description": "Identify and remove or replace any references to private npm packages or internal registries.",
+            "dependencies": [
+              "3.1",
+              "3.2"
+            ],
+            "details": "1. Examine package.json for any dependencies with internal scopes (e.g., @company-name/)\n2. Check for private registry URLs in .npmrc files\n3. Run `npm config list` to identify any configured private registries\n4. For each private package identified:\n   - Determine if it can be replaced with a public alternative\n   - If replaceable, install the public alternative and update imports\n   - If not replaceable, implement the necessary functionality directly in the project\n5. Remove any references to private registries in npm configuration\n6. Update any build scripts that might reference private packages\n7. Test the application thoroughly after removing private dependencies",
+            "status": "done",
+            "testStrategy": "1. Verify the application builds without access to private registries\n2. Confirm all functionality previously dependent on private packages still works\n3. Run the full test suite to ensure no regressions"
+          },
+          {
+            "id": 4,
+            "title": "Update Package Configuration",
+            "description": "Clean up package.json and related configuration files to remove private fields and internal scripts.",
+            "dependencies": [
+              "3.3"
+            ],
+            "details": "1. Remove the `private: true` field from package.json if present\n2. Update the repository field to point to the new public repository\n3. Review and update all npm scripts to ensure they work in a public environment\n4. Remove any internal CI/CD configuration that references private systems\n5. Update any hardcoded paths or references that might be specific to internal environments\n6. Ensure the package name is appropriate and available on npm if publishing is planned\n7. Update author, contributors, and license fields to reflect the open-source status\n8. Add appropriate keywords to improve discoverability\n9. Review and update the engines field if necessary\n10. Create or update .npmignore to prevent unnecessary files from being included",
+            "status": "done",
+            "testStrategy": "1. Validate package.json with `npm validate`\n2. Test npm scripts to ensure they function correctly\n3. Perform a clean install and build to verify configuration is complete\n4. Verify the package can be installed from the public repository"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Documentation Preparation",
+        "description": "Create and update documentation files necessary for open-sourcing the project, including README, environment configuration, and license.",
+        "details": "1. Create or update README.md with comprehensive information:\n   - Project description and purpose\n   - Setup and installation instructions\n   - Usage examples\n   - Configuration options\n   - Contribution guidelines\n2. Ensure `.env.example` documents all required environment variables\n3. Add appropriate LICENSE file (MIT recommended per PRD)\n4. Create CONTRIBUTING.md with guidelines for external contributors\n5. Add CODE_OF_CONDUCT.md if appropriate\n6. Document any API endpoints or integration points\n7. Include information about the project's architecture and design decisions",
+        "testStrategy": "1. Verify README.md contains all necessary sections for new users\n2. Test the setup process by following README instructions on a clean environment\n3. Confirm `npm install && npm run build` works from a fresh clone\n4. Have someone unfamiliar with the project attempt to set it up using only the documentation\n5. Validate that all configuration options are properly documented",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Update README.md with comprehensive project information",
+            "description": "Create or update the README.md file with all necessary information for users to understand, set up, and use the project.",
+            "dependencies": [],
+            "details": "1. Create a clear project title and concise description of its purpose\n2. Add detailed setup and installation instructions including prerequisites\n3. Include usage examples with code snippets\n4. Document all configuration options\n5. Add contribution guidelines section\n6. Include information about the project's architecture and design decisions\n7. Document any API endpoints or integration points\n8. Add badges for build status, version, license, etc.",
+            "status": "done",
+            "testStrategy": "Have a team member unfamiliar with the project attempt to understand and set up the project using only the README instructions. Verify all sections are present and information is clear."
+          },
+          {
+            "id": 2,
+            "title": "Create environment configuration documentation",
+            "description": "Create a .env.example file that documents all required environment variables needed to run the project.",
+            "dependencies": [],
+            "details": "1. Review the codebase to identify all environment variables used\n2. Create a .env.example file in the project root\n3. List all required environment variables with descriptive comments\n4. Provide placeholder values that indicate the expected format\n5. Group related variables together with section headers\n6. Include optional variables with clear indication they are optional\n7. Add instructions in the file header about how to use it",
+            "status": "done",
+            "testStrategy": "Verify that all environment variables used in the codebase are documented in .env.example. Test that a new environment can be properly configured using only the example file as a guide."
+          },
+          {
+            "id": 3,
+            "title": "Add MIT LICENSE file",
+            "description": "Create and add the appropriate MIT license file to the project as recommended in the PRD.",
+            "dependencies": [],
+            "details": "1. Create a LICENSE file in the project root\n2. Use the standard MIT license template\n3. Update the year and copyright holder information\n4. Ensure the license is properly formatted\n5. Verify the license is consistent with any license information in package.json\n6. Add a reference to the license in the README.md",
+            "status": "done",
+            "testStrategy": "Verify the LICENSE file exists, contains the correct MIT license text, and has the current year and appropriate copyright holder information."
+          },
+          {
+            "id": 4,
+            "title": "Create contributor documentation and verify build process",
+            "description": "Create CONTRIBUTING.md and CODE_OF_CONDUCT.md files, and verify that the project can be successfully built from a clean clone.",
+            "dependencies": [
+              "4.1",
+              "4.2",
+              "4.3"
+            ],
+            "details": "1. Create CONTRIBUTING.md with:\n   - How to submit issues and pull requests\n   - Code style guidelines\n   - Testing requirements\n   - Branch naming conventions\n   - Commit message format\n2. Add CODE_OF_CONDUCT.md using the Contributor Covenant template\n3. Clone the repository to a clean environment\n4. Follow the README instructions to install dependencies\n5. Verify that `npm install && npm run build` works correctly\n6. Document any additional steps needed in the README if issues are found",
+            "status": "done",
+            "testStrategy": "Clone the repository to a fresh environment and follow all documentation to set up and build the project. Verify all steps work as documented and the build completes successfully. Have another team member review the contributor documentation for clarity and completeness."
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Final Review and Repository Publication",
+        "description": "Perform final checks, enable security features, and prepare the repository for public release.",
+        "details": "1. Enable GitHub Dependabot for automated dependency updates\n2. Set up GitHub secret scanning to prevent future secret leaks\n3. Perform a final grep search for company-specific terms: `grep -r \"CompanyName\" --include=\"*.{js,ts,json,md}\" ./`\n4. Test the complete setup flow as a new user would experience it\n5. Review GitHub repository settings:\n   - Set appropriate topics/tags\n   - Configure branch protection rules\n   - Set up issue templates and pull request templates\n6. Prepare announcement for the open-source release\n7. Make the repository public after all checks pass",
+        "testStrategy": "1. Verify Dependabot is properly configured\n2. Confirm secret scanning is enabled and functioning\n3. Test the entire setup process on a clean machine\n4. Perform a final security review\n5. Have multiple team members review the repository before making it public\n6. Validate that no company-specific information remains in the codebase",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Enable GitHub Security Features",
+            "description": "Configure GitHub Dependabot and secret scanning to enhance repository security and automate dependency updates.",
+            "dependencies": [],
+            "details": "1. Navigate to the GitHub repository settings\n2. Under 'Security' tab, enable Dependabot alerts\n3. Configure Dependabot security updates to automatically create PRs for vulnerable dependencies\n4. Set up Dependabot version updates by creating a `.github/dependabot.yml` file with appropriate configuration\n5. Enable GitHub secret scanning to detect accidentally committed secrets\n6. Configure secret scanning alerts to be sent to repository administrators\n7. Test the configuration by intentionally adding a test secret pattern to verify alerts work",
+            "status": "done",
+            "testStrategy": "1. Verify Dependabot configuration by checking the `.github/dependabot.yml` file\n2. Confirm secret scanning is enabled in repository settings\n3. Test alert functionality by creating a test commit with a dummy secret pattern\n4. Verify that Dependabot creates appropriate PRs when dependencies need updating"
+          },
+          {
+            "id": 2,
+            "title": "Perform Final Company-Specific Term Removal",
+            "description": "Conduct a thorough search for any remaining company-specific terms, internal references, or proprietary information throughout the codebase.",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "1. Execute grep search for company name: `grep -r \"CompanyName\" --include=\"*.{js,ts,json,md,html,css}\" ./`\n2. Search for internal domains: `grep -r \"internal\\.company\\.com\" --include=\"*.{js,ts,json,md,html,css}\" ./`\n3. Look for internal IPs or development environments: `grep -r \"192\\.168\\.\" --include=\"*.{js,ts,json,md,html,css}\" ./`\n4. Check for employee names or emails: `grep -r \"@companyname\\.com\" --include=\"*.{js,ts,json,md,html,css}\" ./`\n5. Review any matches and replace with generic terms or remove as appropriate\n6. Document any intentionally retained references with clear explanations\n7. Commit changes with clear message about sanitization",
+            "status": "done",
+            "testStrategy": "1. Verify no company-specific terms remain by running the grep commands again\n2. Have another team member perform an independent review\n3. Check git diff to ensure all identified terms were properly addressed\n4. Validate that application still functions after all replacements"
+          },
+          {
+            "id": 3,
+            "title": "Test Complete Setup Flow",
+            "description": "Validate the entire setup process from a new user perspective to ensure the project can be easily installed and used by external contributors.",
+            "dependencies": [
+              "5.2"
+            ],
+            "details": "1. Clone the repository to a clean environment (preferably a different machine)\n2. Follow the README instructions to set up the project from scratch\n3. Create a new `.env` file based on `.env.example`\n4. Install dependencies with `npm install`\n5. Build the project with `npm run build`\n6. Run all tests with `npm test`\n7. Start the application with `npm start`\n8. Test core functionality to ensure everything works as expected\n9. Document any issues encountered during the process\n10. Update documentation based on the experience to improve clarity",
+            "status": "done",
+            "testStrategy": "1. Time how long the setup process takes for a new user\n2. Note any confusing steps or missing information in the documentation\n3. Verify all features work correctly after fresh installation\n4. Test on different operating systems if possible (Windows, macOS, Linux)\n5. Have someone unfamiliar with the project attempt the setup"
+          },
+          {
+            "id": 4,
+            "title": "Finalize Repository Settings and Publish",
+            "description": "Configure final GitHub repository settings, prepare announcement, and make the repository public after all checks have passed.",
+            "dependencies": [
+              "5.3"
+            ],
+            "details": "1. Review and configure GitHub repository settings:\n   - Set appropriate topics/tags for discoverability\n   - Configure branch protection rules for main/master branch\n   - Create issue templates in `.github/ISSUE_TEMPLATE/`\n   - Add pull request template in `.github/PULL_REQUEST_TEMPLATE.md`\n2. Prepare announcement for the open-source release\n   - Draft social media posts\n   - Create internal communication about the release\n   - Prepare blog post if applicable\n3. Conduct final review meeting with stakeholders\n4. Make the repository public in GitHub settings\n5. Publish the announcement through appropriate channels",
+            "status": "done",
+            "testStrategy": "1. Verify all repository settings are correctly configured\n2. Test branch protection by attempting to push directly to protected branches\n3. Create test issues using templates to ensure they work correctly\n4. Have stakeholders review and approve the final state of the repository\n5. After publishing, verify public access by accessing the repository from an incognito browser window"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-12-07T09:44:46.356Z",
+      "updated": "2025-12-07T13:09:36.736Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

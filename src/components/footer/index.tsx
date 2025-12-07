@@ -69,7 +69,7 @@ const Footer = () => {
       setEmailError("Something went wrong. Please try again.");
       setSubmitStatus("error");
       
-      // Capture error in Sentry
+      // Capture error
       captureError(error as Error, {
         component: "Footer",
         action: "newsletter_subscription",

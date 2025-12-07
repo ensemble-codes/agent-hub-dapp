@@ -269,7 +269,7 @@ const Page = () => {
         service: allAttributes.join(", "),
       });
 
-      // Log successful registration to Sentry
+      // Log successful registration
       logAgentRegistration({
         name: agentName,
         service: allAttributes.join(", "),
@@ -283,7 +283,7 @@ const Page = () => {
       }
     } catch (error) {
       console.log(error);
-      // Log error to Sentry
+      // Log error
       logError(error as Error, {
         component: "RegisterAgent",
         action: "register_agent",

@@ -113,7 +113,7 @@ const ConfirmAgent: FC<ConfirmAgentProps> = ({
         service: selectedService,
       });
 
-      // Log successful task creation to Sentry
+      // Log successful task creation
       if (task?.id && selectedProposal && selectedService) {
         logTaskCreation({
           service: selectedService,

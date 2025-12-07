@@ -11,7 +11,7 @@ import { AgentCacheProvider } from "@/context/agent-cache";
 import { XMTPProvider } from "@/context/XMTPContext";
 import ErrorBoundary from "@/components/error-boundary";
 
-// Initialize Sentry for all pages
+// Initialize client-side instrumentation (PostHog)
 import "@/instrumentation-client";
 
 const geistSans = Geist({

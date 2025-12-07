@@ -1,7 +1,12 @@
 {
   "name": "agent-hub-dapp",
   "version": "0.1.0",
-  "private": true,
+  "description": "Decentralized marketplace for AI agents",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ensemble-codes/agent-hub-dapp.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -40,16 +45,13 @@
     "@xmtp/content-type-transaction-reference": "^2.0.2",
     "@xmtp/content-type-wallet-send-calls": "^1.0.1",
     "ai": "^4.3.16",
-    "axios": "^1.10.0",
+    "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "core:latest": "link:@elizaos/core:latest",
     "ethers": "^6.15.0",
     "evt": "^2.5.9",
-    "install": "^0.13.0",
     "lucide-react": "^0.511.0",
     "next": "15.3.6",
-    "npm": "^11.4.2",
     "pinata-web3": "^0.5.4",
     "pino-pretty": "^13.0.0",
     "posthog-js": "^1.257.0",
@@ -67,6 +69,13 @@
     "tailwindcss-animate": "^1.0.7",
     "uint8array-extras": "^1.4.0",
     "viem": "^2.31.6"
+  },
+  "pnpm": {
+    "overrides": {
+      "form-data": ">=4.0.4",
+      "glob@>=10.2.0 <10.5.0": ">=10.5.0",
+      "glob@>=11.0.0 <11.1.0": ">=11.1.0"
+    }
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.3",

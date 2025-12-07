@@ -1,23 +1,18 @@
 "use client";
 import { ScrollingText } from "@/components/ui/scrolling-text";
 import { AgentCardSkeleton } from "@/components/ui/agent-card-skeleton";
-// import { gql, useQuery } from "@apollo/client";
-import { convertRatingToStars } from "@/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { /* useMemo, */ useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getAddress } from "ethers";
 import axios from "axios";
 import Image from "next/image";
 
 export default function Home() {
   const { push } = useRouter();
-  // const [selectedProposal, setSelectedProposal] = useState<string | null>(null);
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [agents, setAgents] = useState<any[]>([]);
-  /* const [agentName, setAgentName] = useState<string>("");
-  const [debouncedAgentName, setDebouncedAgentName] = useState<string>(""); */
 
   const getAgents = async () => {
     try {
@@ -37,15 +32,6 @@ export default function Home() {
       setLoading(false);
     }
   };
-
-  // Debounce agentName with 700ms delay
-  /*  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedAgentName(agentName);
-    }, 700);
-
-    return () => clearTimeout(timer);
-  }, [agentName]); */
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);

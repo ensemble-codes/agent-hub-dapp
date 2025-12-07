@@ -1,0 +1,71 @@
+# Task ID: 1
+# Title: Secret Sanitization
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Scan the codebase and git history to identify and remove any sensitive information such as passwords, API keys, tokens, and internal URLs.
+# Details:
+1. Run `git log -p | grep -iE "password|secret|api_key|token"` to identify secrets in git history
+2. Use `grep -rE "(password|secret|key|token)\s*[:=]" src/` to find hardcoded secrets in the codebase
+3. Ensure `.env` is properly added to `.gitignore`
+4. Create `.env.example` with placeholder values for all required environment variables
+5. Search for and remove any internal URLs, staging endpoints, or private service references
+6. Consider using tools like git-filter-branch or BFG Repo-Cleaner if secrets need to be purged from git history
+
+# Test Strategy:
+1. Verify no secrets appear in git history after sanitization
+2. Confirm no hardcoded secrets exist in the codebase
+3. Test that `.env` is properly ignored by git
+4. Validate that `.env.example` contains all necessary environment variables with placeholder values
+5. Ensure the application can still run properly after sanitization
+
+# Subtasks:
+## 1. Scan Git History for Secrets [pending]
+### Dependencies: None
+### Description: Identify and remove sensitive information from the git history using appropriate tools and techniques.
+### Details:
+1. Run `git log -p | grep -iE "password|secret|api_key|token"` to identify secrets in git history
+2. Document all found secrets and their locations
+3. Use BFG Repo-Cleaner or git-filter-branch to purge secrets from git history
+4. For BFG: `bfg --replace-text secrets.txt --no-blob-protection repo.git`
+5. For git-filter-branch: create a script that replaces secrets with placeholders
+6. Force push changes to remote repository after cleaning
+7. Verify secrets have been removed from history
+
+## 2. Search Codebase for Hardcoded Secrets [pending]
+### Dependencies: None
+### Description: Identify and remove any hardcoded secrets, API keys, tokens, or sensitive credentials from the current codebase.
+### Details:
+1. Use `grep -rE "(password|secret|key|token)\s*[:=]" src/` to find hardcoded secrets in the codebase
+2. Expand search to include other directories with `grep -rE "(password|secret|key|token)\s*[:=]" --include="*.{js,ts,jsx,tsx,json,yml,yaml,env}" ./`
+3. Create a list of all found secrets and their locations
+4. Replace hardcoded secrets with environment variable references
+5. Document each secret that needs to be configured as an environment variable
+6. Search for internal URLs with `grep -r "http" --include="*.{js,ts,jsx,tsx,json,yml,yaml}" ./`
+7. Replace internal URLs with configurable environment variables
+
+## 3. Configure Environment Variables and Examples [pending]
+### Dependencies: None
+### Description: Set up proper environment variable handling and create example templates for configuration.
+### Details:
+1. Check if `.env` is properly added to `.gitignore`
+2. If not, add it with `echo ".env" >> .gitignore`
+3. Create `.env.example` with placeholder values for all required environment variables
+4. Include all environment variables identified during the secret removal process
+5. Add clear comments in `.env.example` explaining each variable's purpose
+6. Update application code to validate required environment variables on startup
+7. Document the environment setup process in a dedicated section of the README
+8. Consider implementing a validation script that checks for missing required variables
+
+## 4. Remove Internal URLs and References [pending]
+### Dependencies: None
+### Description: Identify and remove or replace any internal URLs, staging endpoints, or references to private services.
+### Details:
+1. Search for internal domains and URLs with `grep -r "internal" --include="*.{js,ts,jsx,tsx,json,yml,yaml}" ./`
+2. Search for staging or development endpoints with `grep -r "staging\|dev\|test" --include="*.{js,ts,jsx,tsx,json,yml,yaml}" ./`
+3. Search for IP addresses that might be internal with `grep -r "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}" ./`
+4. Replace internal service references with public alternatives or configurable options
+5. Remove any code that exclusively works with internal systems
+6. Update documentation to remove mentions of internal systems
+7. Create a configuration system for service endpoints that can be changed by users
+

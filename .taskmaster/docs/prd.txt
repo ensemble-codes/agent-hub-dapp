@@ -1,0 +1,31 @@
+# Open Source Preparation Plan
+
+## Phase 1: Secret Sanitization
+- [ ] Run `git log -p | grep -iE "password|secret|api_key|token"` to check git history
+- [ ] Search codebase for hardcoded secrets: `grep -rE "(password|secret|key|token)\s*[:=]" src/`
+- [ ] Verify `.env` is gitignored, create `.env.example` with placeholders
+- [ ] Remove any internal URLs, staging endpoints, or private service references
+
+## Phase 2: Code Cleanup
+- [ ] Remove internal-only features and proprietary integrations
+- [ ] Delete references to internal ticket systems, employee names, internal docs
+- [ ] Remove unused code and dead imports
+- [ ] Clean up console.logs and debug statements
+
+## Phase 3: Dependency Audit
+- [ ] Run `npx license-checker --summary` to review dependency licenses
+- [ ] Run `npm audit` and fix critical vulnerabilities
+- [ ] Remove any private npm packages or internal registry references
+- [ ] Update package.json: remove private fields, internal scripts
+
+## Phase 4: Documentation
+- [ ] Update README.md with setup instructions, usage, and configuration
+- [ ] Create `.env.example` documenting all required variables
+- [ ] Add LICENSE file (MIT recommended)
+- [ ] Verify `npm install && npm run build` works from clean clone
+
+## Phase 5: Final Review
+- [ ] Enable GitHub Dependabot and secret scanning
+- [ ] Do a final grep for company-specific terms
+- [ ] Test full setup flow as a new user would
+- [ ] Make repository public
